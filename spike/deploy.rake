@@ -114,14 +114,14 @@ namespace :deploy do
   # make sure the repo checkout is up-to-date
   remote_task :refresh_deployment, :roles => :app do
     run "echo 'Updating checkout in [#{deploy_to}]...' && " +
-      "cd #{deploy_to} && git fetch origin && git pull origin master && git reset --hard"
+      "cd #{deploy_to} && git fetch origin +refs/heads/#{branch}:refs/remotes/origin/#{branch} && git reset --hard origin/#{branch}"
   end
 
   # update configuration files, overlay onto repo checkout
   desc "refresh remote configuration files"
   remote_task :refresh_config_files, :roles => :app do
     run "echo 'refreshing configuration files to [#{deploy_to}] from [#{deploy_config_to}/#{environment_name}]...' && " +
-      "cd #{deploy_config_to} && git fetch origin && git pull origin master && git reset --hard && " +
+      "cd #{deploy_config_to} && git fetch origin && git reset --hard origin/master && " +
       "rsync -avz --progress #{deploy_config_to}/#{project_name}/#{environment_name}/ #{deploy_to}/"
   end
   

@@ -1,0 +1,7 @@
+  whiskey_disk:
+  - look at git-deploy for some useful hooks
+  - allow for running anything locally (including refreshing configs) as opposed to always remotely
+  - pulling origin master probably isn't sufficient, need to be more sophisticated
+  - un-spike
+  - README to show how it works
+  - get a working key for ogc deployments for fapestniegd/websages, push our configs there
