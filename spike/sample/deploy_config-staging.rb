@@ -1,0 +1,5 @@
+set :domain,      "ogc@larry.ogtastic.com"
+set :deploy_to,   "/opt/ogc/var/www/larry-staging.ogtastic.com/"
+set :repository,  "git://github.com/rick/larry.git"
+set :config_repository, "git@github.com:fapestniegd/websages.git"
+#set :revision, "origin/production"
