@@ -1,11 +1,10 @@
 require 'vlad'
 
 # TODO: 
-# - make the config file path be more useful
 # - look at git-deploy for some hooks we might use
 # - un-spike
+# - some sort of generator to help with making config dirs (or does that belong to another project?)
 # - improve the README to show the whole flow
-# - get a working key for ogc deployments for fapestniegd/websages, push our configs there
 
 def find_base_path
   start = Dir.pwd
