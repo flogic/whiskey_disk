@@ -1,15 +1,23 @@
 require 'vlad'
 
 # TODO: 
-# - finish setting up local-or-remote refresh task
-# - make a local-or-remote setup task, which doesn't try to do the initial main repo checkout if domain is not set
+# - make the config file path be more useful
 # - look at git-deploy for some hooks we might use
 # - un-spike
 # - improve the README to show the whole flow
 # - get a working key for ogc deployments for fapestniegd/websages, push our configs there
 
+def find_base_path
+  start = Dir.pwd
+  while (!File.exists?(File.join(Dir.pwd, 'Rakefile')))
+    Dir.chdir('..')
+    raise "Could not find Rakefile in the current directory tree!" if File.expand_path(Dir.pwd) == '/'
+  end
+  Dir.pwd
+end
+
 def build_filename(str)
-  File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'config', "#{str}.yml"))
+  File.expand_path(File.join(find_base_path, 'config', "#{str}.yml"))
 end
 
 def configuration_file
