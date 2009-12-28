@@ -55,7 +55,7 @@ module WhiskeyDisk
 
   def evaluate_configuration
     unless loaded_configuration.has_key?(environment_name)
-      raise "Using environment [#{environment_name}] but configuration file [#{config_file}] has no declarations for this environment." 
+      raise "Using environment [#{environment_name}] but configuration file [#{configuration_file}] has no declarations for this environment." 
     end
     set_values
   end
