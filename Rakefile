@@ -1,15 +1,16 @@
 require 'rake'
 require 'rake/testtask'
-require 'rake/rdoctask'
-require 'spec/rake/spectask'
 
-desc 'Default: run specs.'
-task :default => :spec
+desc 'Default: run unit tests.'
+task :default => :test
 
-desc 'Test the whiskey_disk library.'
-Spec::Rake::SpecTask.new('spec') do |t|
-  t.spec_files = FileList['spec/**/*_spec.rb']
+desc 'Test RubyCloud'
+Rake::TestTask.new(:test) do |t|
+  t.libs << 'lib'
+  t.pattern = 'spec/**/*_spec.rb'
+  t.verbose = true
 end
+
 
 begin
   require 'jeweler'
