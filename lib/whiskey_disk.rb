@@ -36,37 +36,59 @@ class WhiskeyDisk
       File.split(path).last
     end
     
+    def register_configuration
+      configuration.each_pair {|k,v| set k, v }
+    end
+    
+    def needs(*keys)
+      keys.each do |key|
+        raise "No value for '#{key}' declared in configuration file [#{WhiskeyDisk::Config.filename}]" unless self[key]
+      end
+    end
+    
+    def bundle
+      return '' if buffer.empty?
+      buffer.collect {|c| "(#{c})" }.join(' && ')
+    end
+    
+    def flush
+      if remote?
+        register_configuration
+        run(bundle)
+      else
+        system(bundle)
+      end
+    end
+    
     def ensure_main_parent_path_is_present
-      raise "No value for 'deploy_to' declared in configuration file [#{WhiskeyDisk::Config.filename}]" unless self[:deploy_to]
+      needs(:deploy_to)
       enqueue "mkdir -p #{parent_path(self[:deploy_to])}"
     end
     
     def ensure_config_parent_path_is_present
-      raise "No value for 'deploy_config_to' declared in configuration file [#{WhiskeyDisk::Config.filename}]" unless self[:deploy_config_to]
+      needs(:deploy_config_to)
       enqueue "mkdir -p #{parent_path(self[:deploy_config_to])}"
     end
     
     def checkout_main_repository
-      raise "No value for 'deploy_to' declared in configuration file [#{WhiskeyDisk::Config.filename}]" unless self[:deploy_to]
-      raise "No value for 'repository' declared in configuration file [#{WhiskeyDisk::Config.filename}]" unless self[:repository]
+      needs(:deploy_to, :repository)
       enqueue "cd #{parent_path(self[:deploy_to])}"
       enqueue "git clone #{self[:repository]} #{tail_path(self[:deploy_to])} || true"
     end
     
     def install_hooks
-      raise "No value for 'deploy_to' declared in configuration file [#{WhiskeyDisk::Config.filename}]" unless self[:deploy_to]
+      needs(:deploy_to)
       # FIXME - TODO: MORE HERE
     end
 
     def checkout_configuration_repository
-      raise "No value for 'deploy_config_to' declared in configuration file [#{WhiskeyDisk::Config.filename}]" unless self[:deploy_config_to]
-      raise "No value for 'config_repository' declared in configuration file [#{WhiskeyDisk::Config.filename}]" unless self[:config_repository]
+      needs(:deploy_config_to, :config_repository)
       enqueue "cd #{parent_path(self[:deploy_config_to])}"
       enqueue "git clone #{self[:config_repository]} #{tail_path(self[:deploy_config_to])} || true"
     end
     
     def update_main_repository_checkout
-      raise "No value for 'deploy_to' declared in configuration file [#{WhiskeyDisk::Config.filename}]" unless self[:deploy_to]
+      needs(:deploy_to)
       branch = (self[:branch] and self[:branch] != '') ? self[:branch] : 'master'
       enqueue "cd #{self[:deploy_to]}"
       enqueue "git fetch origin +refs/heads/#{branch}:refs/remotes/origin/#{branch}"
@@ -74,10 +96,27 @@ class WhiskeyDisk
     end
     
     def update_configuration_repository_checkout
-      raise "No value for 'deploy_config_to' declared in configuration file [#{WhiskeyDisk::Config.filename}]" unless self[:deploy_config_to]
+      needs(:deploy_config_to)
       enqueue "cd #{self[:deploy_config_to]}"
       enqueue "git fetch origin +refs/heads/master:refs/remotes/origin/master"
       enqueue "git reset --hard origin/master"
+    end
+    
+    def refresh_configuration
+      needs(:deploy_to, :deploy_config_to)
+      enqueue "rsync -av --progress #{self[:deploy_config_to]}/#{self[:project]}/#{self[:environment]}/ #{self[:deploy_to]}/"
+    end
+    
+    def run_post_setup_hooks
+      needs(:deploy_to)
+      enqueue "cd #{self[:deploy_to]}"
+      enqueue "rake deploy:post_setup"
+    end
+
+    def run_post_deploy_hooks
+      needs(:deploy_to)
+      enqueue "cd #{self[:deploy_to]}"
+      enqueue "rake deploy:post_deploy"
     end
   end
 end

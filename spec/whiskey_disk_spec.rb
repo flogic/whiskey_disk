@@ -223,19 +223,165 @@ describe 'WhiskeyDisk' do
   end
   
   describe 'refreshing the configuration' do
+    before do
+      @parameters = { 'deploy_to' => '/path/to/main/repo', 
+                      'deploy_config_to' => '/path/to/config/repo',
+                      'environment' => 'production',
+                      'project' => 'whiskey_disk' }
+      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
+      WhiskeyDisk.reset
+    end
     
+    it 'should fail if the main deployment path is not specified' do
+      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge('deploy_to' => nil))
+      WhiskeyDisk.reset
+      lambda { WhiskeyDisk.refresh_configuration }.should.raise
+    end
+    
+    it 'should fail if the configuration deployment path is not specified' do
+      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge('deploy_config_to' => nil))
+      WhiskeyDisk.reset
+      lambda { WhiskeyDisk.refresh_configuration }.should.raise
+    end
+    
+    it 'should use rsync to overlay the configuration checkout for the project in the configured environment onto the main checkout' do
+      WhiskeyDisk.refresh_configuration
+      WhiskeyDisk.buffer.last.should.match(%r{rsync.* /path/to/config/repo/whiskey_disk/production/ /path/to/main/repo/})
+    end
   end
   
   describe 'running post setup hooks' do
+    before do
+      @parameters = { 'deploy_to' => '/path/to/main/repo' }
+      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
+      WhiskeyDisk.reset
+    end
     
+    it 'should fail if the deployment path is not specified' do
+      WhiskeyDisk::Config.stub!(:fetch).and_return({})
+      WhiskeyDisk.reset
+      lambda { WhiskeyDisk.run_post_setup_hooks }.should.raise
+    end
+    
+    it 'should work from the main checkout directory' do
+      WhiskeyDisk.run_post_setup_hooks
+      WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo})
+    end
+    
+    it 'should attempt to run the post setup rake tasks' do
+      WhiskeyDisk.run_post_setup_hooks
+      WhiskeyDisk.buffer.join(' ').should.match(%r{rake.*deploy:post_setup})
+    end
   end
   
   describe 'running post deployment hooks' do
+    before do
+      @parameters = { 'deploy_to' => '/path/to/main/repo' }
+      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
+      WhiskeyDisk.reset
+    end
     
+    it 'should fail if the deployment path is not specified' do
+      WhiskeyDisk::Config.stub!(:fetch).and_return({})
+      WhiskeyDisk.reset
+      lambda { WhiskeyDisk.run_post_deploy_hooks }.should.raise
+    end
+    
+    it 'should work from the main checkout directory' do
+      WhiskeyDisk.run_post_deploy_hooks
+      WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo})
+    end
+    
+    it 'should attempt to run the post deployment rake tasks' do
+      WhiskeyDisk.run_post_deploy_hooks
+      WhiskeyDisk.buffer.join(' ').should.match(%r{rake.*deploy:post_deploy})
+    end
   end
   
   describe 'flushing changes' do
-
+    describe 'when running remotely' do
+      before do
+        @parameters = { 'domain' => 'www.domain.com', 'deploy_to' => '/path/to/main/repo' }
+        WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
+        WhiskeyDisk.reset
+        WhiskeyDisk.stub!(:bundle).and_return('command string')
+        WhiskeyDisk.stub!(:register_configuration)
+        WhiskeyDisk.stub!(:run)
+      end
+      
+      it 'should register our configuration with vlad' do
+        WhiskeyDisk.should.receive(:register_configuration)
+        WhiskeyDisk.flush
+      end
+      
+      it 'should bundle the buffer of commands' do
+        WhiskeyDisk.enqueue('x')
+        WhiskeyDisk.enqueue('y')
+        WhiskeyDisk.should.receive(:bundle).and_return('command string')
+        WhiskeyDisk.flush
+      end
+      
+      it 'should use "run" to run all the bundled commands at once' do
+        WhiskeyDisk.should.receive(:run).with('command string')
+        WhiskeyDisk.flush
+      end
+    end
+    
+    describe 'when running locally' do
+      before do
+        @parameters = { 'deploy_to' => '/path/to/main/repo' }
+        WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
+        WhiskeyDisk.reset
+        WhiskeyDisk.stub!(:bundle).and_return('command string')
+        WhiskeyDisk.stub!(:system)
+      end
+      
+      it 'should NOT register our configuration with vlad' do
+        WhiskeyDisk.should.not.receive(:register_configuration)
+        WhiskeyDisk.flush
+      end
+      
+      it 'should bundle the buffer of commands' do
+        WhiskeyDisk.enqueue('x')
+        WhiskeyDisk.enqueue('y')
+        WhiskeyDisk.should.receive(:bundle).and_return('command string')
+        WhiskeyDisk.flush
+      end
+      
+      it 'should use "system" to run all the bundled commands at once' do
+        WhiskeyDisk.should.receive(:system).with('command string')
+        WhiskeyDisk.flush
+      end
+    end
+  end
+  
+  describe 'bundling up buffered commands for execution' do
+    before do
+      WhiskeyDisk.reset
+    end
+      
+    it 'should return an empty string if there are no commands' do
+      WhiskeyDisk.bundle.should == ''
+    end
+    
+    it 'should wrap each command as a subshell () and join with &&s' do
+      WhiskeyDisk.enqueue("cd foo/bar/baz || true")
+      WhiskeyDisk.enqueue("rsync -avz --progress /yer/mom /yo/")
+      WhiskeyDisk.bundle.should == "(cd foo/bar/baz || true) && (rsync -avz --progress /yer/mom /yo/)"
+    end
+  end
+  
+  describe 'registering the configuration with vlad' do
+    before do
+      @parameters = { 'deploy_to' => '/path/to/main/repo', 'foo' => 'bar', 'domain' => 'name' }
+      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
+      WhiskeyDisk.reset
+    end
+    
+    it "should call vlad's 'set' for each configuration parameters" do
+      @parameters.each_pair {|k,v| WhiskeyDisk.should.receive(:set).with(k, v) }
+      WhiskeyDisk.register_configuration
+    end
   end
 end
 

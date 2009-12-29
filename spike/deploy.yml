@@ -6,7 +6,6 @@ staging:
   config_repository: "git@ogtastic.com:project_config.git"
   branch: "master"
 local:
-  domain: ""
   repository: "git://github.com/rick/larry.git"
   config_repository: "git@ogtastic.com:project_config.git"
   deploy_to: "/Users/rick/git/larry"
