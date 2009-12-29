@@ -10,6 +10,7 @@ namespace :deploy do
     WhiskeyDisk.checkout_configuration_repository
     WhiskeyDisk.refresh_configuration
     WhiskeyDisk.run_post_setup_hooks
+    WhiskeyDisk.flush
   end
   
   task :now do
@@ -17,5 +18,6 @@ namespace :deploy do
     WhiskeyDisk.update_configuration_repository_checkout
     WhiskeyDisk.refresh_configuration
     WhiskeyDisk.run_post_deploy_hooks
+    WhiskeyDisk.flush
   end
 end

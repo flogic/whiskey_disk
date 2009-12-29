@@ -24,7 +24,8 @@ describe 'rake tasks' do
           :install_hooks,
           :checkout_configuration_repository,
           :refresh_configuration,
-          :run_post_setup_hooks
+          :run_post_setup_hooks, 
+          :flush
         ].each do |meth| 
           WhiskeyDisk.stub!(meth) 
         end
@@ -69,6 +70,11 @@ describe 'rake tasks' do
         WhiskeyDisk.should.receive(:run_post_setup_hooks)
         @rake["deploy:setup"].invoke
       end
+      
+      it 'should flush WhiskeyDisk changes' do
+        WhiskeyDisk.should.receive(:flush)
+        @rake["deploy:setup"].invoke
+      end
     end
     
     describe 'when no domain is specified' do
@@ -80,7 +86,8 @@ describe 'rake tasks' do
           :ensure_config_parent_path_is_present,
           :checkout_configuration_repository,
           :refresh_configuration,
-          :run_post_setup_hooks
+          :run_post_setup_hooks,
+          :flush
         ].each do |meth| 
           WhiskeyDisk.stub!(meth) 
         end
@@ -124,6 +131,11 @@ describe 'rake tasks' do
         WhiskeyDisk.should.receive(:run_post_setup_hooks)
         @rake["deploy:setup"].invoke
       end
+      
+      it 'should flush WhiskeyDisk changes' do
+        WhiskeyDisk.should.receive(:flush)
+        @rake["deploy:setup"].invoke
+      end
     end
   end
   
@@ -136,7 +148,8 @@ describe 'rake tasks' do
           :update_main_repository_checkout,
           :update_configuration_repository_checkout,
           :refresh_configuration,
-          :run_post_deploy_hooks
+          :run_post_deploy_hooks,
+          :flush
         ].each do |meth| 
           WhiskeyDisk.stub!(meth) 
         end
@@ -165,6 +178,11 @@ describe 'rake tasks' do
         WhiskeyDisk.should.receive(:run_post_deploy_hooks)
         @rake["deploy:now"].invoke
       end
+      
+      it 'should flush WhiskeyDisk changes' do
+        WhiskeyDisk.should.receive(:flush)
+        @rake["deploy:now"].invoke
+      end
     end
     
     describe 'when no domain is specified' do
@@ -175,7 +193,8 @@ describe 'rake tasks' do
         [ 
           :update_configuration_repository_checkout,
           :refresh_configuration,
-          :run_post_deploy_hooks
+          :run_post_deploy_hooks,
+          :flush
         ].each do |meth| 
           WhiskeyDisk.stub!(meth) 
         end
@@ -203,7 +222,12 @@ describe 'rake tasks' do
       it 'should run any post deployment hooks' do        
         WhiskeyDisk.should.receive(:run_post_deploy_hooks)
         @rake["deploy:now"].invoke
-      end    
+      end
+      
+      it 'should flush WhiskeyDisk changes' do
+        WhiskeyDisk.should.receive(:flush)
+        @rake["deploy:now"].invoke
+      end
     end
   end
 end
