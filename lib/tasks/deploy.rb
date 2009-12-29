@@ -1,23 +1,21 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'whiskey_disk'))
 require 'vlad'
 
-def load_configuration
-  WhiskeyDisk::Config.fetch.each_pair do |k,v|
-    set k, v
-  end
-end
-
 namespace :deploy do
-  task :load_configuration do 
-    load_configuration
-  end  
+  task :setup do
+    WhiskeyDisk.ensure_main_parent_path_is_present        if WhiskeyDisk.remote?
+    WhiskeyDisk.ensure_config_parent_path_is_present     
+    WhiskeyDisk.checkout_main_repository                  if WhiskeyDisk.remote?
+    WhiskeyDisk.install_hooks                             if WhiskeyDisk.remote?
+    WhiskeyDisk.checkout_configuration_repository
+    WhiskeyDisk.refresh_configuration
+    WhiskeyDisk.run_post_setup_hooks
+  end
   
   task :now do
-  end
-  
-  task :setup do
-  end
-  
-  task :refresh do
+    WhiskeyDisk.update_main_repository_checkout           if WhiskeyDisk.remote?
+    WhiskeyDisk.update_configuration_repository_checkout
+    WhiskeyDisk.refresh_configuration
+    WhiskeyDisk.run_post_deploy_hooks
   end
 end

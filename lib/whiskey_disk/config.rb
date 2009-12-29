@@ -1,5 +1,5 @@
-module WhiskeyDisk
-  module Config
+class WhiskeyDisk
+  class Config
     def self.fetch
     end
   end
