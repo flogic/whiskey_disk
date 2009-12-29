@@ -229,5 +229,49 @@ describe 'rake tasks' do
         @rake["deploy:now"].invoke
       end
     end
+    
+    describe 'deploy:post_setup' do
+      it 'should run the defined post_setup rake task when a post_setup rake task is defined for this environment' do
+        @configuration = { 'environment' => 'production'}
+        WhiskeyDisk::Config.stub!(:fetch).and_return(@configuration)
+        WhiskeyDisk.reset      
+
+        task "deploy:production:post_setup" do
+          WhiskeyDisk.fake_method
+        end
+
+        WhiskeyDisk.should.receive(:fake_method)
+        Rake::Task['deploy:post_setup'].invoke
+      end
+
+      it 'should not fail when no post_setup rake task is defined for this environment' do
+        @configuration = { 'environment' => 'staging'}
+        WhiskeyDisk::Config.stub!(:fetch).and_return(@configuration)
+        WhiskeyDisk.reset      
+        lambda { Rake::Task['deploy:post_setup'].invoke }.should.not.raise
+      end
+    end
+    
+    describe 'deploy:post_deploy' do
+      it 'should run the defined post_deploy rake task when a post_deploy rake task is defined for this environment' do
+        @configuration = { 'environment' => 'production'}
+        WhiskeyDisk::Config.stub!(:fetch).and_return(@configuration)
+        WhiskeyDisk.reset      
+
+        task "deploy:production:post_deploy" do
+          WhiskeyDisk.fake_method
+        end
+
+        WhiskeyDisk.should.receive(:fake_method)
+        Rake::Task['deploy:post_deploy'].invoke
+      end
+
+      it 'should not fail when no post_deploy rake task is defined for this environment' do
+        @configuration = { 'environment' => 'staging'}
+        WhiskeyDisk::Config.stub!(:fetch).and_return(@configuration)
+        WhiskeyDisk.reset      
+        lambda { Rake::Task['deploy:post_deploy'].invoke }.should.not.raise
+      end
+    end
   end
 end
