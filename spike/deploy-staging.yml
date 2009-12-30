@@ -1,6 +1,0 @@
-staging:
-  domain: "ogc@larry.ogtastic.com"
-  deploy_to: "/opt/ogc/var/www/larry-staging.ogtastic.com/"
-  repository: "git://github.com/rick/larry.git"
-  config_repository: "git@ogtastic.com:project_config.git"
-  deploy_config_to: "/tmp/project_config"
