@@ -35,8 +35,10 @@ Whiskey Disk -- embarrassingly fast deployments.
     - per-environment configurations can be stored in <app_root>/config/deploy-<environment>.yml
     - config files are YAML, with a section for each environment.
 
-      Known config file settings:
-  
+      Known config file settings (if you're familiar with capistrano and vlad these
+      should seem eerily familiar)::
+ 
+      - domain:            host on which to deploy (this is an ssh connect string) 
       - deploy_to:         path to which to deploy main application
       - repository:        git repo path for main application
       - branch:            git branch to deploy from main application git repo
