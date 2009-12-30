@@ -1,5 +1,73 @@
 Whiskey Disk -- embarrassingly fast deployments.
 
+  A very opinionated deployment tool, designed to be as fast as technologically
+  possible.
+
+  Should work with any project which is gem hosted, not just Ruby / Ruby on Rails projects.
+  Allows for local deploys as well as remote.
+
+  Dependencies:  rake, ssh, git, rsync on the deployment target server (affectionately
+                 referred to as the "g-node" by vinbarnes), bash-ish shell on deployment
+                 server.
+
+  Assumptions:
+
+    - you have a Rakefile in the top directory of your project's checkout
+    - you are deploying over ssh
+    - your project is managed via git
+    - you have a second git repository for per-application/per-environment configuration files
+    - you are comfortable defining post-setup and post-deployment actions with rake
+
+  Installation:
+
+    As a gem:
+
+    % gem install whiskey_disk
+
+    As a rails plugin:
+
+    % script/plugin install git://github.com/flogic/whiskey_disk.git
+
+  Configuration:
+
+    - look in the examples/ directory for sample configuration files
+    - main configuration is in <app_root>/config/deploy.yml
+    - per-environment configurations can be stored in <app_root>/config/deploy-<environment>.yml
+    - config files are YAML, with a section for each environment.
+
+      Known config file settings:
+  
+      - deploy_to:         path to which to deploy main application
+      - repository:        git repo path for main application
+      - branch:            git branch to deploy from main application git repo
+      - deploy_config_to:  where to deploy the configuration repository
+      - config_repository: git repository for configuration files
+      - project:           project name (used to compute path in configuration checkout)
+
+    - defining a deploy:<environment>:post_setup rake task (e.g., in lib/tasks/ or in 
+      your project's Rakefile) will cause that task to be run at the end of deploy:setup
+
+    - defining a deploy:<environment>:post_deploy rake task (e.g., in lib/tasks/ or in 
+      your project's Rakefile) will cause that task to be run at the end of deploy:now
+
+  Running:
+
+  - rake deploy:setup to=<environment>   (e.g., "staging", "production", etc.)
+  - rake deploy:now   to=<environment>
+
+
+  Resources:
+    - http://github.com/blog/470-deployment-script-spring-cleaning
+    - http://github.com/mislav/git-deploy
+    - http://toroid.org/ams/git-website-howto
+  
+-----
+
+
+NOTES (aka the original README):
+
+
+
 The idea here is inspired by github's cleaned up deployment scripts, and mislav's git-deploy project.  Only, we gave up on capistrano a long time ago, and after a few years of doing deployments on a few dozen projects, we realized that we really have very little variation on how we do things.  That is, we can afford to have a very opinionated tool to do our deployments.
 
 Here are the features/constraints we're envisioning:
@@ -41,11 +109,3 @@ Here are the features/constraints we're envisioning:
  - build this spec-first (whenever possible) so that there's a useful test suite.
  
  - M$ windows hasn't been a priority for me for over a decade, not starting now.
-
----
-
-Resources:
-  - http://github.com/blog/470-deployment-script-spring-cleaning
-  - http://github.com/mislav/git-deploy
-  - http://toroid.org/ams/git-website-howto
-  
