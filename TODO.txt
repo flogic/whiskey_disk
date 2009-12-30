@@ -1,2 +1,2 @@
- - update the README
+ - common post-deploy tasks (including db:migrate, server bounce)
  - install hooks (look at maybe git-deploy for good examples)
