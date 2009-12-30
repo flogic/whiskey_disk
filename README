@@ -3,7 +3,7 @@ Whiskey Disk -- embarrassingly fast deployments.
   A very opinionated deployment tool, designed to be as fast as technologically
   possible.
 
-  Should work with any project which is gem hosted, not just Ruby / Ruby on Rails projects.
+  Should work with any project which is git hosted, not just Ruby / Ruby on Rails projects.
   Allows for local deploys as well as remote.
 
   Dependencies:  rake, ssh, git, rsync on the deployment target server (affectionately
