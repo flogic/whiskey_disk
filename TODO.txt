@@ -1,0 +1,5 @@
+ - spec-drive the init.rb for plugin installations
+ - spec-drive the install.rb (dump the README file)
+ - update the README
+ - push gem to gemcutter
+ - install hooks (look at maybe git-deploy for good examples)
