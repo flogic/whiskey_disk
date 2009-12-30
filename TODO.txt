@@ -1,3 +1,2 @@
  - update the README
- - push gem to gemcutter
  - install hooks (look at maybe git-deploy for good examples)
