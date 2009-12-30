@@ -1,2 +1,16 @@
  - common post-deploy tasks (including db:migrate, server bounce)
+   - some sort of simple API for hooks to check which files have changed (either via git rev differences or rsync output), so then the rake task would just do something like:
+   
+   require 'whiskey_disk'
+   include WhiskeyDisk::Changes
+   
+   namespace :deploy do
+     task :post_deploy do 
+       if changed_in?('db/migrate') or changed?('config/database.yml')
+         Rake::Task['db:migrate'].invoke
+       end
+       # etc. ...
+     end
+   end
+   
  - install hooks (look at maybe git-deploy for good examples)
