@@ -11,7 +11,6 @@ Rake::TestTask.new(:test) do |t|
   t.verbose = true
 end
 
-
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gemspec|
@@ -25,6 +24,6 @@ begin
   end
   Jeweler::GemcutterTasks.new  
 rescue LoadError
-  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
+  puts "Jeweler not available. Install it with: sudo gem install jeweler -s http://gemcutter.org"
 end
 
