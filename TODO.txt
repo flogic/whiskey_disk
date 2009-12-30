@@ -14,3 +14,4 @@
    end
    
  - install hooks (look at maybe git-deploy for good examples)
+ - make sure the config repo stuff is optional
