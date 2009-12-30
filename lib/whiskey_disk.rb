@@ -36,10 +36,6 @@ class WhiskeyDisk
       File.split(path).last
     end
     
-    def register_configuration
-      configuration.each_pair {|k,v| set k, v }
-    end
-    
     def needs(*keys)
       keys.each do |key|
         raise "No value for '#{key}' declared in configuration files [#{WhiskeyDisk::Config.filenames.join(", ")}]" unless self[key]
@@ -48,16 +44,16 @@ class WhiskeyDisk
     
     def bundle
       return '' if buffer.empty?
-      buffer.collect {|c| "(#{c})" }.join(' && ')
+      buffer.collect {|c| "{ #{c} ; }"}.join(' && ')
+    end
+    
+    def run(cmd)
+      needs(:domain)
+      system('ssh', '-v', self[:domain], "set -x; " + cmd)
     end
     
     def flush
-      if remote?
-        register_configuration
-        run(bundle)
-      else
-        system(bundle)
-      end
+      remote? ? run(bundle) : system(bundle)
     end
     
     def ensure_main_parent_path_is_present
@@ -73,7 +69,7 @@ class WhiskeyDisk
     def checkout_main_repository
       needs(:deploy_to, :repository)
       enqueue "cd #{parent_path(self[:deploy_to])}"
-      enqueue "git clone #{self[:repository]} #{tail_path(self[:deploy_to])} || true"
+      enqueue "git clone #{self[:repository]} #{tail_path(self[:deploy_to])} ; true"
     end
     
     def install_hooks
@@ -84,7 +80,7 @@ class WhiskeyDisk
     def checkout_configuration_repository
       needs(:deploy_config_to, :config_repository)
       enqueue "cd #{parent_path(self[:deploy_config_to])}"
-      enqueue "git clone #{self[:config_repository]} #{tail_path(self[:deploy_config_to])} || true"
+      enqueue "git clone #{self[:config_repository]} #{tail_path(self[:deploy_config_to])} ; true"
     end
     
     def update_main_repository_checkout
@@ -110,13 +106,13 @@ class WhiskeyDisk
     def run_post_setup_hooks
       needs(:deploy_to)
       enqueue "cd #{self[:deploy_to]}"
-      enqueue "rake deploy:post_setup"
+      enqueue "rake --trace deploy:post_setup"
     end
 
     def run_post_deploy_hooks
       needs(:deploy_to)
       enqueue "cd #{self[:deploy_to]}"
-      enqueue "rake deploy:post_deploy"
+      enqueue "rake --trace deploy:post_deploy"
     end
   end
 end

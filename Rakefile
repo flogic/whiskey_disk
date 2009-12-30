@@ -20,7 +20,7 @@ begin
     gemspec.email = "rick@rickbradley.com"
     gemspec.homepage = "http://github.com/flogic/whiskey_disk"
     gemspec.authors = ["Rick Bradley"]
-    gemspec.add_dependency('vlad', '>= 1.3.2')
+    gemspec.add_dependency('rake')
   end
   Jeweler::GemcutterTasks.new  
 rescue LoadError

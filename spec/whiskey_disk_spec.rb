@@ -94,7 +94,7 @@ describe 'WhiskeyDisk' do
     
     it 'should ignore errors from failing to clone an existing repository' do
       WhiskeyDisk.checkout_main_repository
-      WhiskeyDisk.buffer.join(' ').should.match(%r{\|\| true})
+      WhiskeyDisk.buffer.join(' ').should.match(%r{; true})
     end
   end
   
@@ -146,7 +146,7 @@ describe 'WhiskeyDisk' do
 
     it 'should ignore errors from failing to clone an existing repository' do
       WhiskeyDisk.checkout_configuration_repository
-      WhiskeyDisk.buffer.join(' ').should.match(%r{\|\| true})
+      WhiskeyDisk.buffer.join(' ').should.match(%r{; true})
     end    
   end
   
@@ -309,11 +309,6 @@ describe 'WhiskeyDisk' do
         WhiskeyDisk.stub!(:run)
       end
       
-      it 'should register our configuration with vlad' do
-        WhiskeyDisk.should.receive(:register_configuration)
-        WhiskeyDisk.flush
-      end
-      
       it 'should bundle the buffer of commands' do
         WhiskeyDisk.enqueue('x')
         WhiskeyDisk.enqueue('y')
@@ -334,11 +329,6 @@ describe 'WhiskeyDisk' do
         WhiskeyDisk.reset
         WhiskeyDisk.stub!(:bundle).and_return('command string')
         WhiskeyDisk.stub!(:system)
-      end
-      
-      it 'should NOT register our configuration with vlad' do
-        WhiskeyDisk.should.not.receive(:register_configuration)
-        WhiskeyDisk.flush
       end
       
       it 'should bundle the buffer of commands' do
@@ -364,23 +354,38 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.bundle.should == ''
     end
     
-    it 'should wrap each command as a subshell () and join with &&s' do
+    it 'should wrap each command with {} and join with &&s' do
       WhiskeyDisk.enqueue("cd foo/bar/baz || true")
       WhiskeyDisk.enqueue("rsync -avz --progress /yer/mom /yo/")
-      WhiskeyDisk.bundle.should == "(cd foo/bar/baz || true) && (rsync -avz --progress /yer/mom /yo/)"
+      WhiskeyDisk.bundle.should == "{ cd foo/bar/baz || true ; } && { rsync -avz --progress /yer/mom /yo/ ; }"
     end
   end
   
-  describe 'registering the configuration with vlad' do
+  describe 'when running a command string remotely' do
     before do
-      @parameters = { 'deploy_to' => '/path/to/main/repo', 'foo' => 'bar', 'domain' => 'name' }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
+      @domain = 'ogc@ogtastic.com'
+      WhiskeyDisk::Config.stub!(:fetch).and_return({ 'domain' => @domain })
       WhiskeyDisk.reset
+      WhiskeyDisk.stub!(:system)      
     end
     
-    it "should call vlad's 'set' for each configuration parameters" do
-      @parameters.each_pair {|k,v| WhiskeyDisk.should.receive(:set).with(k, v) }
-      WhiskeyDisk.register_configuration
+    it 'should accept a command string' do
+      lambda { WhiskeyDisk.run('ls') }.should.not.raise(ArgumentError)
+    end
+    
+    it 'should require a command string' do
+      lambda { WhiskeyDisk.run }.should.raise(ArgumentError)
+    end
+    
+    it 'should fail if the domain path is not specified' do
+      WhiskeyDisk::Config.stub!(:fetch).and_return({})
+      WhiskeyDisk.reset
+      lambda { WhiskeyDisk.run('ls') }.should.raise
+    end
+    
+    it 'should pass the string to ssh with verbosity enabled' do
+      WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain, "set -x; ls")
+      WhiskeyDisk.run('ls')
     end
   end
 end

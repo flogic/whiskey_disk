@@ -1,6 +1,5 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'whiskey_disk'))
 require 'rake'
-require 'vlad'
 
 namespace :deploy do
   desc "Perform initial setup for deployment"
