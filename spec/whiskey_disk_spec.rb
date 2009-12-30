@@ -272,6 +272,11 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.run_post_setup_hooks
       WhiskeyDisk.buffer.join(' ').should.match(%r{rake.*deploy:post_setup})
     end
+    
+    it 'should use the same environment when running the rake tasks' do
+      WhiskeyDisk.run_post_setup_hooks
+      WhiskeyDisk.buffer.join(' ').should.match(%r{to=#{@env}})      
+    end
   end
   
   describe 'running post deployment hooks' do
@@ -295,6 +300,11 @@ describe 'WhiskeyDisk' do
     it 'should attempt to run the post deployment rake tasks' do
       WhiskeyDisk.run_post_deploy_hooks
       WhiskeyDisk.buffer.join(' ').should.match(%r{rake.*deploy:post_deploy})
+    end
+    
+    it 'should use the same environment when running the rake tasks' do
+      WhiskeyDisk.run_post_deploy_hooks
+      WhiskeyDisk.buffer.join(' ').should.match(%r{to=#{@env}})      
     end
   end
   

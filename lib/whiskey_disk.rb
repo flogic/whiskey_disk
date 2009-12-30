@@ -106,13 +106,13 @@ class WhiskeyDisk
     def run_post_setup_hooks
       needs(:deploy_to)
       enqueue "cd #{self[:deploy_to]}"
-      enqueue "rake --trace deploy:post_setup"
+      enqueue "rake --trace deploy:post_setup to=#{self[:environment]}"
     end
 
     def run_post_deploy_hooks
       needs(:deploy_to)
       enqueue "cd #{self[:deploy_to]}"
-      enqueue "rake --trace deploy:post_deploy"
+      enqueue "rake --trace deploy:post_deploy to=#{self[:environment]}"
     end
   end
 end
