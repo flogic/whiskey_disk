@@ -45,6 +45,7 @@ Whiskey Disk -- embarrassingly fast deployments.
       - deploy_config_to:  where to deploy the configuration repository
       - config_repository: git repository for configuration files
       - project:           project name (used to compute path in configuration checkout)
+      - rake_env:          hash of environment variables to set when running post_setup and post_deploy rake tasks
 
     - defining a deploy:<environment>:post_setup rake task (e.g., in lib/tasks/ or in 
       your project's Rakefile) will cause that task to be run at the end of deploy:setup

@@ -105,14 +105,16 @@ class WhiskeyDisk
     
     def run_post_setup_hooks
       needs(:deploy_to)
+      env_vars = self[:rake_env] ? self[:rake_env].keys.inject('') {|b,k| b += "#{k}='#{self[:rake_env][k]}' "; b } : ''
       enqueue "cd #{self[:deploy_to]}"
-      enqueue "rake --trace deploy:post_setup to=#{self[:environment]}"
+      enqueue "#{env_vars} rake --trace deploy:post_setup to=#{self[:environment]}"
     end
 
     def run_post_deploy_hooks
       needs(:deploy_to)
+      env_vars = self[:rake_env] ? self[:rake_env].keys.inject('') {|b,k| b += "#{k}='#{self[:rake_env][k]}' "; b } : ''
       enqueue "cd #{self[:deploy_to]}"
-      enqueue "rake --trace deploy:post_deploy to=#{self[:environment]}"
+      enqueue "#{env_vars} rake --trace deploy:post_deploy to=#{self[:environment]}"
     end
   end
 end

@@ -4,3 +4,5 @@ staging:
   repository: "git://github.com/clarkkent/suparsite.git"
   config_repository: "git@github.com:clarkkent/suparconfig.git"
   deploy_config_to: "/var/cache/git/suparconfig"
+  rake_env:
+    RAILS_ENV: 'development'

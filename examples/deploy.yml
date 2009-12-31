@@ -5,8 +5,12 @@ staging:
   config_repository: "git@github.com:clarkkent/suparconfig.git"
   deploy_config_to: "/var/cache/git/suparconfig"
   branch: "production"
+  rake_env:
+    RAILS_ENV: "production"
 local:
   repository: "git://github.com/clarkkent/suparsite.git"
   config_repository: "git@github.com:clarkkent/suparconfig.git"
   deploy_to: "/Users/clark/git/suparsite"
   deploy_config_to: "/Users/clark/git/suparconfig"
+  rake_env:
+    RAILS_ENV: "production"
