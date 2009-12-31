@@ -6,6 +6,37 @@ Whiskey Disk -- embarrassingly fast deployments.
   Should work with any project which is git hosted, not just Ruby / Ruby on Rails projects.
   Allows for local deploys as well as remote.
 
+  Selling points:
+
+  - If you share the same opinions there's almost no code involved, almost no dependencies, 
+    and it uses stock *nix tools (ssh, bash, rsync) to get everything done.
+
+  - Written completely spec-first for 100% coverage.  We even did that for the rake tasks, 
+    the init.rb and the plugin install.rb if you swing that way.
+
+  - 1 ssh connection per rake task -- so everything needed to do a full setup is done in
+    one shot.  Everything needed to do a full deployment is done in one shot.  Having 8 
+    minute deploys failing because I was on cdma wireless on a train in india where the 
+    connection won't stay up for more than 2-3 minutes is not where I want to be.
+
+  - You can do *local* deployments, by this I mean you can use whiskey_disk to manage your
+    local checkout with localized (aka non-production) configurations trivially.  This turns
+    out to be surprisingly handy (well, I was surprised).
+
+  - You can have per-developer configurations for environments (especially useful for
+    "local" or "development" enviroments).  Use .gitignore and everyone can have their own
+    local setup that just works.
+
+  - Deployment configuration is specified as YAML data, not as code.  Operations to perform
+    after setup or deployment are specified as rake tasks.
+
+  - There's no before_after_before_after hooks.  You've got plenty of flexibility with just
+    a handful of rake hook points to grab onto.
+ 
+  - rake deploy:setup and rake deploy:now are really all that are needed, best I can tell.
+
+
+
   Dependencies:  rake, ssh, git, rsync on the deployment target server (affectionately
                  referred to as the "g-node" by vinbarnes), bash-ish shell on deployment
                  server.
