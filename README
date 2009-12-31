@@ -143,6 +143,13 @@ Whiskey Disk -- embarrassingly fast deployments.
     directory in our main config repo, because we're deploying the larry project
     (http://github.com/rick/larry) to manage our high-level configuration data.
 
+    Note, if you set the 'project' setting in deploy.yml, that determines the name of the
+    top-level project directory whiskey_disk will hunt for in your config repo.  If you don't
+    it uses the 'repository' setting (i.e., the git URL) to try to guess what the project
+    name might be.  So if the URL ends in foo/bar.git, or foo:bar.git, or /bar, or :bar, 
+    whiskey_disk is going to guess "bar".  If it's all bitched up, just set 'project' manually
+    in deploy.yml.
+
     Inside the project directory is a directory named for each environment we might
     deploy to.  Frankly, we've been using "production", "staging", "development", and "local"
     on just about everything.
