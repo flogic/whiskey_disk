@@ -234,8 +234,16 @@ describe WhiskeyDisk::Config do
       WhiskeyDisk::Config.project_name({ 'repository' => 'git@foo/bar/baz'}).should == 'baz'
     end
     
-    it 'should return the last pasth segment, stripping .git, if the repository ends in .git' do
+    it 'should return the last path segment, stripping .git, if the repository ends in .git' do
       WhiskeyDisk::Config.project_name({ 'repository' => 'git@foo/bar/baz.git'}).should == 'baz'
+    end
+
+    it 'should return the last :-delimited segment if the repository does not end in .git' do
+      WhiskeyDisk::Config.project_name({ 'repository' => 'git@foo/bar:baz'}).should == 'baz'
+    end
+    
+    it 'should return the last :-delimited segment, stripping .git, if the repository ends in .git' do
+      WhiskeyDisk::Config.project_name({ 'repository' => 'git@foo/bar:baz.git'}).should == 'baz'
     end
   end
 

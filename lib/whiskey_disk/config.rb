@@ -41,7 +41,7 @@ class WhiskeyDisk
       
       def project_name(config)
         return '' unless config['repository'] and config['repository'] != ''
-        config['repository'].sub(%r{^.*/}, '').sub(%r{\.git$}, '')
+        config['repository'].sub(%r{^.*[/:]}, '').sub(%r{\.git$}, '')
       end
       
       def load_main_data
