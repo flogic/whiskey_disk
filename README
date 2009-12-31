@@ -89,13 +89,118 @@ Whiskey Disk -- embarrassingly fast deployments.
   - rake deploy:setup to=<environment>   (e.g., "staging", "production", etc.)
   - rake deploy:now   to=<environment>
 
+
+  Configuration Repository
+
+    What's all this about a second repository for configuration stuff?
+
+    Well, we're going to make it optional probably in another release, but we really
+    are digging this, so maybe you should try it.  Basically it goes like this...
+
+    We have a number of web applications that we manage.  Usually there's a customer, 
+    there might be third-party developers, or the customer might have access to the git
+    repo, or their designer might, etc.  We also tend to run a few instances of any given
+    app, for any given customer.  So, we'll run a "production" site, which is the public-
+    facing, world-accessible main site.  We'll usually also run a "staging" site, which is 
+    roughly the same code, maybe the same data, running on a different URL, which the customer
+    can look at to see if the functionality there is suitable for deploying out to production.
+    We sometimes run a "development" site which is even less likely to be the same code as
+    production, etc., but gives visibility into what might end up in production one day soon.
+
+    So we'll store the code for all of these versions of a site in the same git repo, typically
+    using a different remote branch for each environment ("production", "staging", "development").
+
+    One thing that comes up pretty quickly is that there are various files associated with
+    the application which have more to do with configuration of a running instance than they
+    have to do with the application in general.  In the rails world these files are probably
+    in config, or config/initializers/.  Think database connection information, search engine
+    settings, exception notification plugin data, email configuration, Amazon S3 credentials, 
+    e-commerce back-end configuration, etc.
+
+    We don't want the production site using the same database as the development site.  We don't
+    want staging using (and re-indexing, re-starting, etc.) production's search engine server.
+    We don't want any site other than production to send account reset emails, or to push orders
+    out to fulfillment, etc.
+
+    For some reason, the answer to this with cap and/or vlad has been to have recipes which
+    reference various files up in a shared area on the server, do copying or symlinking, etc.
+    Where did those files come from?  How did they get there?  How are they managed over time?
+    If they got there via a configuration tool, why (a) are they not in the right place, or 
+    (b) do we have to do work to get them into the right place?
+
+    So, we decided that we'd change how we deal with the issue.  Instead of moving files around
+    or symlinking every time we deploy, we will manage the configuration data just like we 
+    manage other files required by our projects -- with git.
+
+    So, each project we deploy is associated with a config repo in our git repository.  Usually
+    many projects are in the same repo, because we're the only people to see the data and 
+    there's no confidentiality issue.  But, if a customer has access to their git information
+    then we'll make a separate config repo for all that customers' projects.  (This is easier
+    to manage than it sounds if you're using gitosis, btw.)
+
+    Anyway, a config repo is just a git repo.  In it are directories for every project
+    whose configuration information is managed in that repo.  For example, there's a "larry"
+    directory in our main config repo, because we're deploying the larry project
+    (http://github.com/rick/larry) to manage our high-level configuration data.
+
+    Inside the project directory is a directory named for each environment we might
+    deploy to.  Frankly, we've been using "production", "staging", "development", and "local"
+    on just about everything.
+
+    Inside the environment directory is a tree of files.  So, e.g., there's config/, which 
+    has initializers/ and database.yml in it.
+
+    Long story short, load up whatever configuration files you're using into the repo 
+    as described, and come deployment time exactly those files will be overlaid on top of
+    the most recent checkout of the project.  Snap.
+
+    project-config/
+      |
+      +---larry/
+            |
+            +---production/
+            |     |
+            |     +---config/
+            |           |
+            |           +---initializers/
+            |           |
+            |           +---database.yml
+            |
+            +---staging/
+            |     |
+            |     |
+            |     +---config/
+            |           |
+            |           ....
+            |
+            +---development/
+            |     |
+            |     +---config/
+            |           |
+            |           ....
+            |
+            +---local/
+                  |
+                  +---config/
+                        |
+                        ....
+
+ 
+
   More Examples:
 
   - We are using this to manage larry.  See:
 
     http://github.com/rick/larry/blob/master/config/deploy.yml
-    http://github.com/rick/larry/blob/master/config/deploy-local.yml.example
     http://github.com/rick/larry/blob/master/lib/tasks/deploy.rake
+
+    Note that you can also provide per-environment config settings, 
+    outside of deploy.yml.  This is most useful for handling per-developer
+    local deployments, though you could use it to override some settings 
+    if that makes sense in some context.  Here's a simple example of that:
+
+    http://github.com/rick/larry/blob/master/config/deploy-local.yml.example
+
 
   - We are using it on a private project with lots of config files, but here's
     a gist showing a bit more interesting deploy.rake file for post_setup and
