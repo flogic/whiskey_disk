@@ -9,6 +9,8 @@ namespace :deploy do
     WhiskeyDisk.checkout_main_repository                  if WhiskeyDisk.remote?
     WhiskeyDisk.install_hooks                             if WhiskeyDisk.remote?
     WhiskeyDisk.checkout_configuration_repository
+    WhiskeyDisk.update_main_repository_checkout           if WhiskeyDisk.remote?
+    WhiskeyDisk.update_configuration_repository_checkout
     WhiskeyDisk.refresh_configuration
     WhiskeyDisk.run_post_setup_hooks
     WhiskeyDisk.flush

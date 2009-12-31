@@ -23,6 +23,8 @@ describe 'rake tasks' do
           :checkout_main_repository,
           :install_hooks,
           :checkout_configuration_repository,
+          :update_main_repository_checkout,
+          :update_configuration_repository_checkout,
           :refresh_configuration,
           :run_post_setup_hooks, 
           :flush
@@ -61,6 +63,16 @@ describe 'rake tasks' do
         @rake["deploy:setup"].invoke
       end
       
+      it 'should update the main repository checkout' do
+        WhiskeyDisk.should.receive(:update_main_repository_checkout)
+        @rake["deploy:setup"].invoke
+      end
+      
+      it 'should update the configuration repository checkout' do
+        WhiskeyDisk.should.receive(:update_configuration_repository_checkout)
+        @rake["deploy:setup"].invoke
+      end
+      
       it 'should refresh the configuration' do
         WhiskeyDisk.should.receive(:refresh_configuration)
         @rake["deploy:setup"].invoke
@@ -85,6 +97,7 @@ describe 'rake tasks' do
         [ 
           :ensure_config_parent_path_is_present,
           :checkout_configuration_repository,
+          :update_configuration_repository_checkout,
           :refresh_configuration,
           :run_post_setup_hooks,
           :flush
@@ -119,6 +132,11 @@ describe 'rake tasks' do
       
       it 'should check out the configuration repository' do
         WhiskeyDisk.should.receive(:checkout_configuration_repository)
+        @rake["deploy:setup"].invoke
+      end
+      
+      it 'should update the configuration repository checkout' do
+        WhiskeyDisk.should.receive(:update_configuration_repository_checkout)
         @rake["deploy:setup"].invoke
       end
       
