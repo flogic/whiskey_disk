@@ -1,7 +1,7 @@
 Whiskey Disk -- embarrassingly fast deployments.
 
   A very opinionated deployment tool, designed to be as fast as technologically
-  possible.
+  possible.  (For more background, read the WHY.txt file)
 
   Should work with any project which is git hosted, not just Ruby / Ruby on Rails projects.
   Allows for local deploys as well as remote.
@@ -58,8 +58,39 @@ Whiskey Disk -- embarrassingly fast deployments.
   - rake deploy:setup to=<environment>   (e.g., "staging", "production", etc.)
   - rake deploy:now   to=<environment>
 
+  More Examples:
+
+  - We are using this to manage larry.  See:
+
+    http://github.com/rick/larry/blob/master/config/deploy.yml
+    http://github.com/rick/larry/blob/master/config/deploy-local.yml.example
+    http://github.com/rick/larry/blob/master/lib/tasks/deploy.rake
+
+  - We are using it on a private project with lots of config files, but here's
+    a gist showing a bit more interesting deploy.rake file for post_setup and
+    post_deploy work:
+
+    https://gist.github.com/47e23f2980943531beeb
+
+
+
+  On the radar for an upcoming release are:
+
+  - common post_* recipes being specifiable by symbol names in deploy.yml ?
+  - making the config repo stuff optional if you don't need that at all
+  - bringing in a very simplified version of mislav/git-deploy post-{receive,reset}
+    hooks, and a little sugar so you can say:
+
+    task :post_deploy do
+      if has_changes?('db/migrate') or has_changes?('config/database.yml')
+        Rake::Task['db:migrate'].invoke
+      end
+    end
+
 
   Resources:
     - http://github.com/blog/470-deployment-script-spring-cleaning
     - http://github.com/mislav/git-deploy
     - http://toroid.org/ams/git-website-howto
+
+
