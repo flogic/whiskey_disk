@@ -1,0 +1,45 @@
+
+Why?
+----
+
+The idea here is inspired by github's cleaned up deployment scripts, and mislav's git-deploy project.  Only, we gave up on capistrano a long time ago, and after a few years of doing deployments on a few dozen projects, we realized that we really have very little variation on how we do things.  That is, we can afford to have a very opinionated tool to do our deployments.
+
+Here are the features/constraints we're envisioning:
+
+ - We need some sort of very basic "run this on a remote server" functionality.  We've been using vlad for years now and this would suffice:  it does what we're looking for and is much much smaller than capistrano.  If we don't load the included recipes it's basically a fancy ruby ssh wrapper.
+ 
+ - Setup should mostly just do a very fast remote git checkout in the right place.  Deployment should very quickly update that checkout.
+ 
+ - We have been considering a move towards tracking configuration data across our projects as a separate concern.  So, if we can have a private repo that stores per-project and per-environment (here I mean staging vs. production, etc.) configuration files, and have our deployments overlay those files quickly, that would be ideal.  I'm talking about hoptoad configs, database.yml files, AWS cert files, GeoKit API keys, etc., etc., etc.
+
+ - We should be able to use the same "setup == clone" + "deploy == reset" technique to manage the per-project/per-environment config files.
+ 
+ - Using rsync on the remote to those overlay config files on the deployed project would be a fast way to get them in place.
+ 
+ - Get rid of a bunch of annoying symlinks and symlink-hoops-to-jump-through.
+ 
+ - Get rid of a bunch of space (yeah yeah disk is cheap, but copying isn't) on the disk devoted to umpteen "releases".
+ 
+ - Obviously reduce deployment time by doing less, ssh-ing less, and taking less time to do whatever.
+ 
+ - should be rake based, and should provide a bare minimum of tasks -- like deploy:setup, deploy:now, and maybe a deploy:refresh_config_files.
+ 
+ - While a very basic task or few would run after setup or after deployment (e.g., rake db:migrate if migrations were changed, or touch tmp/restart.txt if the web server needs a restart; see git-deploy for more examples), we should be able to declare optional rake tasks (e.g., "deploy:staging:post_deploy") and have them run on this project if they are declared.
+ 
+ - Should work with projects that aren't remotely ruby.
+ 
+ - Should be loadable as a gem, meaning that it doesn't need to live in your project's space.  (see also non-ruby projects)
+ 
+ - Should be able to use a non-ruby config, preferably yaml, for information for all environments.  That could be stored in <project>/config/deploy.yml and saved with the project.  Even if this is just shoved into vlad 'set' commands, it's still an improvement:  we don't need ruby in the config file because we're opinionated.
+ 
+ - should be able to override settings for an environment locally by declaring a <project>/config/deploy-<environment>.yml.  Ideal for testing out deployments to different servers (or deploying locally).  This also makes it possible to .gitignore your local settings, so everyone can have their config repos in different places.
+ 
+ - should make it easier to do local development (e.g., on a laptop) by being able to overlay config files using the same rake tasks as used for remote deployments, just not running the functionality remotely.
+ 
+ - dropping in a project Rakefile can add post-deploy / post-setup hooks transparently.
+ 
+ - actually have meaningful error messages, unlike anything that ever seems to happen with cap or vlad.  :-/
+
+ - build this spec-first (whenever possible) so that there's a useful test suite.
+ 
+ - M$ windows hasn't been a priority for me for over a decade, not starting now.
