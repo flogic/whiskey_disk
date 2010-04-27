@@ -35,6 +35,14 @@ class WhiskeyDisk
       (self[:branch] and self[:branch] != '') ? self[:branch] : 'master'
     end
     
+    def env_vars
+      return '' unless self[:rake_env]
+      self[:rake_env].keys.inject('') do |buffer,k| 
+        buffer += "#{k}='#{self[:rake_env][k]}' "
+        buffer
+      end
+    end
+    
     def parent_path(path)
       File.split(path).first
     end
@@ -106,14 +114,12 @@ class WhiskeyDisk
     
     def run_post_setup_hooks
       needs(:deploy_to)
-      env_vars = self[:rake_env] ? self[:rake_env].keys.inject('') {|b,k| b += "#{k}='#{self[:rake_env][k]}' "; b } : ''
       enqueue "cd #{self[:deploy_to]}"
       enqueue "#{env_vars} rake --trace deploy:post_setup to=#{self[:environment]}"
     end
 
     def run_post_deploy_hooks
       needs(:deploy_to)
-      env_vars = self[:rake_env] ? self[:rake_env].keys.inject('') {|b,k| b += "#{k}='#{self[:rake_env][k]}' "; b } : ''
       enqueue "cd #{self[:deploy_to]}"
       enqueue "#{env_vars} rake --trace deploy:post_deploy to=#{self[:environment]}"
     end
