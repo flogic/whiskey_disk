@@ -27,6 +27,10 @@ class WhiskeyDisk
       ! (self[:domain].nil? or self[:domain] == '')
     end
     
+    def has_config_repo?
+      ! (self[:config_repository].nil? or self[:config_repository] == '')
+    end
+    
     def parent_path(path)
       File.split(path).first
     end

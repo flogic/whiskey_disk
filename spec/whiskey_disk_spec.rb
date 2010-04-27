@@ -52,6 +52,37 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.remote?.should == false
     end
   end
+  
+  describe 'determining if the deployment has a configuration repository' do
+    before do
+      @parameters = { 'deploy_to' => '/path/to/main/repo' }
+      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
+      WhiskeyDisk.reset
+    end
+    
+    it 'should work without arguments' do
+      lambda { WhiskeyDisk.has_config_repo? }.should.not.raise(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { WhiskeyDisk.has_config_repo?(:foo) }.should.raise(ArgumentError)
+    end
+    
+    it 'should return true if the configuration includes a non-empty config_repository setting' do
+      @parameters['config_repository'] = 'git://foo.git'
+      WhiskeyDisk.has_config_repo?.should == true
+    end
+    
+    it 'should return false if the configuration includes a nil config_repository setting' do
+      @parameters['config_repository'] = nil
+      WhiskeyDisk.has_config_repo?.should == false
+    end
+    
+    it 'should return false if the configuration includes a blank config_repository setting' do
+      @parameters['config_repository'] = ''
+      WhiskeyDisk.has_config_repo?.should == false
+    end
+  end
 
   describe 'ensuring that the parent path for the main repository checkout is present' do
     before do
