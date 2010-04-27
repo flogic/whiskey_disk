@@ -7,7 +7,6 @@ namespace :deploy do
     WhiskeyDisk.ensure_main_parent_path_is_present        if WhiskeyDisk.remote?
     WhiskeyDisk.ensure_config_parent_path_is_present      if WhiskeyDisk.has_config_repo?
     WhiskeyDisk.checkout_main_repository                  if WhiskeyDisk.remote?
-    WhiskeyDisk.install_hooks                             if WhiskeyDisk.remote?
     WhiskeyDisk.checkout_configuration_repository         if WhiskeyDisk.has_config_repo?
     WhiskeyDisk.update_main_repository_checkout           if WhiskeyDisk.remote?
     WhiskeyDisk.update_configuration_repository_checkout  if WhiskeyDisk.has_config_repo?

@@ -75,11 +75,6 @@ class WhiskeyDisk
       enqueue "git clone #{self[:repository]} #{tail_path(self[:deploy_to])} ; true"
     end
     
-    def install_hooks
-      needs(:deploy_to)
-      # FIXME - TODO: MORE HERE
-    end
-
     def checkout_configuration_repository
       needs(:deploy_config_to, :config_repository)
       enqueue "cd #{parent_path(self[:deploy_config_to])}"

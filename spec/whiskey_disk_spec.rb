@@ -160,22 +160,6 @@ describe 'WhiskeyDisk' do
     end
   end
   
-  describe 'installing a post-receive hook on the checked out main repository' do
-    before do
-      @parameters = { 'deploy_to' => '/path/to/main/repo' }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
-    end
-    
-    it 'should fail if the deployment path is not specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge('deploy_to' => nil))
-      WhiskeyDisk.reset
-      lambda { WhiskeyDisk.install_hooks }.should.raise
-    end
-    
-    # FIXME -- TODO:  MORE HERE
-  end
-  
   describe 'checking out the configuration repository' do
     before do
       @parameters = { 'deploy_config_to' => '/path/to/config/repo', 'config_repository' => 'git@ogtastic.com:config.git' }

@@ -64,11 +64,6 @@ describe 'rake tasks' do
         @rake["deploy:setup"].invoke
       end
       
-      it 'should install a post-receive hook on the checked out repository' do
-        WhiskeyDisk.should.receive(:install_hooks)
-        @rake["deploy:setup"].invoke        
-      end
-
       describe 'when a configuration repository is specified' do
         it 'should check out the configuration repository' do
           WhiskeyDisk.stub!(:has_config_repo?).and_return(true)
