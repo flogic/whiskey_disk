@@ -1,16 +1,53 @@
- - common post-deploy tasks (including db:migrate, server bounce)
-   - some sort of simple API for hooks to check which files have changed (either via git rev differences or rsync output), so then the rake task would just do something like:
-   
-   require 'whiskey_disk/rake'
-   
-   namespace :deploy do
-     task :post_deploy do 
-       if changed_in?('db/migrate') or changed?('config/database.yml')
-         Rake::Task['db:migrate'].invoke
-       end
-       # etc. ...
-     end
-   end
-   
- - install hooks (look at maybe git-deploy for good examples)
+
+ - should be possible to specify configurations for multiple projects, that is, need to be able to locate a configuration file outside of a given project repo
+   - this implies that we need a way to specify the path to the file: rake deploy:now file=/etc/deploy.yml to=foo
+
+       [simple target]
+           [no path]   deploy:now to=foo
+             1 - presume we are in project, look for foo.yml
+             2 - presume we are in project, look for deploy.yml with foo: selector
+             
+           [dir path]  deploy:now path=/etc/ to=foo
+             1 - look for /etc/foo.yml
+             2 - look for /etc/deploy.yml with foo:selector
+             
+           [file path] deploy:now path=/etc/deploy.yml to=foo
+             1 - find foo selector in /etc/deploy.yml
+
+       [complex target]
+           [no path]   deploy:now to=foo:staging
+             1 - presume we are in project, look for foo/staging.yml
+             2 - presume we are in project, look for foo.yml with staging selector
+             3 - presume we are in project, look for deploy.yml with foo:staging selector
+             4 - presume we are in project, look for deploy.yml with foo selector, containing staging selector
+             
+           [dir path]  deploy:now path=/etc/ to=foo:staging
+             1 - look for /etc/foo/staging.yml
+             2 - look for /etc/foo.yml with staging selector
+             3 - look for /etc/deploy.yml with foo:staging selector
+             4 - look for /etc/deploy.yml with foo selector, containing staging selector
+           
+           [file path] deploy:now path=/etc/deploy.yml to=foo:staging
+             1 - find foo:staging selector in /etc/deploy.yml
+             2 - find foo selector containing staging selector in /etc/deploy.yml
+       
+ - should be able to specify a branch for the config repo
  - make sure the config repo stuff is optional
+ 
+ - do git-deploy style change detection:  get the current branch ref, then do the fetch/reset, get the current branch ref; find the differences, make them available to the rake task(s)
+   - some sort of simple API to access the detected changes
+     require 'whiskey_disk/rake'
+   
+     namespace :deploy do
+       task :post_deploy do 
+         if changed_in?('db/migrate') or changed?('config/database.yml')
+           Rake::Task['db:migrate'].invoke
+         end
+         # etc. ...
+       end
+     end
+
+ - [Q] what about per-environment rake tasks, do we just store these in the config repo?  does this work?
+ - [Q] do we need actual support for "rollbacks"?
+ - [Q] ditto, maintenance pages(?)
+ - [Q] do we want to support multi-system deployments (i.e., deploy and rollback on 4 simultaneous app servers, other bullshit running on the db server, etc.)?
