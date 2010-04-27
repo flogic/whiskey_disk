@@ -31,6 +31,7 @@
              1 - find foo:staging selector in /etc/deploy.yml
              2 - find foo selector containing staging selector in /etc/deploy.yml
        
+ - review thinking behind .remote? conditional in overall deploy file once we get to multi-deployment configurations (the presumption about local deployments may well be wrong at that level of abstraction, and all we're talking about is a switch for ssh vs. bash)
  - should be able to specify a branch for the config repo
  - make sure the config repo stuff is optional
  

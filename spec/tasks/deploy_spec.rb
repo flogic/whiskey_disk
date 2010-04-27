@@ -15,7 +15,7 @@ describe 'rake tasks' do
   describe 'deploy:setup' do
     describe 'when a domain is specified' do
       before do
-        @configuration = { 'domain' => 'some domain'}
+        @configuration = { 'domain' => 'some domain' }
         WhiskeyDisk::Config.stub!(:fetch).and_return(@configuration)
         [ 
           :ensure_main_parent_path_is_present, 
@@ -43,9 +43,20 @@ describe 'rake tasks' do
         @rake["deploy:setup"].invoke
       end
       
-      it 'should ensure that the parent path for the configuration repository checkout is present' do
-        WhiskeyDisk.should.receive(:ensure_config_parent_path_is_present)
-        @rake["deploy:setup"].invoke        
+      describe 'when a configuration repo is specified' do
+        it 'should ensure that the parent path for the configuration repository checkout is present' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(true)
+          WhiskeyDisk.should.receive(:ensure_config_parent_path_is_present)
+          @rake["deploy:setup"].invoke    
+        end
+      end
+      
+      describe 'when no configuration repo is specified' do
+        it 'should not ensure that the path for the configuration repository checkout is present' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(false)
+          WhiskeyDisk.should.not.receive(:ensure_config_parent_path_is_present)
+          @rake["deploy:setup"].invoke        
+        end
       end
       
       it 'should check out the main repository' do
@@ -57,10 +68,21 @@ describe 'rake tasks' do
         WhiskeyDisk.should.receive(:install_hooks)
         @rake["deploy:setup"].invoke        
       end
+
+      describe 'when a configuration repository is specified' do
+        it 'should check out the configuration repository' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(true)
+          WhiskeyDisk.should.receive(:checkout_configuration_repository)
+          @rake["deploy:setup"].invoke
+        end
+      end
       
-      it 'should check out the configuration repository' do
-        WhiskeyDisk.should.receive(:checkout_configuration_repository)
-        @rake["deploy:setup"].invoke
+      describe 'when no configuration repository is specified' do
+        it 'should not check out the configuration repository' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(false)
+          WhiskeyDisk.should.not.receive(:checkout_configuration_repository)
+          @rake["deploy:setup"].invoke
+        end
       end
       
       it 'should update the main repository checkout' do
@@ -68,14 +90,36 @@ describe 'rake tasks' do
         @rake["deploy:setup"].invoke
       end
       
-      it 'should update the configuration repository checkout' do
-        WhiskeyDisk.should.receive(:update_configuration_repository_checkout)
-        @rake["deploy:setup"].invoke
+      describe 'when a configuration repository is specified' do
+        it 'should update the configuration repository checkout' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(true)
+          WhiskeyDisk.should.receive(:update_configuration_repository_checkout)
+          @rake["deploy:setup"].invoke
+        end
       end
       
-      it 'should refresh the configuration' do
-        WhiskeyDisk.should.receive(:refresh_configuration)
-        @rake["deploy:setup"].invoke
+      describe 'when no configuration repository is specified' do
+        it 'should update the configuration repository checkout' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(false)
+          WhiskeyDisk.should.not.receive(:update_configuration_repository_checkout)
+          @rake["deploy:setup"].invoke
+        end
+      end
+
+      describe 'when a configuration repository is specified' do      
+        it 'should refresh the configuration' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(true)
+          WhiskeyDisk.should.receive(:refresh_configuration)
+          @rake["deploy:setup"].invoke
+        end
+      end
+      
+      describe 'when no configuration repository is specified' do      
+        it 'should not refresh the configuration' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(false)
+          WhiskeyDisk.should.not.receive(:refresh_configuration)
+          @rake["deploy:setup"].invoke
+        end
       end
       
       it 'should run any post setup hooks' do        
@@ -115,11 +159,22 @@ describe 'rake tasks' do
         @rake["deploy:setup"].invoke
       end
       
-      it 'should ensure that the parent path for the configuration repository checkout is present' do
-        WhiskeyDisk.should.receive(:ensure_config_parent_path_is_present)
-        @rake["deploy:setup"].invoke        
+      describe 'when a configuration repository is specified' do
+        it 'should ensure that the parent path for the configuration repository checkout is present' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(true)
+          WhiskeyDisk.should.receive(:ensure_config_parent_path_is_present)
+          @rake["deploy:setup"].invoke        
+        end
       end
       
+      describe 'when a configuration repository is specified' do
+        it 'should ensure that the parent path for the configuration repository checkout is present' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(false)
+          WhiskeyDisk.should.not.receive(:ensure_config_parent_path_is_present)
+          @rake["deploy:setup"].invoke        
+        end
+      end
+
       it 'should NOT check out the main repository' do
         WhiskeyDisk.should.not.receive(:checkout_main_repository)
         @rake["deploy:setup"].invoke
@@ -130,19 +185,52 @@ describe 'rake tasks' do
         @rake["deploy:setup"].invoke        
       end
       
-      it 'should check out the configuration repository' do
-        WhiskeyDisk.should.receive(:checkout_configuration_repository)
-        @rake["deploy:setup"].invoke
+      describe 'when a configuration repository is specified' do
+        it 'should check out the configuration repository' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(true)
+          WhiskeyDisk.should.receive(:checkout_configuration_repository)
+          @rake["deploy:setup"].invoke
+        end
       end
       
-      it 'should update the configuration repository checkout' do
-        WhiskeyDisk.should.receive(:update_configuration_repository_checkout)
-        @rake["deploy:setup"].invoke
+      describe 'when no configuration repository is specified' do
+        it 'should not check out the configuration repository' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(false)
+          WhiskeyDisk.should.not.receive(:checkout_configuration_repository)
+          @rake["deploy:setup"].invoke
+        end
+      end
+
+      describe 'when a configuration repository is specified' do
+        it 'should update the configuration repository checkout' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(true)
+          WhiskeyDisk.should.receive(:update_configuration_repository_checkout)
+          @rake["deploy:setup"].invoke
+        end
       end
       
-      it 'should refresh the configuration' do
-        WhiskeyDisk.should.receive(:refresh_configuration)
-        @rake["deploy:setup"].invoke
+      describe 'when no configuration repository is specified' do
+        it 'should not update the configuration repository checkout' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(false)
+          WhiskeyDisk.should.not.receive(:update_configuration_repository_checkout)
+          @rake["deploy:setup"].invoke
+        end
+      end
+      
+      describe 'when a configuration repository is specified' do      
+        it 'should refresh the configuration' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(true)
+          WhiskeyDisk.should.receive(:refresh_configuration)
+          @rake["deploy:setup"].invoke
+        end
+      end
+      
+      describe 'when no configuration repository is specified' do      
+        it 'should not refresh the configuration' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(false)
+          WhiskeyDisk.should.not.receive(:refresh_configuration)
+          @rake["deploy:setup"].invoke
+        end
       end
       
       it 'should run any post setup hooks' do        
@@ -182,14 +270,36 @@ describe 'rake tasks' do
         @rake["deploy:now"].invoke
       end
       
-      it 'should update the configuration repository checkout' do
-        WhiskeyDisk.should.receive(:update_configuration_repository_checkout)
-        @rake["deploy:now"].invoke
+      describe 'when a configuration repository is specified' do
+        it 'should update the configuration repository checkout' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(true)
+          WhiskeyDisk.should.receive(:update_configuration_repository_checkout)
+          @rake["deploy:now"].invoke
+        end
       end
       
-      it 'should refresh the configuration' do
-        WhiskeyDisk.should.receive(:refresh_configuration)
-        @rake["deploy:now"].invoke
+      describe 'when no configuration repository is specified' do
+        it 'should not update the configuration repository checkout' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(false)
+          WhiskeyDisk.should.not.receive(:update_configuration_repository_checkout)
+          @rake["deploy:now"].invoke
+        end
+      end
+      
+      describe 'when a configuration repository is specified' do
+        it 'should refresh the configuration' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(true)
+          WhiskeyDisk.should.receive(:refresh_configuration)
+          @rake["deploy:now"].invoke
+        end
+      end
+      
+      describe 'when no configuration repository is specified' do
+        it 'should not refresh the configuration' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(false)
+          WhiskeyDisk.should.not.receive(:refresh_configuration)
+          @rake["deploy:now"].invoke
+        end
       end
       
       it 'should run any post deployment hooks' do        
@@ -227,14 +337,36 @@ describe 'rake tasks' do
         @rake["deploy:now"].invoke
       end
       
-      it 'should update the configuration repository checkout' do
-        WhiskeyDisk.should.receive(:update_configuration_repository_checkout)
-        @rake["deploy:now"].invoke
+      describe 'when a configuration repository is specified' do
+        it 'should update the configuration repository checkout' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(true)
+          WhiskeyDisk.should.receive(:update_configuration_repository_checkout)
+          @rake["deploy:now"].invoke
+        end
       end
       
-      it 'should refresh the configuration' do
-        WhiskeyDisk.should.receive(:refresh_configuration)
-        @rake["deploy:now"].invoke
+      describe 'when no configuration repository is specified' do
+        it 'should not update the configuration repository checkout' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(false)
+          WhiskeyDisk.should.not.receive(:update_configuration_repository_checkout)
+          @rake["deploy:now"].invoke
+        end
+      end
+      
+      describe 'when a configuration repository is specified' do
+        it 'should refresh the configuration' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(true)
+          WhiskeyDisk.should.receive(:refresh_configuration)
+          @rake["deploy:now"].invoke
+        end
+      end
+      
+      describe 'when no configuration repository is specified' do
+        it 'should not refresh the configuration' do
+          WhiskeyDisk.stub!(:has_config_repo?).and_return(false)
+          WhiskeyDisk.should.not.receive(:refresh_configuration)
+          @rake["deploy:now"].invoke
+        end
       end
       
       it 'should run any post deployment hooks' do        
