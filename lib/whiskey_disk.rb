@@ -31,6 +31,10 @@ class WhiskeyDisk
       ! (self[:config_repository].nil? or self[:config_repository] == '')
     end
     
+    def branch
+      (self[:branch] and self[:branch] != '') ? self[:branch] : 'master'
+    end
+    
     def parent_path(path)
       File.split(path).first
     end
@@ -83,7 +87,6 @@ class WhiskeyDisk
     
     def update_main_repository_checkout
       needs(:deploy_to)
-      branch = (self[:branch] and self[:branch] != '') ? self[:branch] : 'master'
       enqueue "cd #{self[:deploy_to]}"
       enqueue "git fetch origin +refs/heads/#{branch}:refs/remotes/origin/#{branch}"
       enqueue "git reset --hard origin/#{branch}"
