@@ -19,9 +19,10 @@ Whiskey Disk -- embarrassingly fast deployments.
     minute deploys failing because I was on cdma wireless on a train in india where the 
     connection won't stay up for more than 2-3 minutes is not where I want to be.
 
-  - You can do *local* deployments, by this I mean you can use whiskey_disk to manage your
-    local checkout with localized (aka non-production) configurations trivially.  This turns
-    out to be surprisingly handy (well, I was surprised).
+  - You can do *local* deployments, by this I mean you can use whiskey_disk to deploy fully
+    running instances of your application to the same machine you're developing on.  This turns
+    out to be surprisingly handy (well, I was surprised).  *NOTE*:  be sure to set your deploy_to
+    to a place other than the current local checkout.
 
   - You can have per-developer configurations for environments (especially useful for
     "local" or "development" enviroments).  Use .gitignore and everyone can have their own
@@ -215,8 +216,6 @@ Whiskey Disk -- embarrassingly fast deployments.
     post_deploy work:
 
     https://gist.github.com/47e23f2980943531beeb
-
-
 
   On the radar for an upcoming release are:
 

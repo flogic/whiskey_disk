@@ -1,6 +1,4 @@
 
- - review thinking behind .remote? conditional in overall deploy file once we get to multi-deployment configurations (the presumption about local deployments may well be wrong at that level of abstraction, and all we're talking about is a switch for ssh vs. bash)
-
  - should be possible to specify configurations for multiple projects, that is, need to be able to locate a configuration file outside of a given project repo
    - this implies that we need a way to specify the path to the file: rake deploy:now file=/etc/deploy.yml to=foo
 
