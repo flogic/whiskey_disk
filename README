@@ -25,8 +25,8 @@ Whiskey Disk -- embarrassingly fast deployments.
     to a place other than the current local checkout.
 
   - You can have per-developer configurations for environments (especially useful for
-    "local" or "development" enviroments).  Use .gitignore and everyone can have their own
-    local setup that just works.
+    "local" or "development" enviroments).  Use .gitignore, or specify a config_branch and
+    everyone can have their own local setup that just works.
 
   - Deployment configuration is specified as YAML data, not as code.  Operations to perform
     after setup or deployment are specified as rake tasks.
@@ -64,7 +64,6 @@ Whiskey Disk -- embarrassingly fast deployments.
 
     - look in the examples/ directory for sample configuration files
     - main configuration is in <app_root>/config/deploy.yml
-    - per-environment configurations can be stored in <app_root>/config/deploy-<environment>.yml
     - config files are YAML, with a section for each environment.
 
       Known config file settings (if you're familiar with capistrano and vlad these
@@ -220,7 +219,6 @@ Whiskey Disk -- embarrassingly fast deployments.
   On the radar for an upcoming release are:
 
   - common post_* recipes being specifiable by symbol names in deploy.yml ?
-  - making the config repo stuff optional if you don't need that at all
   - bringing in a very simplified version of mislav/git-deploy post-{receive,reset}
     hooks, and a little sugar so you can say:
 
