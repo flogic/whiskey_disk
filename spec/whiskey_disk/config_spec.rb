@@ -76,22 +76,6 @@ describe WhiskeyDisk::Config do
       WhiskeyDisk::Config.fetch['project'].should == 'diskey_whisk'
     end
   end
-  
-  describe 'when returning the configuration filenames' do    
-    before do
-      ENV['to'] = @env = 'staging'
-      WhiskeyDisk::Config.stub!(:configuration_file).and_return('/path/to/config')
-    end
-
-    it 'should fail if the current environment cannot be determined' do
-      ENV['to'] = nil
-      lambda { WhiskeyDisk::Config.filenames }.should.raise
-    end
-    
-    it 'should include the location of the configuration file' do
-      WhiskeyDisk::Config.filenames.should.include('/path/to/config')
-    end
-  end
 
   describe 'computing the project name from a configuration hash' do
     it 'should return the empty string if no repository is defined' do

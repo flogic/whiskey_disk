@@ -57,7 +57,7 @@ class WhiskeyDisk
     
     def needs(*keys)
       keys.each do |key|
-        raise "No value for '#{key}' declared in configuration files [#{WhiskeyDisk::Config.filenames.join(", ")}]" unless self[key]
+        raise "No value for '#{key}' declared in configuration files [#{WhiskeyDisk::Config.configuration_file}]" unless self[key]
       end
     end
     

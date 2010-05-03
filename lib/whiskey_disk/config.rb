@@ -46,11 +46,6 @@ class WhiskeyDisk
         config = (data[environment_name] || {}).merge({'environment' => environment_name})
         { 'project' => project_name(config) }.merge(config)
       end
-    
-      def filenames
-        raise "Cannot determine current environment -- try rake ... to=staging, for example." unless environment_name
-        [ configuration_file ]
-      end
     end
   end
 end
