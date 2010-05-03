@@ -104,8 +104,19 @@ describe WhiskeyDisk::Config do
   end
 
   describe 'finding the main configuration file' do
+    before do
+      ENV['to'] = @env = 'staging'
+    end
+    
+    it 'should return the path to a per-environment configuration file in the config directory under the project base path if it exists' do
+      WhiskeyDisk::Config.stub!(:base_path).and_return('/path/to/project')
+      File.stub!(:exists?).with('/path/to/project/config/deploy/staging.yml').and_return(true)
+      WhiskeyDisk::Config.configuration_file.should == '/path/to/project/config/deploy/staging.yml'      
+    end
+    
     it 'should return the path to deploy.yml in the config directory under the project base path' do
       WhiskeyDisk::Config.stub!(:base_path).and_return('/path/to/project')
+      File.stub!(:exists?).with('/path/to/project/config/deploy/staging.yml').and_return(false)
       WhiskeyDisk::Config.configuration_file.should == '/path/to/project/config/deploy.yml'
     end
   end

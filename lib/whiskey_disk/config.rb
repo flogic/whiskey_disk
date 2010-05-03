@@ -20,6 +20,8 @@ class WhiskeyDisk
       end
       
       def configuration_file
+        per_environment_file = File.join(base_path, 'config', 'deploy', "#{environment_name}.yml")
+        return per_environment_file if File.exists?(per_environment_file)
         File.expand_path(File.join(base_path, 'config', 'deploy.yml'))
       end
       
