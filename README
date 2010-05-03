@@ -72,9 +72,10 @@ Whiskey Disk -- embarrassingly fast deployments.
       - domain:            host on which to deploy (this is an ssh connect string) 
       - deploy_to:         path to which to deploy main application
       - repository:        git repo path for main application
-      - branch:            git branch to deploy from main application git repo
+      - branch:            git branch to deploy from main application git repo (default: master)
       - deploy_config_to:  where to deploy the configuration repository
       - config_repository: git repository for configuration files
+      - config_branch:     git branch to deploy from configuration git repo (default: master)
       - project:           project name (used to compute path in configuration checkout)
       - rake_env:          hash of environment variables to set when running post_setup and post_deploy rake tasks
 

@@ -35,6 +35,10 @@ class WhiskeyDisk
       (self[:branch] and self[:branch] != '') ? self[:branch] : 'master'
     end
     
+    def config_branch
+      (self[:config_branch] and self[:config_branch] != '') ? self[:config_branch] : 'master'
+    end
+    
     def env_vars
       return '' unless self[:rake_env]
       self[:rake_env].keys.inject('') do |buffer,k| 
@@ -103,8 +107,8 @@ class WhiskeyDisk
     def update_configuration_repository_checkout
       needs(:deploy_config_to)
       enqueue "cd #{self[:deploy_config_to]}"
-      enqueue "git fetch origin +refs/heads/master:refs/remotes/origin/master"
-      enqueue "git reset --hard origin/master"
+      enqueue "git fetch origin +refs/heads/#{config_branch}:refs/remotes/origin/#{config_branch}"
+      enqueue "git reset --hard origin/#{config_branch}"
     end
     
     def refresh_configuration

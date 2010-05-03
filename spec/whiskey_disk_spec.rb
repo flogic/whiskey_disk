@@ -257,14 +257,28 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/config/repo})
     end
     
-    it 'should attempt to fetch only the master branch from the origin' do
+    it 'should attempt to fetch only the master branch from the origin if no configuration branch is specified' do
       WhiskeyDisk.update_configuration_repository_checkout
       WhiskeyDisk.buffer.join(' ').should.match(%r{git fetch origin \+refs/heads/master:refs/remotes/origin/master})
     end
     
-    it 'should attempt to reset the master branch from the origin' do
+    it 'should attempt to fetch the specified branch from the origin if a configuration branch is specified' do
+      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'config_branch' => 'production'}))
+      WhiskeyDisk.reset
+      WhiskeyDisk.update_configuration_repository_checkout
+      WhiskeyDisk.buffer.join(' ').should.match(%r{git fetch origin \+refs/heads/production:refs/remotes/origin/production})
+    end
+    
+    it 'should attempt to reset the master branch from the origin if no configuration branch is specified' do
       WhiskeyDisk.update_configuration_repository_checkout
       WhiskeyDisk.buffer.join(' ').should.match(%r{git reset --hard origin/master})
+    end
+
+    it 'should attempt to reset the master branch from the origin if no configuration branch is specified' do
+      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'config_branch' => 'production'}))
+      WhiskeyDisk.reset
+      WhiskeyDisk.update_configuration_repository_checkout
+      WhiskeyDisk.buffer.join(' ').should.match(%r{git reset --hard origin/production})
     end
   end
   

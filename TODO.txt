@@ -1,4 +1,6 @@
 
+ - review thinking behind .remote? conditional in overall deploy file once we get to multi-deployment configurations (the presumption about local deployments may well be wrong at that level of abstraction, and all we're talking about is a switch for ssh vs. bash)
+
  - should be possible to specify configurations for multiple projects, that is, need to be able to locate a configuration file outside of a given project repo
    - this implies that we need a way to specify the path to the file: rake deploy:now file=/etc/deploy.yml to=foo
 
@@ -31,10 +33,6 @@
              1 - find foo:staging selector in /etc/deploy.yml
              2 - find foo selector containing staging selector in /etc/deploy.yml
        
- - review thinking behind .remote? conditional in overall deploy file once we get to multi-deployment configurations (the presumption about local deployments may well be wrong at that level of abstraction, and all we're talking about is a switch for ssh vs. bash)
- - should be able to specify a branch for the config repo
- - make sure the config repo stuff is optional
- 
  - do git-deploy style change detection:  get the current branch ref, then do the fetch/reset, get the current branch ref; find the differences, make them available to the rake task(s)
    - some sort of simple API to access the detected changes
      require 'whiskey_disk/rake'
