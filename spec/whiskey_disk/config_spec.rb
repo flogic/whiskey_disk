@@ -77,6 +77,38 @@ describe WhiskeyDisk::Config do
       WhiskeyDisk::Config.fetch['project'].should == 'diskey_whisk'
     end
   end
+  
+  describe 'returning configuration data from a configuration file' do
+    it 'should fail if the configuration file does not exist' do
+      WhiskeyDisk::Config.stub!(:configuration_file).and_return(CURRENT_FILE + '._crap')
+      lambda { WhiskeyDisk::Config.configuration_data }.should.raise
+    end
+    
+    it 'should return the contents of the configuration file' do
+      WhiskeyDisk::Config.stub!(:configuration_file).and_return(CURRENT_FILE)
+      File.stub!(:read).with(CURRENT_FILE).and_return('file contents')
+      WhiskeyDisk::Config.configuration_data.should == 'file contents'
+    end
+  end
+  
+  describe 'transforming data from the configuration file' do
+    it 'should fail if the configuration data cannot be loaded' do
+      WhiskeyDisk::Config.stub!(:configuration_data).and_raise
+      lambda { WhiskeyDisk::Config.load_data }.should.raise
+    end
+    
+    it 'should fail if converting the configuration data from YAML fails' do
+      WhiskeyDisk::Config.stub!(:configuration_data).and_return('configuration data')
+      YAML.stub!(:load).and_raise
+      lambda { WhiskeyDisk::Config.load_data }.should.raise
+    end
+    
+    it 'should return an un-YAMLized version of the configuration data' do
+      data = { 'a' => 'b', 'c' => 'd' }
+      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump(data))
+      WhiskeyDisk::Config.load_data.should == data
+    end
+  end
 
   describe 'computing the project name from a configuration hash' do
     it 'should return the empty string if no repository is defined' do
