@@ -77,11 +77,18 @@ class WhiskeyDisk
         has_repository_data?(data.values.first)
       end
 
-      def normalize_data(original_data)
-        data = original_data.clone
-        data = { environment_name => data }                     if needs_environment_scoping?(data)
-        data = { project_name(data[environment_name]) => data } if needs_project_scoping?(data)
-        data
+      def add_environment_scoping(data)
+        return data unless needs_environment_scoping?(data)
+        { environment_name => data }
+      end
+
+      def add_project_scoping(data)        
+        return data unless needs_project_scoping?(data)
+        { project_name(data[environment_name]) => data }
+      end
+
+      def normalize_data(data)
+        add_project_scoping(add_environment_scoping(data.clone))
       end      
       
       def load_data
