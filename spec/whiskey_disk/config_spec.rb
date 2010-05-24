@@ -103,10 +103,37 @@ describe WhiskeyDisk::Config do
       lambda { WhiskeyDisk::Config.load_data }.should.raise
     end
     
-    it 'should return an un-YAMLized version of the configuration data' do
+    it 'should return a normalized version of the un-YAMLized configuration data' do
       data = { 'a' => 'b', 'c' => 'd' }
       WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump(data))
-      WhiskeyDisk::Config.load_data.should == data
+      WhiskeyDisk::Config.stub!(:normalize_data).with(data).and_return('normalized data')
+      WhiskeyDisk::Config.load_data.should == 'normalized data'
+    end
+  end
+  
+  describe 'normalizing YAML data from the configuration file' do
+    before do
+      ENV['to'] = @env = 'staging'
+      
+      @bare_data  = { 'repository' => 'git://foo/bar.git', 'domain' => 'ogc@ogtastic.com' }
+      @env_data   = { 'staging' => { 'repository' => 'git://foo/bar.git', 'domain' => 'ogc@ogtastic.com' } }
+      @proj_data  = { 'whiskey_disk' => { 'staging' => { 'repository' => 'git://foo/bar.git', 'domain' => 'ogc@ogtastic.com' } } }
+    end
+    
+    it 'should fail if the configuration data is not a hash' do
+      lambda { WhiskeyDisk::Config.normalize_data([]) }.should.raise
+    end
+    
+    it 'should return the original data if it has both project and environment scoping' do
+      WhiskeyDisk::Config.normalize_data(@proj_data).should == @proj_data
+    end
+        
+    it 'should return the original data wrapped in project scope if it has environment scoping but no project scoping' do
+      WhiskeyDisk::Config.normalize_data(@env_data).should == { 'whiskey_disk' => @env_data }
+    end
+    
+    it 'should return the original data wrapped in a project scope and an environmet scope if it has neither scoping' do
+      WhiskeyDisk::Config.normalize_data(@bare_data).should == { 'whiskey_disk' => { 'staging' => @bare_data } } 
     end
   end
 

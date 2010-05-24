@@ -11,6 +11,10 @@ class WhiskeyDisk
         (ENV['path'] && ENV['path'] != '') ? ENV['path'] : false
       end
       
+      def project
+        'whiskey_disk'
+      end
+      
       def contains_rakefile?(path)
         File.exists?(File.expand_path(File.join(path, 'Rakefile')))
       end
@@ -50,8 +54,30 @@ class WhiskeyDisk
         config['repository'].sub(%r{^.*[/:]}, '').sub(%r{\.git$}, '')
       end
       
+      def has_repository_data?(data)
+        raise "Expected configuration data to be a hash!" unless data.respond_to?(:has_key?)
+        data.has_key?('repository') and !data['repository'].respond_to?(:keys)
+      end
+      
+      # is this data hash a bottom-level data hash without an environment name?
+      def needs_environment_scoping?(data)
+        has_repository_data?(data)
+      end
+      
+      # is this data hash an environment data hash without a project name?
+      def needs_project_scoping?(data)
+        has_repository_data?(data.values.first)
+      end
+
+      def normalize_data(original_data)
+        data = original_data.clone
+        data = { environment_name => data } if needs_environment_scoping?(data)
+        data = { project => data }          if needs_project_scoping?(data)
+        data
+      end      
+      
       def load_data
-        YAML.load(configuration_data)
+        normalize_data(YAML.load(configuration_data))
       rescue Exception => e
         raise %Q{Error reading configuration file [#{configuration_file}]: "#{e}"}
       end
