@@ -6,6 +6,23 @@ CURRENT_FILE = File.expand_path(__FILE__)           # Bacon evidently mucks arou
 CURRENT = File.expand_path(File.dirname(__FILE__))  # Bacon evidently mucks around with __FILE__ or something related :-/
 
 describe WhiskeyDisk::Config do
+  describe 'when computing the environment name' do
+    it 'should return false when there is no ENV["to"] setting' do
+      ENV['to'] = nil
+      WhiskeyDisk::Config.environment_name.should == false
+    end
+    
+    it 'should return false when the ENV["to"] setting is blank' do
+      ENV['to'] = ''
+      WhiskeyDisk::Config.environment_name.should == false  
+    end
+    
+    it 'should return the ENV["to"] setting when it is non-blank' do
+      ENV['to'] = 'staging'
+      WhiskeyDisk::Config.environment_name.should == 'staging'
+    end
+  end
+  
   describe 'when fetching configuration' do
     before do
       ENV['to'] = @env = 'staging'
