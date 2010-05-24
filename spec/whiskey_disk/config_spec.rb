@@ -21,6 +21,11 @@ describe WhiskeyDisk::Config do
       ENV['to'] = 'staging'
       WhiskeyDisk::Config.environment_name.should == 'staging'
     end
+    
+    it 'should return the environment portion of the ENV["to"] setting when a project is specified' do
+      ENV['to'] = 'project:staging'
+      WhiskeyDisk::Config.environment_name.should == 'staging'      
+    end
   end
   
   describe 'when fetching configuration' do
@@ -155,28 +160,69 @@ describe WhiskeyDisk::Config do
   end
 
   describe 'computing the project name from a configuration hash' do
-    it 'should return the empty string if no repository is defined' do
-      WhiskeyDisk::Config.project_name({}).should == ''
+    it 'should return the project name from the ENV["to"] setting when it is available' do
+      ENV['to'] = 'project:staging'
+      WhiskeyDisk::Config.project_name({}).should == 'project'      
     end
     
-    it 'should return the empty string if the repository is blank' do
-      WhiskeyDisk::Config.project_name({ 'repository' => ''}).should == ''
-    end
+    describe 'when ENV["to"] is unset' do
+      before do
+        ENV['to'] = ''
+      end
+      
+      it 'should return the empty string if no repository is defined' do
+        WhiskeyDisk::Config.project_name({}).should == ''
+      end
     
-    it 'should return the last path segment if the repository does not end in .git' do
-      WhiskeyDisk::Config.project_name({ 'repository' => 'git@foo/bar/baz'}).should == 'baz'
-    end
+      it 'should return the empty string if the repository is blank' do
+        WhiskeyDisk::Config.project_name({ 'repository' => ''}).should == ''
+      end
     
-    it 'should return the last path segment, stripping .git, if the repository ends in .git' do
-      WhiskeyDisk::Config.project_name({ 'repository' => 'git@foo/bar/baz.git'}).should == 'baz'
-    end
+      it 'should return the last path segment if the repository does not end in .git' do
+        WhiskeyDisk::Config.project_name({ 'repository' => 'git@foo/bar/baz'}).should == 'baz'
+      end
+    
+      it 'should return the last path segment, stripping .git, if the repository ends in .git' do
+        WhiskeyDisk::Config.project_name({ 'repository' => 'git@foo/bar/baz.git'}).should == 'baz'
+      end
 
-    it 'should return the last :-delimited segment if the repository does not end in .git' do
-      WhiskeyDisk::Config.project_name({ 'repository' => 'git@foo/bar:baz'}).should == 'baz'
+      it 'should return the last :-delimited segment if the repository does not end in .git' do
+        WhiskeyDisk::Config.project_name({ 'repository' => 'git@foo/bar:baz'}).should == 'baz'
+      end
+    
+      it 'should return the last :-delimited segment, stripping .git, if the repository ends in .git' do
+        WhiskeyDisk::Config.project_name({ 'repository' => 'git@foo/bar:baz.git'}).should == 'baz'
+      end
     end
     
-    it 'should return the last :-delimited segment, stripping .git, if the repository ends in .git' do
-      WhiskeyDisk::Config.project_name({ 'repository' => 'git@foo/bar:baz.git'}).should == 'baz'
+    describe 'when no ENV["to"] project setting is available' do
+      before do
+        ENV['to'] = 'staging'
+      end
+      
+      it 'should return the empty string if no repository is defined' do
+        WhiskeyDisk::Config.project_name({}).should == ''
+      end
+    
+      it 'should return the empty string if the repository is blank' do
+        WhiskeyDisk::Config.project_name({ 'repository' => ''}).should == ''
+      end
+    
+      it 'should return the last path segment if the repository does not end in .git' do
+        WhiskeyDisk::Config.project_name({ 'repository' => 'git@foo/bar/baz'}).should == 'baz'
+      end
+    
+      it 'should return the last path segment, stripping .git, if the repository ends in .git' do
+        WhiskeyDisk::Config.project_name({ 'repository' => 'git@foo/bar/baz.git'}).should == 'baz'
+      end
+
+      it 'should return the last :-delimited segment if the repository does not end in .git' do
+        WhiskeyDisk::Config.project_name({ 'repository' => 'git@foo/bar:baz'}).should == 'baz'
+      end
+    
+      it 'should return the last :-delimited segment, stripping .git, if the repository ends in .git' do
+        WhiskeyDisk::Config.project_name({ 'repository' => 'git@foo/bar:baz.git'}).should == 'baz'
+      end
     end
   end
 

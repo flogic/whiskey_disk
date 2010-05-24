@@ -4,7 +4,14 @@ class WhiskeyDisk
   class Config
     class << self
       def environment_name
-        (ENV['to'] && ENV['to'] != '') ? ENV['to'] : false
+        return false unless (ENV['to'] && ENV['to'] != '')
+        return ENV['to'] unless ENV['to'] =~ /:/
+        ENV['to'].split(/:/)[1]
+      end
+      
+      def specified_project_name
+        return false unless (ENV['to'] && ENV['to'] =~ /:/)
+        ENV['to'].split(/:/).first
       end
       
       def path
@@ -50,6 +57,7 @@ class WhiskeyDisk
       end
       
       def project_name(config)
+        return specified_project_name if specified_project_name
         return '' unless config['repository'] and config['repository'] != ''
         config['repository'].sub(%r{^.*[/:]}, '').sub(%r{\.git$}, '')
       end
