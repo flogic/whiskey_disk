@@ -1,25 +1,51 @@
 
+??? the config fetch routine should always return a hash of the form:
+
+  - project_name
+    - environment_name
+      - settings
+
+  -> this implies that we need to know whether a config file is using
+  single-environment, single-project format or multi-project format.  
+  
+  Single-environment:
+  
+    - repository: "..."
+    ...
+  
+  Single-project:
+  
+    staging:
+      - repository: "..."
+      ...
+    production:
+      - repository: "..."
+
+  Multi-project:
+
+    foo:
+      staging:
+        - repository: "..."
+        ...
+      production:
+        - repository: "..."
+    bar:
+      staging:
+        - repository: "..."
+        ...
+      production:
+        - repository: "..."
+
+
  - should be possible to specify configurations for multiple projects, that is, need to be able to locate a configuration file outside of a given project repo
    - this implies that we need a way to specify the path to the file: rake deploy:now file=/etc/deploy.yml to=foo
 
-       [simple target]
-           [no path]   deploy:now to=foo
-             1 - presume we are in project, look for foo.yml
-             2 - presume we are in project, look for deploy.yml with foo: selector
-             
-           [dir path]  deploy:now path=/etc/ to=foo
-             1 - look for /etc/foo.yml
-             2 - look for /etc/deploy.yml with foo:selector
-             
-           [file path] deploy:now path=/etc/deploy.yml to=foo
-             1 - find foo selector in /etc/deploy.yml
-
        [complex target]
            [no path]   deploy:now to=foo:staging
-             1 - presume we are in project, look for foo/staging.yml
-             2 - presume we are in project, look for foo.yml with staging selector
-             3 - presume we are in project, look for deploy.yml with foo:staging selector
-             4 - presume we are in project, look for deploy.yml with foo selector, containing staging selector
+             1 - we are in project, look for foo/staging.yml
+             2 - we are in project, look for foo.yml with staging selector
+             3 - we are in project, look for deploy.yml with foo:staging selector
+             4 - we are in project, look for deploy.yml with foo selector, containing staging selector
              
            [dir path]  deploy:now path=/etc/ to=foo:staging
              1 - look for /etc/foo/staging.yml
@@ -30,6 +56,11 @@
            [file path] deploy:now path=/etc/deploy.yml to=foo:staging
              1 - find foo:staging selector in /etc/deploy.yml
              2 - find foo selector containing staging selector in /etc/deploy.yml
+       
+  Regardless of how the config-file shorthands it.
+       
+       
+ - between the two of these constraints, I think this means we need to be able to reconcile what we're trying to deploy (project, environment) with the amount of information available through the config file and config path.  That is, if the config file is per-environment, but we've specified project and environment in our to=foo:bar specification, we probably don't have enough information to make that happen.  Do we care?  That is, if there's just one environment on a single-project basis, or one file for all environments, why not let people do that?  Let's run with that and see how it falls out.
        
  - do git-deploy style change detection:  get the current branch ref, then do the fetch/reset, get the current branch ref; find the differences, make them available to the rake task(s)
    - some sort of simple API to access the detected changes
@@ -44,7 +75,16 @@
        end
      end
 
+ - do we want a mechanism to manage the config repo?  (add a repo, add a project, add an environment, put a file into the config repo for an environment?)
+
+ - would be nice to have the ability to say if a project is out of date (meaning that, based upon this config file, either the checked out project repo or the checked out config repo is older than the upstream) so we can do some sort of automated / conditional deployments.  Would we want a command-line wrapper around this, or a flag, or something else?
+
+ - do we want a command-line program to ease the situation where 
+
  - [Q] what about per-environment rake tasks, do we just store these in the config repo?  does this work?
+ 
  - [Q] do we need actual support for "rollbacks"?
+
  - [Q] ditto, maintenance pages(?)
- - [Q] do we want to support multi-system deployments (i.e., deploy and rollback on 4 simultaneous app servers, other bullshit running on the db server, etc.)?
+
+ - [Q] do we want to support multi-system deployments (i.e., deploy and rollback on 4 simultaneous app servers, other bullshit running on the db server, etc.)?  If we get into this, we have the original :role problem that cap faced -- i.e., we only want to run the database operations on certain hosts.
