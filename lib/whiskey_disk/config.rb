@@ -58,7 +58,7 @@ class WhiskeyDisk
       
       def project_name(config)
         return specified_project_name if specified_project_name
-        return '' unless config['repository'] and config['repository'] != ''
+        return '' unless has_repository_data?(config)
         config['repository'].sub(%r{^.*[/:]}, '').sub(%r{\.git$}, '')
       end
       
