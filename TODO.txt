@@ -1,4 +1,8 @@
 
+*** make sure the semantics of providing the project name in the hash are well-defined
+
+*** dereference project & environment now in the normalized hash
+
 ??? the config fetch routine should always return a hash of the form:
 
   - project_name

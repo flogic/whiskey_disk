@@ -79,8 +79,8 @@ class WhiskeyDisk
 
       def normalize_data(original_data)
         data = original_data.clone
-        data = { environment_name => data } if needs_environment_scoping?(data)
-        data = { project => data }          if needs_project_scoping?(data)
+        data = { environment_name => data }                     if needs_environment_scoping?(data)
+        data = { project_name(data[environment_name]) => data } if needs_project_scoping?(data)
         data
       end      
       

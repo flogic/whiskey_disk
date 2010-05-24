@@ -145,17 +145,38 @@ describe WhiskeyDisk::Config do
     it 'should fail if the configuration data is not a hash' do
       lambda { WhiskeyDisk::Config.normalize_data([]) }.should.raise
     end
-    
-    it 'should return the original data if it has both project and environment scoping' do
-      WhiskeyDisk::Config.normalize_data(@proj_data).should == @proj_data
-    end
+
+
+    describe 'when no project name is specified via ENV["to"]' do    
+      it 'should return the original data if it has both project and environment scoping' do
+        WhiskeyDisk::Config.normalize_data(@proj_data).should == @proj_data
+      end
         
-    it 'should return the original data wrapped in project scope if it has environment scoping but no project scoping' do
-      WhiskeyDisk::Config.normalize_data(@env_data).should == { 'whiskey_disk' => @env_data }
-    end
+      it 'should return the original data wrapped in project scope, using the repo project, if it has environment scoping but no project scoping' do
+        WhiskeyDisk::Config.normalize_data(@env_data).should == { 'bar' => @env_data }
+      end
     
-    it 'should return the original data wrapped in a project scope and an environmet scope if it has neither scoping' do
-      WhiskeyDisk::Config.normalize_data(@bare_data).should == { 'whiskey_disk' => { 'staging' => @bare_data } } 
+      it 'should return the original data wrapped in a project scope, using the repo proejct, and an environment scope if it has neither scoping' do
+        WhiskeyDisk::Config.normalize_data(@bare_data).should == { 'bar' => { 'staging' => @bare_data } } 
+      end
+    end
+
+    describe 'when a project name is specified via ENV["to"]' do    
+      before do
+        ENV['to'] = @env = 'whiskey_disk:staging'
+      end
+      
+      it 'should return the original data if it has both project and environment scoping' do
+        WhiskeyDisk::Config.normalize_data(@proj_data).should == @proj_data
+      end
+        
+      it 'should return the original data wrapped in project scope if it has environment scoping but no project scoping' do
+        WhiskeyDisk::Config.normalize_data(@env_data).should == { 'whiskey_disk' => @env_data }
+      end
+    
+      it 'should return the original data wrapped in a project scope and an environment scope if it has neither scoping' do
+        WhiskeyDisk::Config.normalize_data(@bare_data).should == { 'whiskey_disk' => { 'staging' => @bare_data } } 
+      end
     end
   end
 
