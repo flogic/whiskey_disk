@@ -15,8 +15,7 @@ class WhiskeyDisk
         File.exists?(File.expand_path(File.join(path, 'Rakefile')))
       end
       
-      def base_path
-        return path if path
+      def find_rakefile_from_current_path
         while (!contains_rakefile?(Dir.pwd))
           raise "Could not find Rakefile in the current directory tree!" if Dir.pwd == '/'
           Dir.chdir('..')
@@ -24,14 +23,21 @@ class WhiskeyDisk
         File.join(Dir.pwd, 'config')
       end
       
+      def base_path
+        return path if path
+        find_rakefile_from_current_path
+      end
+      
       def configuration_file
         return path if path and File.file?(path)
-        per_environment_file = File.join(base_path, 'deploy', "#{environment_name}.yml")
-        return per_environment_file if File.exists?(per_environment_file)
-        per_environment_file = File.join(base_path, "#{environment_name}.yml")
-        return per_environment_file if File.exists?(per_environment_file)
-        raise "Could not locate configuration file in path [#{base_path}]" unless File.exists?(File.join(base_path, 'deploy.yml'))
-        File.expand_path(File.join(base_path, 'deploy.yml'))
+        
+        [ 
+          File.join(base_path, 'deploy', "#{environment_name}.yml"),
+          File.join(base_path, "#{environment_name}.yml"), 
+          File.join(base_path, 'deploy.yml') 
+        ].each { |file|  return file if File.exists?(file) }
+        
+        raise "Could not locate configuration file in path [#{base_path}]"
       end
       
       def configuration_data
