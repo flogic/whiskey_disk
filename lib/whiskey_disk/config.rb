@@ -59,12 +59,18 @@ class WhiskeyDisk
         repo.sub(%r{^.*[/:]}, '').sub(%r{\.git$}, '')
       end
 
+      def get_project_handle(data)
+        return specified_project_name if specified_project_name
+        raise "Cannot determine unique project name from configuration file [#{configuration_file}]" if data.keys.size > 1
+        data.keys.first
+      end
+
       def repository(data)
-        return data['repository'] unless specified_project_name
-        raise "Could not find data for project [#{specified_project_name}]" unless data[specified_project_name]
-        raise "Could not find data for environment [#{environment_name}] in project [#{specified_project_name}]" unless data[specified_project_name][environment_name]
-        raise "Could not find repository for environment [#{environment_name}] in project [#{specified_project_name}]" unless data[specified_project_name][environment_name].has_key?('repository')
-        data[specified_project_name][environment_name]['repository']
+        project = get_project_handle(data)
+        raise "Could not find data for project [#{project}]" unless data[project]
+        raise "Could not find data for environment [#{environment_name}] in project [#{project}]" unless data[project][environment_name]
+        raise "Could not find repository for environment [#{environment_name}] in project [#{project}]" unless data[project][environment_name].has_key?('repository')
+        data[project][environment_name]['repository']
       end
       
       def repository_depth(data, depth = 0)
