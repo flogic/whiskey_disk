@@ -54,12 +54,17 @@ class WhiskeyDisk
       
       def project_name(config)
         return specified_project_name if specified_project_name
-        return '' unless has_repository_data?(config)
-        config['repository'].sub(%r{^.*[/:]}, '').sub(%r{\.git$}, '')
+        repo = repository(config)
+        raise "Could not determine project name from configuration file [#{configuration_file}]" unless repo and repo != ''
+        repo.sub(%r{^.*[/:]}, '').sub(%r{\.git$}, '')
       end
-      
-      def has_repository_data?(data)
-        !!repository_depth(data) rescue false
+
+      def repository(data)
+        return data['repository'] unless specified_project_name
+        raise "Could not find data for project [#{specified_project_name}]" unless data[specified_project_name]
+        raise "Could not find data for environment [#{environment_name}] in project [#{specified_project_name}]" unless data[specified_project_name][environment_name]
+        raise "Could not find repository for environment [#{environment_name}] in project [#{specified_project_name}]" unless data[specified_project_name][environment_name].has_key?('repository')
+        data[specified_project_name][environment_name]['repository']
       end
       
       def repository_depth(data, depth = 0)
