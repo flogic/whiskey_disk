@@ -1,4 +1,16 @@
+ - focus on the ease of deploying non-Ruby applications, as well as large numbers of applications on a server, without running from inside application checkouts (i.e., headaches with rakefiles, lib includes, etc.) 
+ 
+ - document the various ways we'd handle deployments with this; various config repo patterns of usage
 
+ - cut the next gem release
+
+
+---
+
+ - would be nice to have the ability to say if a project is out of date (meaning that, based upon this config file, either the checked out project repo or the checked out config repo is older than the upstream) so we can do some sort of automated / conditional deployments.  We could implement this as a config file option (check for out of date before deploying), but questions about how to "force" if necessary.  Could also be done as a flag.
+ 
+ 
+ 
  - do git-deploy style change detection:  get the current branch ref, then do the fetch/reset, get the current branch ref; find the differences, make them available to the rake task(s)
    - some sort of simple API to access the detected changes
      require 'whiskey_disk/rake'
@@ -12,13 +24,15 @@
        end
      end
 
- - would be nice to have the ability to say if a project is out of date (meaning that, based upon this config file, either the checked out project repo or the checked out config repo is older than the upstream) so we can do some sort of automated / conditional deployments.  Would we want a command-line wrapper around this, or a flag, or something else?
+
+
+---
 
  - [Q] what about per-environment rake tasks, do we just store these in the config repo?  does this work?
  
  - [Q] ditto, maintenance pages(?) (i.e., a pre-deploy hook)
 
- - do we want a mechanism to manage the config repo?  (add a repo, add a project, add an environment, put a file into the config repo for an environment?)
+ - [Q] do we want a mechanism to manage the config repo?  (add a repo, add a project, add an environment, put a file into the config repo for an environment?)
 
  - [Q] do we need actual support for "rollbacks"?
 
