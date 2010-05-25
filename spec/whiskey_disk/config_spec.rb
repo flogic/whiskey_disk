@@ -145,16 +145,20 @@ describe WhiskeyDisk::Config do
     end
 
     describe 'when no project name is specified via ENV["to"]' do    
+      before do
+        ENV['to'] = @env = 'staging'
+      end
+      
       it 'should return the original data if it has both project and environment scoping' do
         WhiskeyDisk::Config.normalize_data(@proj_data).should == @proj_data
       end
         
-      it 'should return the original data wrapped in project scope, using the repo project, if it has environment scoping but no project scoping' do
-        WhiskeyDisk::Config.normalize_data(@env_data).should == { 'foo' => @env_data }
+      it 'should return the original data wrapped in project scope, using a dummy project, if it has environment scoping but no project scoping' do
+        WhiskeyDisk::Config.normalize_data(@env_data).should == { 'unnamed_project' => @env_data }
       end
     
-      it 'should return the original data wrapped in a project scope, using the repo project, and an environment scope if it has neither scoping' do
-        WhiskeyDisk::Config.normalize_data(@bare_data).should == { 'foo' => { 'staging' => @bare_data } } 
+      it 'should return the original data wrapped in a project scope, using a dummy project, and an environment scope if it has neither scoping' do
+        WhiskeyDisk::Config.normalize_data(@bare_data).should == { 'unnamed_project' => { 'staging' => @bare_data } } 
       end
     end
 

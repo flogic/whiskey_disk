@@ -1,5 +1,10 @@
  - focus on the ease of deploying non-Ruby applications, as well as large numbers of applications on a server, without running from inside application checkouts (i.e., headaches with rakefiles, lib includes, etc.) 
  
+   a starter wd script might look like:
+ 
+   #!/bin/sh
+   rake -f ~/path/to/some/Rakefile -rubygems -r 'tasks/deploy' "$@"
+   
  - document the various ways we'd handle deployments with this; various config repo patterns of usage
 
  - cut the next gem release

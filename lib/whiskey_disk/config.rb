@@ -105,7 +105,7 @@ class WhiskeyDisk
 
       def add_project_scoping(data)        
         return data unless needs_project_scoping?(data)
-        { project_name(data[environment_name]) => data }
+        { (specified_project_name ? specified_project_name : 'unnamed_project') => data }
       end
 
       def normalize_data(data)
