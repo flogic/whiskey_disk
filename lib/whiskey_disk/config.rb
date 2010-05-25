@@ -38,11 +38,20 @@ class WhiskeyDisk
       def configuration_file
         return path if path and File.file?(path)
         
-        [ 
-          File.join(base_path, 'deploy', "#{environment_name}.yml"),
-          File.join(base_path, "#{environment_name}.yml"), 
-          File.join(base_path, 'deploy.yml') 
-        ].each { |file|  return file if File.exists?(file) }
+        files = []
+
+        files += [
+          File.join(base_path, 'deploy', specified_project_name, "#{environment_name}.yml"),  # /deploy/foo/staging.yml
+          File.join(base_path, 'deploy', "#{specified_project_name}.yml") # /deploy/foo.yml
+        ] if specified_project_name
+        
+        files += [ 
+          File.join(base_path, 'deploy', "#{environment_name}.yml"),  # /deploy/staging.yml
+          File.join(base_path, "#{environment_name}.yml"), # /staging.yml
+          File.join(base_path, 'deploy.yml') # /deploy.yml
+        ]
+        
+        files.each { |file|  return file if File.exists?(file) }
         
         raise "Could not locate configuration file in path [#{base_path}]"
       end

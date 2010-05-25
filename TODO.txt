@@ -1,20 +1,4 @@
- 
- - Support naming project files by project name (similar to how we do for environment name now):
 
-       [complex target]
-           [no path]   deploy:now to=foo:staging
-             1 - we are in project, look for foo/staging.yml
-             2 - we are in project, look for foo.yml 
-             3 - fall back to deploy.yml like we currently do
-             
-           [dir path]  deploy:now path=/etc/ to=foo:staging
-             1 - look for /etc/foo/staging.yml
-             2 - look for /etc/foo.yml 
-             3 - fall back to deploy.yml like we currently do
-           
-           [file path] deploy:now path=/etc/deploy.yml to=foo:staging
-           - just use deploy.yml like we currently do
-       
  - do git-deploy style change detection:  get the current branch ref, then do the fetch/reset, get the current branch ref; find the differences, make them available to the rake task(s)
    - some sort of simple API to access the detected changes
      require 'whiskey_disk/rake'
@@ -28,14 +12,14 @@
        end
      end
 
- - do we want a mechanism to manage the config repo?  (add a repo, add a project, add an environment, put a file into the config repo for an environment?)
-
  - would be nice to have the ability to say if a project is out of date (meaning that, based upon this config file, either the checked out project repo or the checked out config repo is older than the upstream) so we can do some sort of automated / conditional deployments.  Would we want a command-line wrapper around this, or a flag, or something else?
 
  - [Q] what about per-environment rake tasks, do we just store these in the config repo?  does this work?
  
- - [Q] do we need actual support for "rollbacks"?
+ - [Q] ditto, maintenance pages(?) (i.e., a pre-deploy hook)
 
- - [Q] ditto, maintenance pages(?)
+ - do we want a mechanism to manage the config repo?  (add a repo, add a project, add an environment, put a file into the config repo for an environment?)
+
+ - [Q] do we need actual support for "rollbacks"?
 
  - [Q] do we want to support multi-system deployments (i.e., deploy and rollback on 4 simultaneous app servers, other bullshit running on the db server, etc.)?  If we get into this, we have the original :role problem that cap faced -- i.e., we only want to run the database operations on certain hosts.
