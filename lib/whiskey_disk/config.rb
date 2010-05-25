@@ -18,10 +18,6 @@ class WhiskeyDisk
         (ENV['path'] && ENV['path'] != '') ? ENV['path'] : false
       end
       
-      def project
-        'whiskey_disk'
-      end
-      
       def contains_rakefile?(path)
         File.exists?(File.expand_path(File.join(path, 'Rakefile')))
       end
@@ -63,18 +59,23 @@ class WhiskeyDisk
       end
       
       def has_repository_data?(data)
-        raise "Expected configuration data to be a hash!" unless data.respond_to?(:has_key?)
-        data.has_key?('repository') and !data['repository'].respond_to?(:keys)
+        !!repository_depth(data) rescue false
+      end
+      
+      def repository_depth(data, depth = 0)
+        raise 'no repository found' unless data.respond_to?(:has_key?)
+        return depth if data.has_key?('repository')
+        repository_depth(data.values.first, depth + 1)
       end
       
       # is this data hash a bottom-level data hash without an environment name?
       def needs_environment_scoping?(data)
-        has_repository_data?(data)
+        repository_depth(data) == 0
       end
       
       # is this data hash an environment data hash without a project name?
       def needs_project_scoping?(data)
-        has_repository_data?(data.values.first)
+        repository_depth(data) == 1
       end
 
       def add_environment_scoping(data)
@@ -97,12 +98,17 @@ class WhiskeyDisk
         raise %Q{Error reading configuration file [#{configuration_file}]: "#{e}"}
       end
       
+      def filter_data(data)
+        raise "No configuration file defined data for environment [#{environment_name}]" unless data[project_name(data)][environment_name]
+        data[project_name(data)][environment_name].merge({
+          'environment' => environment_name, 
+          'project' => project_name(data) 
+        })
+      end
+      
       def fetch
         raise "Cannot determine current environment -- try rake ... to=staging, for example." unless environment_name
-        data = load_data
-        raise "No configuration file defined data for environment [#{environment_name}]" unless data[environment_name]
-        config = (data[environment_name] || {}).merge({'environment' => environment_name})
-        { 'project' => project_name(config) }.merge(config)
+        filter_data(load_data)
       end
     end
   end

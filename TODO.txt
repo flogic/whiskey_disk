@@ -1,28 +1,22 @@
+ - fail on project name search where project name is ambiguous
 
-*** make sure the semantics of providing the project name in the hash are well-defined
-
-*** dereference project & environment now in the normalized hash
-
+ +++
+ 
  - Support naming project files by project name (similar to how we do for environment name now):
 
        [complex target]
            [no path]   deploy:now to=foo:staging
              1 - we are in project, look for foo/staging.yml
-             2 - we are in project, look for foo.yml with staging selector
-             3 - we are in project, look for deploy.yml with foo:staging selector
-             4 - we are in project, look for deploy.yml with foo selector, containing staging selector
+             2 - we are in project, look for foo.yml 
+             3 - fall back to deploy.yml like we currently do
              
            [dir path]  deploy:now path=/etc/ to=foo:staging
              1 - look for /etc/foo/staging.yml
-             2 - look for /etc/foo.yml with staging selector
-             3 - look for /etc/deploy.yml with foo:staging selector
-             4 - look for /etc/deploy.yml with foo selector, containing staging selector
+             2 - look for /etc/foo.yml 
+             3 - fall back to deploy.yml like we currently do
            
            [file path] deploy:now path=/etc/deploy.yml to=foo:staging
-             1 - find foo:staging selector in /etc/deploy.yml
-             2 - find foo selector containing staging selector in /etc/deploy.yml
-       
-  Regardless of how the config-file shorthands it.
+           - just use deploy.yml like we currently do
        
  - do git-deploy style change detection:  get the current branch ref, then do the fetch/reset, get the current branch ref; find the differences, make them available to the rake task(s)
    - some sort of simple API to access the detected changes

@@ -30,7 +30,7 @@ describe WhiskeyDisk::Config do
   
   describe 'when fetching configuration' do
     before do
-      ENV['to'] = @env = 'staging'
+      ENV['to'] = @env = 'foo:staging'
     end
     
     it 'should fail if the current environment cannot be determined' do
@@ -54,13 +54,13 @@ describe WhiskeyDisk::Config do
     end
     
     it 'should fail if the configuration file does not define data for this environment' do
-      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({ 'production' => { 'a' => 'b'} }))
+      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({'foo' => { 'production' => { 'a' => 'b'}}}))
       lambda { WhiskeyDisk::Config.fetch }.should.raise
     end
     
     it 'should return the configuration yaml file data for this environment as a hash' do
-      staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
-      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({ 'production' => { 'a' => 'b'}, 'staging' => staging }))
+      staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
+      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}))
       result = WhiskeyDisk::Config.fetch
       staging.each_pair do |k,v|
         result[k].should == v
@@ -69,34 +69,32 @@ describe WhiskeyDisk::Config do
     
     it 'should not include configuration information for other environments in the returned hash' do
       staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
-      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({ 'production' => { 'a' => 'b'}, 'staging' => staging }))
+      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({ 'production' => { 'repository' => 'c', 'a' => 'b'}, 'staging' => staging }))
       WhiskeyDisk::Config.fetch['a'].should.be.nil
     end
     
     it 'should include the environment in the hash' do
       staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
-      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({ 'production' => { 'a' => 'b'}, 'staging' => staging }))
+      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}))
       WhiskeyDisk::Config.fetch['environment'].should == 'staging'
     end
     
     it 'should not allow overriding the environment in the configuration file' do
-      staging = { 'foo' => 'bar', 'baz' => 'xyzzy', 'environment' => 'production' }
-      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({ 'production' => { 'a' => 'b'}, 'staging' => staging }))
+      staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'environment' => 'production' }
+      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}))
       WhiskeyDisk::Config.fetch['environment'].should == 'staging'
     end
     
     it 'should include the project handle in the hash' do
-      staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
-      WhiskeyDisk::Config.stub!(:project_name).and_return('whiskey_disk')
-      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({ 'production' => { 'a' => 'b'}, 'staging' => staging }))
-      WhiskeyDisk::Config.fetch['project'].should == 'whiskey_disk'
+      staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
+      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}))
+      WhiskeyDisk::Config.fetch['project'].should == 'foo'
     end
     
-    it 'should allow overriding the project handle in the configuration file' do
-      staging = { 'foo' => 'bar', 'baz' => 'xyzzy', 'project' => 'diskey_whisk' }
-      WhiskeyDisk::Config.stub!(:project_name).and_return('whiskey_disk')
-      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({ 'production' => { 'a' => 'b'}, 'staging' => staging }))
-      WhiskeyDisk::Config.fetch['project'].should == 'diskey_whisk'
+    it 'should not allow overriding the project handle in the configuration file' do
+      staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
+      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}))
+      WhiskeyDisk::Config.fetch['project'].should == 'foo'
     end
   end
   
@@ -138,14 +136,13 @@ describe WhiskeyDisk::Config do
       ENV['to'] = @env = 'staging'
       
       @bare_data  = { 'repository' => 'git://foo/bar.git', 'domain' => 'ogc@ogtastic.com' }
-      @env_data   = { 'staging' => { 'repository' => 'git://foo/bar.git', 'domain' => 'ogc@ogtastic.com' } }
-      @proj_data  = { 'whiskey_disk' => { 'staging' => { 'repository' => 'git://foo/bar.git', 'domain' => 'ogc@ogtastic.com' } } }
+      @env_data   = { 'staging' => @bare_data }
+      @proj_data  = { 'whiskey_disk' => @env_data }
     end
     
     it 'should fail if the configuration data is not a hash' do
       lambda { WhiskeyDisk::Config.normalize_data([]) }.should.raise
     end
-
 
     describe 'when no project name is specified via ENV["to"]' do    
       it 'should return the original data if it has both project and environment scoping' do
@@ -156,7 +153,7 @@ describe WhiskeyDisk::Config do
         WhiskeyDisk::Config.normalize_data(@env_data).should == { 'bar' => @env_data }
       end
     
-      it 'should return the original data wrapped in a project scope, using the repo proejct, and an environment scope if it has neither scoping' do
+      it 'should return the original data wrapped in a project scope, using the repo project, and an environment scope if it has neither scoping' do
         WhiskeyDisk::Config.normalize_data(@bare_data).should == { 'bar' => { 'staging' => @bare_data } } 
       end
     end
