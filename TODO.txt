@@ -1,5 +1,3 @@
- - [BUG] still a problem with project name when not specified in config file and not specified in ENV['to']; try deploying with current code -- will get a problem mapping the dummy project name when looking up the final config data.  Review this code.
-
  - update README
  - cut the next gem release
 

@@ -184,106 +184,17 @@ describe WhiskeyDisk::Config do
   describe 'computing the project name from a configuration hash' do
     it 'should return the project name from the ENV["to"] setting when it is available' do
       ENV['to'] = 'foo:staging'
-      WhiskeyDisk::Config.project_name({}).should == 'foo'      
+      WhiskeyDisk::Config.project_name.should == 'foo'      
     end
     
     it 'should fail when ENV["to"] is unset' do
       ENV['to'] = ''
-      @config = { 'foo' => { 'staging' => { 'repository' => 'path' }}}      
-      lambda { WhiskeyDisk::Config.project_name(@config) }.should.raise      
+      WhiskeyDisk::Config.project_name.should == 'unnamed_project'    
     end
     
-    describe 'when no ENV["to"] project setting is available' do
-      before do
-        ENV['to'] = 'staging'
-        @config = { 'foo' => { 'staging' => { 'repository' => '' }}}
-      end
-      
-      it 'should fail if no repository is defined' do
-        @config['foo']['staging'] = {}
-        lambda { WhiskeyDisk::Config.project_name(@config) }.should.raise
-      end
-    
-      it 'should fail if the repository is blank' do
-        lambda { WhiskeyDisk::Config.project_name(@config) }.should.raise
-      end
-    
-      it 'should return the last path segment if the repository does not end in .git' do
-        @config['foo']['staging']['repository'] = 'git@foo/bar/baz'
-        WhiskeyDisk::Config.project_name(@config).should == 'baz'
-      end
-    
-      it 'should return the last path segment, stripping .git, if the repository ends in .git' do
-        @config['foo']['staging']['repository'] = 'git@foo/bar/baz.git'
-        WhiskeyDisk::Config.project_name(@config).should == 'baz'
-      end
-
-      it 'should return the last :-delimited segment if the repository does not end in .git' do
-        @config['foo']['staging']['repository'] = 'git@foo/bar:baz'
-        WhiskeyDisk::Config.project_name(@config).should == 'baz'
-      end
-    
-      it 'should return the last :-delimited segment, stripping .git, if the repository ends in .git' do
-        @config['foo']['staging']['repository'] = 'git@foo/bar:baz.git'
-        WhiskeyDisk::Config.project_name(@config).should == 'baz'
-      end
-    end
-  end
-  
-  describe 'finding the repository in a normalized data hash' do
-    describe 'when a project name is set via ENV["to"]' do
-      before do
-        @project = 'foo'
-        @env = 'staging'
-        ENV['to'] = "#{@project}:#{@env}"
-      end
-      
-      it 'should fail if there is no data for the specified project in the hash' do
-        data = { 'bar' => { 'staging' => { 'repository' => 'path', 'bar' => 'xyzzy' }}}
-        lambda { WhiskeyDisk::Config.repository(data) }.should.raise
-      end
-      
-      it 'should fail if there is no data for the specified project and environment in the hash' do
-        data = { 'foo' => { 'production' => { 'repository' => 'path', 'bar' => 'xyzzy' }}}
-        lambda { WhiskeyDisk::Config.repository(data) }.should.raise        
-      end
-      
-      it 'should fail if there is no repository setting for the specified project and environment in the hash' do
-        data = { 'foo' => { 'staging' => { 'poopository' => 'path', 'bar' => 'xyzzy' }}}
-        lambda { WhiskeyDisk::Config.repository(data) }.should.raise
-      end
-      
-      it 'should return the repository setting for the specified project and environment in the hash' do
-        data = { 'foo' => { 'staging' => { 'repository' => 'path', 'bar' => 'xyzzy' }}}
-        WhiskeyDisk::Config.repository(data).should == 'path'
-      end
-    end
-    
-    describe 'when no project name is set via ENV["to"]' do
-      before do
-        ENV['to'] = @env = 'staging'
-      end
-      
-      it 'should fail if there is more than one project in the configuration data' do
-        data = { 'foo' => { 'staging' => { 'repository' => 'path' }}, 
-                 'bar' => { 'staging' => { 'repository' => 'path' }}}
-        lambda { WhiskeyDisk::Config.repository(data) }.should.raise
-      end
-
-      it 'should fail if there is no data in the hash for the unique project and the specified environment' do
-        data = { 'foo' => { 'production' => { 'repository' => 'path' }}}
-        lambda { WhiskeyDisk::Config.repository(data) }.should.raise
-      end
-
-      it 'should fail if there is no repository setting for the unique project and the specified environment' do
-        data = { 'foo' => { 'staging' => { 'bacon' => 'path' }}}
-        lambda { WhiskeyDisk::Config.repository(data) }.should.raise
-      end
-
-      it 'should return the repository setting for the unique project and the specified environment' do
-        data = { 'foo' => { 'staging' => { 'repository' => 'path' }}}
-        WhiskeyDisk::Config.repository(data).should == 'path'
-      end
+    it 'should return "unnamed_project" when no ENV["to"] project setting is available' do
+      ENV['to'] = 'staging'
+      WhiskeyDisk::Config.project_name.should == 'unnamed_project'      
     end
   end
 

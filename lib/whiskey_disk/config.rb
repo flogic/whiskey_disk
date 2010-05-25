@@ -61,27 +61,10 @@ class WhiskeyDisk
         File.read(configuration_file)
       end
       
-      def project_name(config)
-        return specified_project_name if specified_project_name
-        repo = repository(config)
-        raise "Could not determine project name from configuration file [#{configuration_file}]" unless repo and repo != ''
-        repo.sub(%r{^.*[/:]}, '').sub(%r{\.git$}, '')
+      def project_name
+        specified_project_name || 'unnamed_project'
       end
 
-      def get_project_handle(data)
-        return specified_project_name if specified_project_name
-        raise "Cannot determine unique project name from configuration file [#{configuration_file}]" if data.keys.size > 1
-        data.keys.first
-      end
-
-      def repository(data)
-        project = get_project_handle(data)
-        raise "Could not find data for project [#{project}]" unless data[project]
-        raise "Could not find data for environment [#{environment_name}] in project [#{project}]" unless data[project][environment_name]
-        raise "Could not find repository for environment [#{environment_name}] in project [#{project}]" unless data[project][environment_name].has_key?('repository')
-        data[project][environment_name]['repository']
-      end
-      
       def repository_depth(data, depth = 0)
         raise 'no repository found' unless data.respond_to?(:has_key?)
         return depth if data.has_key?('repository')
@@ -105,7 +88,7 @@ class WhiskeyDisk
 
       def add_project_scoping(data)        
         return data unless needs_project_scoping?(data)
-        { (specified_project_name ? specified_project_name : 'unnamed_project') => data }
+        { project_name => data }
       end
 
       def normalize_data(data)
@@ -119,10 +102,10 @@ class WhiskeyDisk
       end
       
       def filter_data(data)
-        raise "No configuration file defined data for environment [#{environment_name}]" unless data[project_name(data)][environment_name]
-        data[project_name(data)][environment_name].merge({
+        raise "No configuration file defined data for environment [#{environment_name}]" unless data[project_name][environment_name]
+        data[project_name][environment_name].merge({
           'environment' => environment_name, 
-          'project' => project_name(data) 
+          'project' => project_name
         })
       end
       
