@@ -1,6 +1,7 @@
 
- - ruby wrapper script to do deployments, etc.; ultimately delegating to rake?
- - update/rewrite README
+ - full integrations with wd command
+ - default Rakefile in the gem(?) so we can do system-wide deployments
+ - update/rewrite README, bitch
  - cut the next gem release
 
 ---
@@ -19,8 +20,6 @@
          # etc. ...
        end
      end
-
-
 
 ---
 
