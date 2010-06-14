@@ -6,6 +6,10 @@ op = OptionParser.new do |opts|
   opts.on('-t=TARGET', '--to=TARGET', "deployment target") do |target| 
     options[:target] = target
   end
+  
+  opts.on('-p=TARGET', '--path=TARGET', "configuration path") do |path|
+    options[:path] = path
+  end
     
   opts.on_tail('-h', '--help', 'show this message') do
     raise opts.to_s
@@ -19,6 +23,7 @@ command = rest.first
 raise op.to_s unless ['deploy', 'setup'].include?(command)
 
 ENV['to'] = options[:target]
+ENV['path'] = options[:path]
 
 if command == 'deploy'
   Rake::Task['deploy:now'].invoke

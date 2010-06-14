@@ -6,6 +6,10 @@ def run_command
 end
 
 describe 'wd command' do
+  before do
+    ENV['to'] = ENV['path'] = nil
+  end
+  
   describe 'when no command-line arguments are specified' do
     before do
       Object.send(:remove_const, :ARGV)
@@ -60,14 +64,63 @@ describe 'wd command' do
         ENV['to'].should == 'foo'
       end
       
-      it 'should fail if the rake task fails' do
-        @rake.stub!(:invoke).and_raise(RuntimeError)
-        lambda { run_command }.should.raise
+      describe 'and a --path argument is specified' do
+        before do
+          ARGV.push '--path=/path/to/foo'
+        end
+        
+        it 'should make the specified path available as a "path" argument to the rake task' do
+          run_command
+          ENV['path'].should == '/path/to/foo'
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
       end
       
-      it 'should not fail if the rake task succeeds' do
-        @rake.stub!(:invoke).and_return(true)
-        lambda { run_command }.should.not.raise
+      describe 'and a -p argument is specified' do
+        before do
+          ARGV.push '-p'
+          ARGV.push '/path/to/foo'
+        end
+        
+        it 'should make the specified path available as a "path" argument to the rake task' do
+          run_command
+          ENV['path'].should == '/path/to/foo'
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+      
+      describe 'and no --path or -p argument is specified' do
+        it 'should not make a "path" argument available to the rake task' do
+          ENV['path'].should.be.nil
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
       end
     end
 
@@ -93,14 +146,63 @@ describe 'wd command' do
         ENV['to'].should == 'foo'
       end
 
-      it 'should fail if the rake task fails' do
-        @rake.stub!(:invoke).and_raise(RuntimeError)
-        lambda { run_command }.should.raise
+      describe 'and a --path argument is specified' do
+        before do
+          ARGV.push '--path=/path/to/foo'
+        end
+        
+        it 'should make the specified path available as a "path" argument to the rake task' do
+          run_command
+          ENV['path'].should == '/path/to/foo'
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
       end
-
-      it 'should not fail if the rake task succeeds' do
-        @rake.stub!(:invoke).and_return(true)
-        lambda { run_command }.should.not.raise
+      
+      describe 'and a -p argument is specified' do
+        before do
+          ARGV.push '-p'
+          ARGV.push '/path/to/foo'
+        end
+        
+        it 'should make the specified path available as a "path" argument to the rake task' do
+          run_command
+          ENV['path'].should == '/path/to/foo'
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+      
+      describe 'and no --path or -p argument is specified' do
+        it 'should not make a "path" argument available to the rake task' do
+          ENV['path'].should.be.nil
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
       end
     end
   end
@@ -142,15 +244,63 @@ describe 'wd command' do
         run_command
         ENV['to'].should == 'foo'
       end
+      describe 'and a --path argument is specified' do
+        before do
+          ARGV.push '--path=/path/to/foo'
+        end
+        
+        it 'should make the specified path available as a "path" argument to the rake task' do
+          run_command
+          ENV['path'].should == '/path/to/foo'
+        end
       
-      it 'should fail if the rake task fails' do
-        @rake.stub!(:invoke).and_raise(RuntimeError)
-        lambda { run_command }.should.raise
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
       end
       
-      it 'should not fail if the rake task succeeds' do
-        @rake.stub!(:invoke).and_return(true)
-        lambda { run_command }.should.not.raise
+      describe 'and a -p argument is specified' do
+        before do
+          ARGV.push '-p'
+          ARGV.push '/path/to/foo'
+        end
+        
+        it 'should make the specified path available as a "path" argument to the rake task' do
+          run_command
+          ENV['path'].should == '/path/to/foo'
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+      
+      describe 'and no --path or -p argument is specified' do
+        it 'should not make a "path" argument available to the rake task' do
+          ENV['path'].should.be.nil
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
       end
     end
 
@@ -176,14 +326,63 @@ describe 'wd command' do
         ENV['to'].should == 'foo'
       end
 
-      it 'should fail if the rake task fails' do
-        @rake.stub!(:invoke).and_raise(RuntimeError)
-        lambda { run_command }.should.raise
+      describe 'and a --path argument is specified' do
+        before do
+          ARGV.push '--path=/path/to/foo'
+        end
+        
+        it 'should make the specified path available as a "path" argument to the rake task' do
+          run_command
+          ENV['path'].should == '/path/to/foo'
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
       end
-
-      it 'should not fail if the rake task succeeds' do
-        @rake.stub!(:invoke).and_return(true)
-        lambda { run_command }.should.not.raise
+      
+      describe 'and a -p argument is specified' do
+        before do
+          ARGV.push '-p'
+          ARGV.push '/path/to/foo'
+        end
+        
+        it 'should make the specified path available as a "path" argument to the rake task' do
+          run_command
+          ENV['path'].should == '/path/to/foo'
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+      
+      describe 'and no --path or -p argument is specified' do
+        it 'should not make a "path" argument available to the rake task' do
+          ENV['path'].should.be.nil
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
       end
     end
   end
