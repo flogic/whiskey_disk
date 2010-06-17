@@ -3,6 +3,8 @@
 require 'optparse'
 require 'tasks/deploy'
 
+$0 = "#{$0} setup|deploy"  # jesus, this is a hack.
+
 options = {}
 op = OptionParser.new do |opts|
   opts.on('-t=TARGET', '--to=TARGET', "deployment target") do |target| 

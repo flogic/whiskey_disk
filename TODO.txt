@@ -1,6 +1,5 @@
  - reorganize library path so that we can include whiskey_disk/rake
  - full integrations with wd command
- - make wd usage include 'setup|deploy' 
  - update/rewrite README, bitch
  - cut the next gem release
 
