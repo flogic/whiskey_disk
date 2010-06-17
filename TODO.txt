@@ -1,4 +1,3 @@
- - full integrations with wd command
  - update/rewrite README, bitch
  - cut the next gem release
 
