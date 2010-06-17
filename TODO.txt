@@ -22,6 +22,16 @@
 
 ---
 
+ - [Q] how to specify readily which projects need to be deployed?  Metaconfig?:
+   
+     --- 
+     - config: /path/to/config
+       project: larry
+       target: staging
+     - config: /path/to/config
+       project: larry
+       target: production
+
  - [Q] what about per-environment rake tasks, do we just store these in the config repo?  does this work?
  
  - [Q] ditto, maintenance pages(?) (i.e., a pre-deploy hook)
