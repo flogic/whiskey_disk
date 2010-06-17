@@ -5,7 +5,7 @@ require 'rake'
 describe 'requiring the main library' do
   before do
     Rake.application = @rake = Rake::Application.new
-    load File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib', 'tasks', 'deploy.rb'))
+    load File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib', 'whiskey_disk', 'rake.rb'))
   end
 
   after do

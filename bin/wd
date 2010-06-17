@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby 
 
 require 'optparse'
-require 'tasks/deploy'
+require 'whiskey_disk/rake'
 
 $0 = "#{$0} setup|deploy"  # jesus, this is a hack.
 
