@@ -1,4 +1,3 @@
- - fix 0.3rc1 bug with 'unnamed_project' being used to map to config repo subdirectory
  - reorganize library path so that we can include whiskey_disk/rake
  - full integrations with wd command
  - make wd usage include 'setup|deploy' 

@@ -304,6 +304,12 @@ describe 'WhiskeyDisk' do
       lambda { WhiskeyDisk.refresh_configuration }.should.raise
     end
     
+    it 'should fail if no project name was specified' do
+      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge('project' => 'unnamed_project'))
+      WhiskeyDisk.reset
+      lambda { WhiskeyDisk.refresh_configuration }.should.raise      
+    end
+    
     it 'should use rsync to overlay the configuration checkout for the project in the configured environment onto the main checkout' do
       WhiskeyDisk.refresh_configuration
       WhiskeyDisk.buffer.last.should.match(%r{rsync.* /path/to/config/repo/whiskey_disk/production/ /path/to/main/repo/})

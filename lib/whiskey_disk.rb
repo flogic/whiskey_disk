@@ -113,6 +113,7 @@ class WhiskeyDisk
     
     def refresh_configuration
       needs(:deploy_to, :deploy_config_to)
+      raise "Must specify project name when using a configuration repository." if self[:project] == 'unnamed_project'
       enqueue "rsync -av --progress #{self[:deploy_config_to]}/#{self[:project]}/#{self[:environment]}/ #{self[:deploy_to]}/"
     end
     
