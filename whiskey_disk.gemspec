@@ -42,7 +42,8 @@ Gem::Specification.new do |s|
      "spec/whiskey_disk/config_spec.rb",
      "spec/whiskey_disk/rake_spec.rb",
      "spec/whiskey_disk_spec.rb",
-     "tasks/deploy.rake"
+     "tasks/deploy.rake",
+     "whiskey_disk.gemspec"
   ]
   s.homepage = %q{http://github.com/flogic/whiskey_disk}
   s.rdoc_options = ["--charset=UTF-8"]
