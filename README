@@ -92,19 +92,48 @@ of deploy:setup
       lib/tasks/ or in your project's Rakefile) will cause that task to be run
 at the end of deploy:now
 
-  Running:
 
-  - rake deploy:setup to=<environment>   (e.g., "staging", "production", etc.)
-  - rake deploy:now   to=<environment>
+  Running via rake:
+
+  ... in your Rakefile:
+
+  require 'whiskey_disk/rake'
+
+  Then, from the command-line:
+
+  % rake deploy:setup to=<target>   (e.g., "staging", "production", etc.)
+  % rake deploy:now   to=<target>
+
+  or, specifying the project name:
+
+  % rake deploy:setup to=<project>:<target>   (e.g., "foo:staging", "bar:production", etc.)
+  % rake deploy:now   to=<project>:<target>
+
+
+  Running from the command-line:
+  
+  % wd setup --to=<target>
+  % wd setup --to=<project>:<target>
+  % wd setup --to=foo:staging --path=/etc/whiskey_disk/deploy.yml
+
+  % wd deploy --to=<target>
+  % wd deploy --to=<project>:<target>
+  % wd deploy --to=foo:staging --path=/etc/whiskey_disk/deploy.yml
+
+
+  Note that the wd command (unlike rake, which requires a Rakefile in the current directory) can be run from anywhere, so you can deploy any project, working from any path, and can even specify where to find the deployment YAML configuration file.
+  
+  The --path argument can take either a file or a directory.  When given a file it will use that file as the configuration file.  When given a directory it will look in that directory for deploy/<project>/<target>.yml, then deploy/<project>.yml, then deploy/<target>.yml, then <target>.yml, and finally, deploy.yml.
+  
+  All this means you can manage a large number of project deployments (local or remote) and have a single scripted deployment manager that keeps them up to date.  Configurations can live in a centralized location, and developers don't have to be actively involved in ensuring code gets shipped up to a server.  Win.
 
 
   Configuration Repository
 
     What's all this about a second repository for configuration stuff?
 
-    Well, we're going to make it optional probably in another release, but we
-really are digging this, so maybe you should try it.  Basically it goes like
-this...
+    This is completely optional, but we really are digging this, so maybe 
+you should try it.  Basically it goes like this...
 
     We have a number of web applications that we manage.  Usually there's a
 customer, there might be third-party developers, or the customer might have
