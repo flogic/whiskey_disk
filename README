@@ -1,5 +1,13 @@
 Whiskey Disk -- embarrassingly fast deployments.
 
+  Right-arrow through a short whiskey_disk presentation here:
+
+    http://wd2010.rickbradley.com/
+
+  (slide source available a http://github.com/rick/whiskey_disk_presentation) 
+
+
+
   A very opinionated deployment tool, designed to be as fast as technologically possible.  (For more background, read the WHY.txt file)
 
   Should work with any project which is git hosted, not just Ruby / Ruby on
