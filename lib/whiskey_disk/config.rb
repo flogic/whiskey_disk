@@ -18,6 +18,10 @@ class WhiskeyDisk
         (ENV['path'] && ENV['path'] != '') ? ENV['path'] : false
       end
       
+      def check_staleness?
+        !!(ENV['check'] && ENV['check'] =~ /^(?:t(?:rue)?|y(?:es)?|1)$/)
+      end
+      
       def contains_rakefile?(path)
         File.exists?(File.expand_path(File.join(path, 'Rakefile')))
       end

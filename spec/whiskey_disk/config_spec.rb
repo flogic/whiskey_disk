@@ -28,6 +28,43 @@ describe WhiskeyDisk::Config do
     end
   end
   
+  describe 'when determining whether to do a staleness check before updating' do
+    it 'should return false when there is no ENV["check"] setting' do
+      ENV['check'] = nil
+      WhiskeyDisk::Config.check_staleness?.should == false
+    end
+    
+    it 'should return false when the ENV["check"] setting is blank' do
+      ENV['check'] = ''
+      WhiskeyDisk::Config.check_staleness?.should == false      
+    end
+    
+    it 'should return true if the ENV["check"] setting is "t"' do
+      ENV['check'] = 't'
+      WhiskeyDisk::Config.check_staleness?.should == true      
+    end
+
+    it 'should return true if the ENV["check"] setting is "true"' do
+      ENV['check'] = 'true'
+      WhiskeyDisk::Config.check_staleness?.should == true
+    end
+
+    it 'should return true if the ENV["check"] setting is "y"' do
+      ENV['check'] = 'y'
+      WhiskeyDisk::Config.check_staleness?.should == true      
+    end
+
+    it 'should return true if the ENV["check"] setting is "yes"' do
+      ENV['check'] = 'yes'
+      WhiskeyDisk::Config.check_staleness?.should == true      
+    end
+
+    it 'should return true if the ENV["check"] setting is "1"' do
+      ENV['check'] = '1'
+      WhiskeyDisk::Config.check_staleness?.should == true      
+    end
+  end
+  
   describe 'when fetching configuration' do
     before do
       ENV['to'] = @env = 'foo:staging'
