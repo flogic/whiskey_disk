@@ -101,6 +101,17 @@ of deploy:setup
 at the end of deploy:now
 
 
+  A simple config/deploy.yml might look like:
+  
+  production:
+    domain: "ogc@www.ogtastic.com"
+    deploy_to: "/var/www/www.ogtastic.com"
+    repository: "git@ogtastic.com:www.ogtastic.com.git"
+    branch: "production"
+    rake_env:
+      RAILS_ENV: 'production'
+
+
   Running via rake:
 
   ... in your Rakefile:
