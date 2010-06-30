@@ -42,15 +42,17 @@ works.
     flexibility with just a handful of rake hook points to grab onto.
  
 
-  Dependencies:  rake, ssh, git, rsync on the deployment target server (affectionately referred to as the "g-node" by vinbarnes), bash-ish shell on deployment server.
+#### Dependencies ####
 
-  Assumptions:
+rake, ssh, git, rsync on the deployment target server (affectionately referred to as the "g-node" by vinbarnes), bash-ish shell on deployment server.
 
-    - you have a Rakefile in the top directory of your project's checkout
-    - you are deploying over ssh
-    - your project is managed via git
-    - you are comfortable defining post-setup and post-deployment actions with rake
-    - you have an optional second git repository for per-application/per-environment configuration files
+#### Assumptions ####
+
+ - you have a Rakefile in the top directory of your project's checkout
+ - you are deploying over ssh
+ - your project is managed via git
+ - you are comfortable defining post-setup and post-deployment actions with rake
+ - you have an optional second git repository for per-application/per-environment configuration files
 
 ### Installation ###
 
