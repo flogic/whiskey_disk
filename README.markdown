@@ -67,7 +67,7 @@ As a rails plugin:
 ### Configuration ###
 
  - look in the examples/ directory for sample configuration files
- - main configuration is in <app_root>/config/deploy.yml
+ - main configuration is in %lt;app_root&gt;/config/deploy.yml
  - config files are YAML, with a section for each target.
 
 Known config file settings (if you're familiar with capistrano and vlad these should seem eerily familiar):
@@ -93,11 +93,11 @@ A simple config/deploy.yml might look like:
       rake_env:
         RAILS_ENV: 'production'
 
- - defining a deploy:<environment>:post_setup rake task (e.g., in lib/tasks/
+ - defining a deploy:&lt;environment&gt;:post_setup rake task (e.g., in lib/tasks/
    or in your project's Rakefile) will cause that task to be run at the end
 of deploy:setup
 
- - defining a deploy:<environment>:post_deploy rake task (e.g., in
+ - defining a deploy:&lt;environment&gt;:post_deploy rake task (e.g., in
    lib/tasks/ or in your project's Rakefile) will cause that task to be run
 at the end of deploy:now
 
@@ -133,7 +133,7 @@ In your Rakefile:
 
 Note that the wd command (unlike rake, which requires a Rakefile in the current directory) can be run from anywhere, so you can deploy any project, working from any path, and can even specify where to find the deployment YAML configuration file.
   
-The --path argument can take either a file or a directory.  When given a file it will use that file as the configuration file.  When given a directory it will look in that directory for deploy/<project>/<target>.yml, then deploy/<project>.yml, then deploy/<target>.yml, then <target>.yml, and finally, deploy.yml.
+The --path argument can take either a file or a directory.  When given a file it will use that file as the configuration file.  When given a directory it will look in that directory for deploy/&lt;project&gt;/&lt;target&gt;.yml, then deploy/&lt;project&gt;.yml, then deploy/&lt;target&gt;.yml, then &lt;target&gt;.yml, and finally, deploy.yml.
   
 All this means you can manage a large number of project deployments (local or remote) and have a single scripted deployment manager that keeps them up to date.  Configurations can live in a centralized location, and developers don't have to be actively involved in ensuring code gets shipped up to a server.  Win.
 
