@@ -33,8 +33,8 @@ current local checkout.
   - You can do multi-project deployments, specifying deployment data in a single
     deploy.yml config file, or keep an entire directory of project deployment config files.
 
-  - You can have per-developer configurations for environments (especially
-    useful for "local" or "development" enviroments).  Use .gitignore, or
+  - You can have per-developer configurations for targets (especially
+    useful for "local" or "development" targets).  Use .gitignore, or
 specify a config_branch and everyone can have their own local setup that just
 works.
 
@@ -52,7 +52,7 @@ rake, ssh, git, rsync on the deployment target server (affectionately referred t
  - you are deploying over ssh
  - your project is managed via git
  - you are comfortable defining post-setup and post-deployment actions with rake
- - you have an optional second git repository for per-application/per-environment configuration files
+ - you have an optional second git repository for per-application/per-target configuration files
 
 ### Installation ###
 
@@ -93,11 +93,11 @@ A simple config/deploy.yml might look like:
       rake_env:
         RAILS_ENV: 'production'
 
- - defining a deploy:&lt;environment&gt;:post_setup rake task (e.g., in lib/tasks/
+ - defining a deploy:&lt;target&gt;:post_setup rake task (e.g., in lib/tasks/
    or in your project's Rakefile) will cause that task to be run at the end
 of deploy:setup
 
- - defining a deploy:&lt;environment&gt;:post_deploy rake task (e.g., in
+ - defining a deploy:&lt;target&gt;:post_deploy rake task (e.g., in
    lib/tasks/ or in your project's Rakefile) will cause that task to be run
 at the end of deploy:now
 
