@@ -42,9 +42,7 @@ works.
     flexibility with just a handful of rake hook points to grab onto.
  
 
-  Dependencies:  rake, ssh, git, rsync on the deployment target server (affectionately
-                 referred to as the "g-node" by vinbarnes), bash-ish shell on deployment
-                 server.
+  Dependencies:  rake, ssh, git, rsync on the deployment target server (affectionately referred to as the "g-node" by vinbarnes), bash-ish shell on deployment server.
 
   Assumptions:
 
