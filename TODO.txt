@@ -1,6 +1,11 @@
+ [BUG] if there is no Rakefile in the current path, but we didn't specify --path (because we found a config/deploy.yml) we should use the library's rakefile bypass
+ [BUG] wd is going to look for a Rakefile for post_setup stuff, do we want this to be required?  seems like maybe we should be smarter about running Rake tasks (if no Rakefile in the application then don't run rake tasks)
+ Q: the README still documents per-target config files, is that real?
+
  - would be nice to have the ability to say if a project is out of date (meaning that, based upon this config file, either the checked out project repo or the checked out config repo is older than the upstream) so we can do some sort of automated / conditional deployments.  We could implement this as a config file option (check for out of date before deploying), but questions about how to "force" if necessary.  Could also be done as a flag.
    by default, the behavior should be *not* to check if in-sync, make it so that ENV['check'] =~ /^(?:t(?:rue)?|1|y(?:es))/i will trigger the check
    similarly wd --check will set the variable
+   
    - the thinking is that a metadata file for multiple projects would specify values for this, with a meta-app using check=true by default
 
    ml=`cat .git/refs/heads/master`; mr=`git ls-remote git@ogtastic.com:whiskey_disk.git refs/heads/master`; if [[ $ml != ${mr%%       *} ]]; then { echo "out-of-date"; } else { echo "up-to-date"; } fi  
