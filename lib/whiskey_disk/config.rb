@@ -27,11 +27,14 @@ class WhiskeyDisk
       end
       
       def find_rakefile_from_current_path
+        original_path = Dir.pwd
         while (!contains_rakefile?(Dir.pwd))
-          raise "Could not find Rakefile in the current directory tree!" if Dir.pwd == '/'
+          return File.join(original_path, 'config') if Dir.pwd == '/'
           Dir.chdir('..')
         end
         File.join(Dir.pwd, 'config')
+      ensure
+        Dir.chdir(original_path)
       end
       
       def base_path

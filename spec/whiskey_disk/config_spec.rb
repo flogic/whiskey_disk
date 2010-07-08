@@ -435,22 +435,54 @@ describe WhiskeyDisk::Config do
       ENV['path'] = @path = nil
     end
     
-    it 'should return the path set in the "path" environment variable when one is set' do
-      ENV['path'] = @path = CURRENT
-      WhiskeyDisk::Config.base_path.should == @path      
+    describe 'and a "path" environment variable is set' do
+      before do
+        ENV['path'] = @path = CURRENT
+        Dir.chdir(CURRENT)
+      end
+      
+      it 'should return the path set in the "path" environment variable' do
+        WhiskeyDisk::Config.base_path.should == @path      
+      end
+      
+      it 'should leave the current working path the same as when the base path lookup started' do
+        WhiskeyDisk::Config.base_path
+        Dir.pwd.should == CURRENT
+      end
     end
     
-    it 'should fail if there is no Rakefile along the root path to the current directory'  do
-      WhiskeyDisk::Config.stub!(:contains_rakefile?).and_return(false)
-      lambda { WhiskeyDisk::Config.base_path }.should.raise
-    end
+    describe 'and there is no Rakefile in the root path to the current directory' do
+      before do
+        Dir.chdir(CURRENT)
+        WhiskeyDisk::Config.stub!(:contains_rakefile?).and_return(false)
+      end
+      
+      it 'should return the config directory under the current directory if there is no Rakefile along the root path to the current directory' do
+        WhiskeyDisk::Config.base_path.should == File.join(CURRENT, 'config')
+      end
+      
+      it 'should leave the current working path the same as when the base path lookup started' do
+        WhiskeyDisk::Config.base_path
+        Dir.pwd.should == CURRENT
+      end
+    end    
     
-    it 'return the config directory in the nearest enclosing path with a Rakefile along the root path to the current directory' do
-      top = ::File.expand_path(File.join(CURRENT, '..', '..'))
-      WhiskeyDisk::Config.stub!(:contains_rakefile?).and_return(false)
-      WhiskeyDisk::Config.stub!(:contains_rakefile?).with(top).and_return(true)
-      Dir.chdir(CURRENT)
-      WhiskeyDisk::Config.base_path.should == File.join(top, 'config')
+    describe 'and there is a Rakefile in the root path to the current directory' do
+      before do
+        @top = ::File.expand_path(File.join(CURRENT, '..', '..'))
+        WhiskeyDisk::Config.stub!(:contains_rakefile?).and_return(false)
+        WhiskeyDisk::Config.stub!(:contains_rakefile?).with(@top).and_return(true)
+        Dir.chdir(CURRENT)
+      end
+      
+      it 'return the config directory in the nearest enclosing path with a Rakefile along the root path to the current directory' do
+        WhiskeyDisk::Config.base_path.should == File.join(@top, 'config')
+      end
+      
+      it 'should leave the current working path the same as when the base path lookup started' do
+        WhiskeyDisk::Config.base_path
+        Dir.pwd.should == CURRENT
+      end
     end
   end
 end
