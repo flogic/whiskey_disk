@@ -75,6 +75,10 @@ class WhiskeyDisk
       remote? ? run(bundle) : system(bundle)
     end
     
+    def if_file_present(path, cmd)
+      "if [ -e #{path} ]; then #{cmd}; fi"
+    end
+
     def ensure_main_parent_path_is_present
       needs(:deploy_to)
       enqueue "mkdir -p #{parent_path(self[:deploy_to])}"
@@ -120,13 +124,15 @@ class WhiskeyDisk
     def run_post_setup_hooks
       needs(:deploy_to)
       enqueue "cd #{self[:deploy_to]}"
-      enqueue "#{env_vars} rake --trace deploy:post_setup to=#{self[:environment]}"
+      enqueue(if_file_present("#{self[:deploy_to]}/Rakefile", 
+                               "#{env_vars} rake --trace deploy:post_setup to=#{self[:environment]}"))
     end
 
     def run_post_deploy_hooks
       needs(:deploy_to)
       enqueue "cd #{self[:deploy_to]}"
-      enqueue "#{env_vars} rake --trace deploy:post_deploy to=#{self[:environment]}"
+      enqueue(if_file_present("#{self[:deploy_to]}/Rakefile", 
+                               "#{env_vars} rake --trace deploy:post_deploy to=#{self[:environment]}"))
     end
   end
 end

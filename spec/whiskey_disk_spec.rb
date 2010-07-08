@@ -334,6 +334,11 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo})
     end
     
+    it 'should make the post setup rake tasks conditional on the presence of a Rakefile in the deployment path' do      
+      WhiskeyDisk.run_post_setup_hooks
+      WhiskeyDisk.buffer.join(' ').should.match(%r{if \[ -e /path/to/main/repo/Rakefile \]; then .*; fi})
+    end
+    
     it 'should attempt to run the post setup rake tasks' do
       WhiskeyDisk.run_post_setup_hooks
       WhiskeyDisk.buffer.join(' ').should.match(%r{rake.*deploy:post_setup})
@@ -371,6 +376,11 @@ describe 'WhiskeyDisk' do
     it 'should work from the main checkout directory' do
       WhiskeyDisk.run_post_deploy_hooks
       WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo})
+    end
+    
+    it 'should make the post deployment rake tasks conditional on the presence of a Rakefile in the deployment path' do      
+      WhiskeyDisk.run_post_deploy_hooks
+      WhiskeyDisk.buffer.join(' ').should.match(%r{if \[ -e /path/to/main/repo/Rakefile \]; then .*; fi})
     end
     
     it 'should attempt to run the post deployment rake tasks' do
