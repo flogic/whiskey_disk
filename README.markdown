@@ -3,7 +3,7 @@
 
 A very opinionated deployment tool, designed to be as fast as technologically possible.  (For more background, read the [WHY.txt](http://github.com/flogic/whiskey_disk/raw/master/WHY.txt) file)  Should work with any project which is git hosted, not just Ruby / Ruby on Rails projects.  Allows for local deploys as well as remote.
 
-Right-arrow through a short whiskey_disk presentation at [http://wd2010.rickbradley.com/](http://wd2010.rickbradley.com) (slide source available [here](http://github.com/rick/whiskey_disk_presentation).)
+Right-arrow through a short whiskey_disk presentation at [http://wd2010.rickbradley.com/](http://wd2010.rickbradley.com) (slide source available [here](http://github.com/rick/whiskey_disk_presentation).), covering the 0.2.*-era functionality.
 
 ### Selling points ###
 
@@ -136,6 +136,16 @@ Note that the wd command (unlike rake, which requires a Rakefile in the current 
 The --path argument can take either a file or a directory.  When given a file it will use that file as the configuration file.  When given a directory it will look in that directory for deploy/&lt;project&gt;/&lt;target&gt;.yml, then deploy/&lt;project&gt;.yml, then deploy/&lt;target&gt;.yml, then &lt;target&gt;.yml, and finally, deploy.yml.
   
 All this means you can manage a large number of project deployments (local or remote) and have a single scripted deployment manager that keeps them up to date.  Configurations can live in a centralized location, and developers don't have to be actively involved in ensuring code gets shipped up to a server.  Win.
+
+
+### A note about post\__{setup,deploy} Rake tasks
+
+If you want actions to run on the deployment target after you do a whiskey\_disk setup or whiskey\_disk deploy, 
+you will need to make sure that whiskey\_disk is available on the target system (either by gem installation,
+as a rails plugin in the Rails application to be deployed, or as a vendored library in the application to be
+deployed).  Whiskey\_disk provides the basic deploy:post\_setup and deploy:post\_deploy hooks which get called.
+You can also define these tasks yourself if you want to eliminate the dependency on whiskey\_disk on the
+deployment target system.
 
 
 ### Configuration Repository ###
