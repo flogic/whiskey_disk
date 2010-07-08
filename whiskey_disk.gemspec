@@ -5,22 +5,22 @@
 
 Gem::Specification.new do |s|
   s.name = %q{whiskey_disk}
-  s.version = "0.3.0"
+  s.version = "0.3.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Rick Bradley"]
-  s.date = %q{2010-06-17}
+  s.date = %q{2010-07-08}
   s.default_executable = %q{wd}
   s.description = %q{Opinionated gem for doing fast git-based server deployments.}
   s.email = %q{rick@rickbradley.com}
   s.executables = ["wd"]
   s.extra_rdoc_files = [
-    "README"
+    "README.markdown"
   ]
   s.files = [
     ".gitignore",
      "MIT-LICENSE",
-     "README",
+     "README.markdown",
      "Rakefile",
      "TODO.txt",
      "VERSION",
