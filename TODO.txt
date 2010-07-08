@@ -33,13 +33,10 @@
      - config: /path/to/config
        project: larry
        target: production
+       cache: no
 
- - [Q] what about per-environment rake tasks, do we just store these in the config repo?  does this work?
- 
- - [Q] ditto, maintenance pages(?) (i.e., a pre-deploy hook)
-
+ - [Q] what about maintenance pages(?) (i.e., do we need a pre-deploy hook?; also are these per-target config stuffs?; fun managing changes to a maintenance page ;-)
  - [Q] do we want a mechanism to manage the config repo?  (add a repo, add a project, add an environment, put a file into the config repo for an environment?)
-
+ - [Q] what about per-target rake tasks, do we just store these in the config repo?  does this work?
  - [Q] do we need actual support for "rollbacks"?
-
  - [Q] do we want to support multi-system deployments (i.e., deploy and rollback on 4 simultaneous app servers, other bullshit running on the db server, etc.)?  If we get into this, we have the original :role problem that cap faced -- i.e., we only want to run the database operations on certain hosts.
