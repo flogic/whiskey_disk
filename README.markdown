@@ -256,11 +256,6 @@ overlaid on top of the most recent checkout of the project.  Snap.
   - We are using this to manage larry.  See [http://github.com/rick/larry/blob/master/config/deploy.yml](http://github.com/rick/larry/blob/master/config/deploy.yml) and 
     [http://github.com/rick/larry/blob/master/lib/tasks/deploy.rake](http://github.com/rick/larry/blob/master/lib/tasks/deploy.rake)
 
-Note that you can also provide per-target config settings, outside of
-deploy.yml.  This is most useful for handling per-developer local deployments,
-though you could use it to override some settings if that makes sense in some
-context.  Here's a simple example of that:  [http://github.com/rick/larry/blob/master/config/deploy-local.yml.example](http://github.com/rick/larry/blob/master/config/deploy-local.yml.example)
-
  - We are using whiskey\_disk on a private project with lots of config files, but here's
     a gist showing a bit more interesting deploy.rake file for post_setup and
 post_deploy work:  [https://gist.github.com/47e23f2980943531beeb](https://gist.github.com/47e23f2980943531beeb)
