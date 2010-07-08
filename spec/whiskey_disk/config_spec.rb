@@ -432,8 +432,13 @@ describe WhiskeyDisk::Config do
   
   describe 'computing the base path for the project' do
     before do
+      @original_path = Dir.pwd
       ENV['path'] = @path = nil
     end
+    
+    after do
+      Dir.chdir(@original_path)
+    end      
     
     describe 'and a "path" environment variable is set' do
       before do

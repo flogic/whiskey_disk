@@ -19,6 +19,10 @@ class WhiskeyDisk
       configuration[key.to_s]
     end
     
+    def check_staleness?
+      WhiskeyDisk::Config.check_staleness?
+    end
+    
     def enqueue(command)
       buffer << command
     end
@@ -31,6 +35,10 @@ class WhiskeyDisk
       ! (self[:config_repository].nil? or self[:config_repository] == '')
     end
     
+    def project_name_specified?
+      self[:project] != 'unnamed_project'
+    end
+
     def branch
       (self[:branch] and self[:branch] != '') ? self[:branch] : 'master'
     end
@@ -116,11 +124,19 @@ class WhiskeyDisk
     end
     
     def refresh_configuration
-      needs(:deploy_to, :deploy_config_to)
-      raise "Must specify project name when using a configuration repository." if self[:project] == 'unnamed_project'
-      enqueue "rsync -av --progress #{self[:deploy_config_to]}/#{self[:project]}/#{self[:environment]}/ #{self[:deploy_to]}/"
+      needs(:deploy_to, :deploy_config_to, :config_repository, :config_branch)
+      raise "Must specify project name when using a configuration repository." unless project_name_specified?
+      command = "rsync -av --progress #{self[:deploy_config_to]}/#{self[:project]}/#{self[:environment]}/ #{self[:deploy_to]}/"      
+      command = conditional_staleness_check(self[:deploy_config_to], self[:config_repository], self[:config_branch], command) if check_staleness?
+      enqueue command
     end
     
+    def conditional_staleness_check(path, repo, branch, command)
+      "ml=\`cat .git/refs/heads/#{branch}\`; " +
+      "mr=\`git ls-remote #{repo} refs/heads/#{branch}\`; " +
+      "if [[ $ml != ${mr%%\t*} ]]; then #{command}; fi"
+    end
+  
     def run_post_setup_hooks
       needs(:deploy_to)
       enqueue "cd #{self[:deploy_to]}"

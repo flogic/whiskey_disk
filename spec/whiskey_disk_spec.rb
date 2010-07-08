@@ -287,6 +287,8 @@ describe 'WhiskeyDisk' do
       @parameters = { 'deploy_to' => '/path/to/main/repo', 
                       'deploy_config_to' => '/path/to/config/repo',
                       'environment' => 'production',
+                      'config_repository' => 'git@git://foo.bar.git',
+                      'config_branch' => 'master',
                       'project' => 'whiskey_disk' }
       WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
       WhiskeyDisk.reset
@@ -313,6 +315,40 @@ describe 'WhiskeyDisk' do
     it 'should use rsync to overlay the configuration checkout for the project in the configured environment onto the main checkout' do
       WhiskeyDisk.refresh_configuration
       WhiskeyDisk.buffer.last.should.match(%r{rsync.* /path/to/config/repo/whiskey_disk/production/ /path/to/main/repo/})
+    end
+    
+    describe 'and checking for staleness' do
+      before do
+        ENV['check'] = 'true'
+      end
+      
+      it 'should wrap the configuration refresh in a staleness check' do
+        WhiskeyDisk.refresh_configuration
+        WhiskeyDisk.buffer.last.should.match(%r{\`cat \.git/refs/heads/})        
+      end
+      
+      it 'should use the configuration branch when one is specified' do
+        WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'config_branch' => 'production'}))
+        WhiskeyDisk.reset
+        WhiskeyDisk.refresh_configuration
+        WhiskeyDisk.buffer.last.should.match(%r{\`cat \.git/refs/heads/production\`})                
+      end
+      
+      it 'should use the "master" branch when no configuration branch is specified' do
+        WhiskeyDisk.refresh_configuration
+        WhiskeyDisk.buffer.last.should.match(%r{\`cat \.git/refs/heads/master\`})                
+      end
+    end
+    
+    describe 'and not checking for staleness' do
+      before do
+        ENV['check'] = nil
+      end
+      
+      it 'should not wrap the configuration refresh in a staleness check' do
+        WhiskeyDisk.refresh_configuration
+        WhiskeyDisk.buffer.last.should.not.match(%r{\`cat \.git/refs/heads/master\`})                
+      end
     end
   end
   
