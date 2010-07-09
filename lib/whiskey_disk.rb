@@ -5,6 +5,7 @@ class WhiskeyDisk
     def reset
       @configuration = nil
       @buffer = nil
+      @staleness_checks = nil
     end
     
     def buffer
@@ -86,6 +87,14 @@ class WhiskeyDisk
     def if_file_present(path, cmd)
       "if [ -e #{path} ]; then #{cmd}; fi"
     end
+    
+    def enable_staleness_checks
+      @staleness_checks = true
+    end
+    
+    def staleness_checks_enabled?
+      !!@staleness_checks
+    end    
 
     def ensure_main_parent_path_is_present
       needs(:deploy_to)

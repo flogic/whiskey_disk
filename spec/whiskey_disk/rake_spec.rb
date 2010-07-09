@@ -140,6 +140,7 @@ describe 'rake tasks' do
       @configuration = { }
       WhiskeyDisk::Config.stub!(:fetch).and_return(@configuration)
       [ 
+        :enable_staleness_checks,
         :update_main_repository_checkout,
         :update_configuration_repository_checkout,
         :refresh_configuration,
@@ -159,6 +160,11 @@ describe 'rake tasks' do
     
     it 'should make changes on the local system when no domain is specified' do
       WhiskeyDisk.should.not.be.remote
+    end
+    
+    it 'should enable staleness checks' do
+      WhiskeyDisk.should.receive(:enable_staleness_checks)
+      @rake["deploy:now"].invoke
     end
     
     it 'should update the main repository checkout' do

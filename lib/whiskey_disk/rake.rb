@@ -17,6 +17,7 @@ namespace :deploy do
   
   desc "Deploy now."
   task :now do
+    WhiskeyDisk.enable_staleness_checks
     WhiskeyDisk.update_main_repository_checkout
     WhiskeyDisk.update_configuration_repository_checkout  if WhiskeyDisk.has_config_repo?
     WhiskeyDisk.refresh_configuration                     if WhiskeyDisk.has_config_repo?

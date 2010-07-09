@@ -83,6 +83,27 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.has_config_repo?.should == false
     end
   end
+  
+  describe 'enabling staleness checks' do
+    it 'should ensure that staleness checks are activated' do
+      WhiskeyDisk.reset
+      WhiskeyDisk.enable_staleness_checks
+      WhiskeyDisk.staleness_checks_enabled?.should == true      
+    end
+  end
+  
+  describe 'when checking staleness checks' do
+    it 'should return false if staleness checks have not been enabled' do
+      WhiskeyDisk.reset
+      WhiskeyDisk.staleness_checks_enabled?.should == false
+    end
+    
+    it 'should return true if staleness checks have been enabled' do
+      WhiskeyDisk.reset
+      WhiskeyDisk.enable_staleness_checks
+      WhiskeyDisk.staleness_checks_enabled?.should == true
+    end
+  end
 
   describe 'ensuring that the parent path for the main repository checkout is present' do
     before do
@@ -316,40 +337,6 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.refresh_configuration
       WhiskeyDisk.buffer.last.should.match(%r{rsync.* /path/to/config/repo/whiskey_disk/production/ /path/to/main/repo/})
     end
-    
-    describe 'and checking for staleness' do
-      before do
-        ENV['check'] = 'true'
-      end
-      
-      it 'should wrap the configuration refresh in a staleness check' do
-        WhiskeyDisk.refresh_configuration
-        WhiskeyDisk.buffer.last.should.match(%r{\`cat \.git/refs/heads/})        
-      end
-      
-      it 'should use the configuration branch when one is specified' do
-        WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'config_branch' => 'production'}))
-        WhiskeyDisk.reset
-        WhiskeyDisk.refresh_configuration
-        WhiskeyDisk.buffer.last.should.match(%r{\`cat \.git/refs/heads/production\`})                
-      end
-      
-      it 'should use the "master" branch when no configuration branch is specified' do
-        WhiskeyDisk.refresh_configuration
-        WhiskeyDisk.buffer.last.should.match(%r{\`cat \.git/refs/heads/master\`})                
-      end
-    end
-    
-    describe 'and not checking for staleness' do
-      before do
-        ENV['check'] = nil
-      end
-      
-      it 'should not wrap the configuration refresh in a staleness check' do
-        WhiskeyDisk.refresh_configuration
-        WhiskeyDisk.buffer.last.should.not.match(%r{\`cat \.git/refs/heads/master\`})                
-      end
-    end
   end
   
   describe 'running post setup hooks' do
@@ -491,16 +478,129 @@ describe 'WhiskeyDisk' do
     before do
       WhiskeyDisk.reset
     end
-      
-    it 'should return an empty string if there are no commands' do
-      WhiskeyDisk.bundle.should == ''
-    end
     
-    it 'should wrap each command with {} and join with &&s' do
-      WhiskeyDisk.enqueue("cd foo/bar/baz || true")
-      WhiskeyDisk.enqueue("rsync -avz --progress /yer/mom /yo/")
-      WhiskeyDisk.bundle.should == "{ cd foo/bar/baz || true ; } && { rsync -avz --progress /yer/mom /yo/ ; }"
+    describe 'when staleness checks are disabled' do
+      it 'should return an empty string if there are no commands' do
+        WhiskeyDisk.bundle.should == ''
+      end
+
+      it 'should wrap each command with {} and join with &&s' do
+        WhiskeyDisk.enqueue("cd foo/bar/baz || true")
+        WhiskeyDisk.enqueue("rsync -avz --progress /yer/mom /yo/")
+        WhiskeyDisk.bundle.should == "{ cd foo/bar/baz || true ; } && { rsync -avz --progress /yer/mom /yo/ ; }"
+      end
+
+      it 'should not wrap the bundled commands inside a staleness check' do
+        WhiskeyDisk.enqueue("cd foo/bar/baz || true")
+        WhiskeyDisk.enqueue("rsync -avz --progress /yer/mom /yo/")
+        WhiskeyDisk.bundle.should == "{ cd foo/bar/baz || true ; } && { rsync -avz --progress /yer/mom /yo/ ; }"
+      end
     end
+
+    describe 'when staleness checks are enabled' do
+      before do
+        WhiskeyDisk.enable_staleness_checks
+      end
+      
+      describe 'but not we are not configured for staleness checks on this deployment' do
+        before do
+          ENV['check'] = nil
+        end
+        
+        it 'should return an empty string if there are no commands' do
+          WhiskeyDisk.bundle.should == ''
+        end
+
+        it 'should wrap each command with {} and join with &&s' do
+          WhiskeyDisk.enqueue("cd foo/bar/baz || true")
+          WhiskeyDisk.enqueue("rsync -avz --progress /yer/mom /yo/")
+          WhiskeyDisk.bundle.should == "{ cd foo/bar/baz || true ; } && { rsync -avz --progress /yer/mom /yo/ ; }"
+        end
+
+        it 'should not wrap the bundled commands inside a staleness check' do
+          WhiskeyDisk.enqueue("cd foo/bar/baz || true")
+          WhiskeyDisk.enqueue("rsync -avz --progress /yer/mom /yo/")
+          WhiskeyDisk.bundle.should == "{ cd foo/bar/baz || true ; } && { rsync -avz --progress /yer/mom /yo/ ; }"
+        end       
+      end
+      
+      describe 'and we are configured for staleness checks on this deployment' do
+        before do
+          ENV['check'] = 'true'
+        end
+        
+        describe 'when no configuration repository is in use' do
+          it 'should return an empty string if there are no commands' do
+            WhiskeyDisk.bundle.should == ''
+          end
+
+          it 'should wrap each command with {} and join with &&s' do
+            WhiskeyDisk.enqueue("cd foo/bar/baz || true")
+            WhiskeyDisk.enqueue("rsync -avz --progress /yer/mom /yo/")
+            WhiskeyDisk.bundle.should.match(Regexp.escape("{ cd foo/bar/baz || true ; } && { rsync -avz --progress /yer/mom /yo/ ; }"))
+          end
+
+          it 'should wrap the bundled commands inside a staleness check'
+          it 'should check the main repository for staleness'
+          it 'should not check a configuration repository for staleness'
+        end
+      
+        describe 'when a configuration repository is in use' do
+          it 'should return an empty string if there are no commands' do
+            WhiskeyDisk.bundle.should == ''
+          end
+
+          it 'should wrap each command with {} and join with &&s' do
+            WhiskeyDisk.enqueue("cd foo/bar/baz || true")
+            WhiskeyDisk.enqueue("rsync -avz --progress /yer/mom /yo/")
+            WhiskeyDisk.bundle.should.match(Regexp.escape("{ cd foo/bar/baz || true ; } && { rsync -avz --progress /yer/mom /yo/ ; }"))
+          end
+
+          it 'should wrap the bundled commands inside a staleness check'
+          it 'should check the main repository for staleness'
+          it 'should check the configuration repository for staleness'
+        end
+      end
+    end
+
+    # describe 'checking for staleness' do
+    #   describe 'and checking for staleness' do
+    #     before do
+    #       ENV['check'] = 'true'
+    #     end
+    #     
+    #     it 'should wrap the buffer in a staleness check' do
+    #       WhiskeyDisk.check_for_staleness
+    #       WhiskeyDisk.buffer.last.should.match(%r{\`cat \.git/refs/heads/})        
+    #     end
+    #     
+    #     it 'should use the configuration branch when one is specified' do
+    #       WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'config_branch' => 'production'}))
+    #       WhiskeyDisk.reset
+    #       
+    #       WhiskeyDisk.check_for_staleness
+    #       WhiskeyDisk.buffer.last.should.match(%r{\`cat \.git/refs/heads/production\`})                
+    #     end
+    #     
+    #     it 'should use the "master" branch when no configuration branch is specified' do
+    #       WhiskeyDisk.check_for_staleness
+    #       WhiskeyDisk.buffer.last.should.match(%r{\`cat \.git/refs/heads/master\`})                
+    #     end
+    #   end
+    #   
+    #   describe 'and not checking for staleness' do
+    #     before do
+    #       ENV['check'] = nil
+    #     end
+    #     
+    #     it 'should not wrap the configuration refresh in a staleness check' do
+    #       WhiskeyDisk.refresh_configuration
+    #       WhiskeyDisk.buffer.last.should.not.match(%r{\`cat \.git/refs/heads/master\`})                
+    #     end
+    #   end
+    # end
+
+    
   end
   
   describe 'when running a command string remotely' do
