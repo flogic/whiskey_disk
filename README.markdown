@@ -55,11 +55,11 @@ rake, ssh, git, rsync on the deployment target server (affectionately referred t
 
 #### Assumptions ####
 
- - you have a Rakefile in the top directory of your project's checkout
- - you are deploying over ssh
  - your project is managed via git
- - you are comfortable defining post-setup and post-deployment actions with rake
+ - you are deploying over ssh, or deploying locally and have a bash-compatible shell
+ - you are comfortable defining (optional) post-setup and post-deployment actions with rake
  - you have an optional second git repository for per-application/per-target configuration files
+ - you have an optional Rakefile in the top directory of your project's checkout
 
 ### Installation ###
 
