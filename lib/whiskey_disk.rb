@@ -24,6 +24,14 @@ class WhiskeyDisk
       WhiskeyDisk::Config.check_staleness?
     end
     
+    def enable_staleness_checks
+      @staleness_checks = true
+    end
+    
+    def staleness_checks_enabled?
+      !!@staleness_checks
+    end    
+
     def enqueue(command)
       buffer << command
     end
@@ -69,10 +77,32 @@ class WhiskeyDisk
         raise "No value for '#{key}' declared in configuration files [#{WhiskeyDisk::Config.configuration_file}]" unless self[key]
       end
     end
+
+    def apply_staleness_check(commands)
+      needs(:deploy_to, :repository)
+      
+      check = "cd #{self[:deploy_to]}; " +
+              "ml=\`cat .git/refs/heads/#{branch}\`; " +
+              "mr=\`git ls-remote #{self[:repository]} refs/heads/#{branch}\`; "
+      
+      if self[:deploy_config_to]
+        check += "cd #{self[:deploy_config_to]}; " +
+                 "cl=\`cat .git/refs/heads/#{config_branch}\`; " +
+                 "cr=\`git ls-remote #{self[:config_repository]} refs/heads/#{config_branch}\`; "
+      end
+      
+      check += "if [[ $ml != ${mr%%\t*} " +
+               (self[:deploy_config_to] ? "-o $cl != ${cr%%\t*} " : '') +
+               "]]; then #{commands}; fi"
+    end
+    
+    def join_commands
+      buffer.collect {|c| "{ #{c} ; }"}.join(' && ')
+    end
     
     def bundle
       return '' if buffer.empty?
-      buffer.collect {|c| "{ #{c} ; }"}.join(' && ')
+      (staleness_checks_enabled? and check_staleness?) ? apply_staleness_check(join_commands) : join_commands
     end
     
     def run(cmd)
@@ -88,14 +118,6 @@ class WhiskeyDisk
       "if [ -e #{path} ]; then #{cmd}; fi"
     end
     
-    def enable_staleness_checks
-      @staleness_checks = true
-    end
-    
-    def staleness_checks_enabled?
-      !!@staleness_checks
-    end    
-
     def ensure_main_parent_path_is_present
       needs(:deploy_to)
       enqueue "mkdir -p #{parent_path(self[:deploy_to])}"

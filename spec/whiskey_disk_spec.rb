@@ -530,6 +530,15 @@ describe 'WhiskeyDisk' do
         end
         
         describe 'when no configuration repository is in use' do
+          before do
+            @deploy_to = '/path/to/main/repo'
+            @repository = 'git@git://foo.bar.git'
+            @parameters = { 'deploy_to' => @deploy_to, 'repository' => @repository }
+            WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
+            WhiskeyDisk.reset
+            WhiskeyDisk.enable_staleness_checks
+          end
+          
           it 'should return an empty string if there are no commands' do
             WhiskeyDisk.bundle.should == ''
           end
@@ -537,15 +546,61 @@ describe 'WhiskeyDisk' do
           it 'should wrap each command with {} and join with &&s' do
             WhiskeyDisk.enqueue("cd foo/bar/baz || true")
             WhiskeyDisk.enqueue("rsync -avz --progress /yer/mom /yo/")
-            WhiskeyDisk.bundle.should.match(Regexp.escape("{ cd foo/bar/baz || true ; } && { rsync -avz --progress /yer/mom /yo/ ; }"))
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("{ cd foo/bar/baz || true ; } && { rsync -avz --progress /yer/mom /yo/ ; }")))
           end
 
-          it 'should wrap the bundled commands inside a staleness check'
-          it 'should check the main repository for staleness'
-          it 'should not check a configuration repository for staleness'
+          it 'should wrap the bundled commands inside a staleness check which checks only the main repo for staleness' do
+            WhiskeyDisk.enqueue("COMMAND")
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("if [[ $ml != ${mr%%\t*} ]]; then { COMMAND ; }")))
+          end
+          
+          it "should query the head of the main checkout's master branch if no branch is specified" do
+            WhiskeyDisk.enqueue("COMMAND")
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`cat .git/refs/heads/master\`;")))
+          end
+          
+          it "should query the head of the main checkout's specified branch if a branch is specified" do
+            WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'branch' => 'production'}))
+            WhiskeyDisk.reset
+            WhiskeyDisk.enable_staleness_checks
+            WhiskeyDisk.enqueue("COMMAND")
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`cat .git/refs/heads/production\`;")))
+          end
+          
+          it "should query the head on the main repository's master branch if no branch is specified" do            
+            WhiskeyDisk.enqueue("COMMAND")
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("mr=\`git ls-remote #{@repository} refs/heads/master\`;")))
+          end
+          
+          it "should query the head of the main repository's specified branch if a branch is specified" do
+            WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'branch' => 'production'}))
+            WhiskeyDisk.reset
+            WhiskeyDisk.enable_staleness_checks
+            WhiskeyDisk.enqueue("COMMAND")
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("mr=\`git ls-remote #{@repository} refs/heads/production\`;")))
+          end
+          
+          it 'should not check a configuration repository for staleness' do
+            WhiskeyDisk.enqueue("COMMAND")
+            WhiskeyDisk.bundle.should.not.match(/c[lr]=/)
+          end
         end
       
         describe 'when a configuration repository is in use' do
+          before do
+            @deploy_to = '/path/to/main/repo'
+            @repository = 'git@git://foo.bar.git'
+            @deploy_config_to = '/path/to/config/repo'
+            @config_repository = 'git@git://foo.bar-config.git'
+            @parameters = { 
+              'deploy_to' => @deploy_to, 'repository' => @repository,
+              'deploy_config_to' => @deploy_config_to, 'config_repository' => @config_repository
+            }
+            WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
+            WhiskeyDisk.reset
+            WhiskeyDisk.enable_staleness_checks
+          end
+          
           it 'should return an empty string if there are no commands' do
             WhiskeyDisk.bundle.should == ''
           end
@@ -553,54 +608,68 @@ describe 'WhiskeyDisk' do
           it 'should wrap each command with {} and join with &&s' do
             WhiskeyDisk.enqueue("cd foo/bar/baz || true")
             WhiskeyDisk.enqueue("rsync -avz --progress /yer/mom /yo/")
-            WhiskeyDisk.bundle.should.match(Regexp.escape("{ cd foo/bar/baz || true ; } && { rsync -avz --progress /yer/mom /yo/ ; }"))
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("{ cd foo/bar/baz || true ; } && { rsync -avz --progress /yer/mom /yo/ ; }")))
           end
 
-          it 'should wrap the bundled commands inside a staleness check'
-          it 'should check the main repository for staleness'
-          it 'should check the configuration repository for staleness'
+          it 'should wrap the bundled commands inside a staleness check which checks both main and config repos for staleness' do
+            WhiskeyDisk.enqueue("COMMAND")
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("if [[ $ml != ${mr%%\t*} -o $cl != ${cr%%\t*} ]]; then { COMMAND ; }; fi")))
+          end
+          
+          it "should query the head of the main checkout's master branch if no branch is specified" do
+            WhiskeyDisk.enqueue("COMMAND")
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`cat .git/refs/heads/master\`;")))
+          end
+          
+          it "should query the head of the main checkout's specified branch if a branch is specified" do
+            WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'branch' => 'production'}))
+            WhiskeyDisk.reset
+            WhiskeyDisk.enable_staleness_checks
+            WhiskeyDisk.enqueue("COMMAND")
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`cat .git/refs/heads/production\`;")))
+          end
+          
+          it "should query the head on the main repository's master branch if no branch is specified" do            
+            WhiskeyDisk.enqueue("COMMAND")
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("mr=\`git ls-remote #{@repository} refs/heads/master\`;")))
+          end
+          
+          it "should query the head of the main repository's specified branch if a branch is specified" do
+            WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'branch' => 'production'}))
+            WhiskeyDisk.reset
+            WhiskeyDisk.enable_staleness_checks
+            WhiskeyDisk.enqueue("COMMAND")
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("mr=\`git ls-remote #{@repository} refs/heads/production\`;")))
+          end
+          
+          it "should query the head of the config checkout's master branch if no branch is specified" do
+            WhiskeyDisk.enqueue("COMMAND")
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_config_to}; cl=\`cat .git/refs/heads/master\`;")))
+          end
+          
+          it "should query the head of the config checkout's specified branch if a branch is specified" do
+            WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'config_branch' => 'production'}))
+            WhiskeyDisk.reset
+            WhiskeyDisk.enable_staleness_checks
+            WhiskeyDisk.enqueue("COMMAND")
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_config_to}; cl=\`cat .git/refs/heads/production\`;")))
+          end
+          
+          it "should query the head on the config repository's master branch if no branch is specified" do            
+            WhiskeyDisk.enqueue("COMMAND")
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cr=\`git ls-remote #{@config_repository} refs/heads/master\`;")))
+          end
+          
+          it "should query the head of the config repository's specified branch if a branch is specified" do
+            WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'config_branch' => 'production'}))
+            WhiskeyDisk.reset
+            WhiskeyDisk.enable_staleness_checks
+            WhiskeyDisk.enqueue("COMMAND")
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cr=\`git ls-remote #{@config_repository} refs/heads/production\`;")))
+          end
         end
       end
     end
-
-    # describe 'checking for staleness' do
-    #   describe 'and checking for staleness' do
-    #     before do
-    #       ENV['check'] = 'true'
-    #     end
-    #     
-    #     it 'should wrap the buffer in a staleness check' do
-    #       WhiskeyDisk.check_for_staleness
-    #       WhiskeyDisk.buffer.last.should.match(%r{\`cat \.git/refs/heads/})        
-    #     end
-    #     
-    #     it 'should use the configuration branch when one is specified' do
-    #       WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'config_branch' => 'production'}))
-    #       WhiskeyDisk.reset
-    #       
-    #       WhiskeyDisk.check_for_staleness
-    #       WhiskeyDisk.buffer.last.should.match(%r{\`cat \.git/refs/heads/production\`})                
-    #     end
-    #     
-    #     it 'should use the "master" branch when no configuration branch is specified' do
-    #       WhiskeyDisk.check_for_staleness
-    #       WhiskeyDisk.buffer.last.should.match(%r{\`cat \.git/refs/heads/master\`})                
-    #     end
-    #   end
-    #   
-    #   describe 'and not checking for staleness' do
-    #     before do
-    #       ENV['check'] = nil
-    #     end
-    #     
-    #     it 'should not wrap the configuration refresh in a staleness check' do
-    #       WhiskeyDisk.refresh_configuration
-    #       WhiskeyDisk.buffer.last.should.not.match(%r{\`cat \.git/refs/heads/master\`})                
-    #     end
-    #   end
-    # end
-
-    
   end
   
   describe 'when running a command string remotely' do
