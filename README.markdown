@@ -41,6 +41,13 @@ works.
   - There's no before\_after\_before_after hooks.  You've got plenty of
     flexibility with just a handful of rake hook points to grab onto.
  
+  - You can enable "staleness checks" so that deployments only happen if
+    either the main repo, or the config repo (if you're using one) has
+    changes that are newer than what is currently deployed.
+
+  - Put whiskey\_disk in a cron, with staleness checks enabled, and you can
+    do hands-free automated deployments whenever code is pushed to your
+    deployment branch of choice!
 
 #### Dependencies ####
 
@@ -146,6 +153,19 @@ as a rails plugin in the Rails application to be deployed, or as a vendored libr
 deployed).  Whiskey\_disk provides the basic deploy:post\_setup and deploy:post\_deploy hooks which get called.
 You can also define these tasks yourself if you want to eliminate the dependency on whiskey\_disk on the
 deployment target system.
+
+### Staleness checks ###
+
+Enabling staleness checking will cause whiskey\_disk to check whether the deployed checkout of the repository
+is out of date ("stale") with respect to the upstream version in git.  If there is a configuration repository
+in use, whiskey\_disk will check the deployed checkout of the configuration repository for staleness as well.
+If the checkouts are already up-to-date the deployment process will print an up-to-date message and stop rather
+than proceeding with any of the deployment actions.  This makes it easy to simply run whiskey\_disk out of cron
+so that it will automatically perform a deployment whenever changes are pushed to the upstream git repositories.
+
+To turn on staleness checking, simply set the 'check' environment variable:
+
+    check='yes' wd deploy --to=foobar:production
 
 
 ### Configuration Repository ###
