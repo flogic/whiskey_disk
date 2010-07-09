@@ -290,17 +290,11 @@ overlaid on top of the most recent checkout of the project.  Snap.
     a gist showing a bit more interesting deploy.rake file for post_setup and
 post_deploy work:  [https://gist.github.com/47e23f2980943531beeb](https://gist.github.com/47e23f2980943531beeb)
 
-On the radar for an upcoming release are:
 
- - common post_* recipes being specifiable by symbol names in deploy.yml ?
- - bringing in a very simplified version of mislav/git-deploy post-{receive,reset} hooks, and a little sugar so you can say:
+### Future Directions ###
 
-        task :post_deploy do
-          if has_changes?('db/migrate') or has_changes?('config/database.yml')
-            Rake::Task['db:migrate'].invoke
-          end
-        end
-
+Check out the [TODO.txt](http://github.com/flogic/whiskey_disk/raw/master/TODO.txt) file 
+to see what we have in mind for the near future.
 
 ### Resources ###
 
