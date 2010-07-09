@@ -554,6 +554,11 @@ describe 'WhiskeyDisk' do
             WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("if [[ $ml != ${mr%%\t*} ]]; then { COMMAND ; }")))
           end
           
+          it 'should add a notice message for when the repository is not stale' do
+            WhiskeyDisk.enqueue("COMMAND")
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("then { COMMAND ; }; else echo \"No changes to deploy.\"; fi")))            
+          end
+          
           it "should query the head of the main checkout's master branch if no branch is specified" do
             WhiskeyDisk.enqueue("COMMAND")
             WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`cat .git/refs/heads/master\`;")))
@@ -613,7 +618,12 @@ describe 'WhiskeyDisk' do
 
           it 'should wrap the bundled commands inside a staleness check which checks both main and config repos for staleness' do
             WhiskeyDisk.enqueue("COMMAND")
-            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("if [[ $ml != ${mr%%\t*} -o $cl != ${cr%%\t*} ]]; then { COMMAND ; }; fi")))
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("if [[ $ml != ${mr%%\t*} -o $cl != ${cr%%\t*} ]]; then { COMMAND ; }")))
+          end
+          
+          it 'should add a notice message for when the repositories are not stale' do
+            WhiskeyDisk.enqueue("COMMAND")
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("then { COMMAND ; }; else echo \"No changes to deploy.\"; fi")))            
           end
           
           it "should query the head of the main checkout's master branch if no branch is specified" do
