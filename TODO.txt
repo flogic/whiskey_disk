@@ -1,3 +1,4 @@
+
  - do git-deploy style change detection:  get the current branch ref, then do the fetch/reset, get the current branch ref; find the differences, make them available to the rake task(s)
    - some sort of simple API to access the detected changes
      require 'whiskey_disk/rake'

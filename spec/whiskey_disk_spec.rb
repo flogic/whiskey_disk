@@ -551,7 +551,7 @@ describe 'WhiskeyDisk' do
 
           it 'should wrap the bundled commands inside a staleness check which checks only the main repo for staleness' do
             WhiskeyDisk.enqueue("COMMAND")
-            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("if [[ $ml != ${mr%%\t*} ]]; then { COMMAND ; }")))
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("if [[ $ml != ${mr%%\t*} ]] ; then { COMMAND ; }")))
           end
           
           it 'should add a notice message for when the repository is not stale' do
@@ -618,7 +618,7 @@ describe 'WhiskeyDisk' do
 
           it 'should wrap the bundled commands inside a staleness check which checks both main and config repos for staleness' do
             WhiskeyDisk.enqueue("COMMAND")
-            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("if [[ $ml != ${mr%%\t*} -o $cl != ${cr%%\t*} ]]; then { COMMAND ; }")))
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("if [[ $ml != ${mr%%\t*} ]] || [[ $cl != ${cr%%\t*} ]]; then { COMMAND ; }")))
           end
           
           it 'should add a notice message for when the repositories are not stale' do

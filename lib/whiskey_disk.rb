@@ -91,9 +91,9 @@ class WhiskeyDisk
                  "cr=\`git ls-remote #{self[:config_repository]} refs/heads/#{config_branch}\`; "
       end
       
-      check += "if [[ $ml != ${mr%%\t*} " +
-               (self[:deploy_config_to] ? "-o $cl != ${cr%%\t*} " : '') +
-               "]]; then #{commands}; else echo \"No changes to deploy.\"; fi"
+      check += "if [[ $ml != ${mr%%\t*} ]] " +
+               (self[:deploy_config_to] ? "|| [[ $cl != ${cr%%\t*} ]]" : '') +
+               "; then #{commands}; else echo \"No changes to deploy.\"; fi"
     end
     
     def join_commands
