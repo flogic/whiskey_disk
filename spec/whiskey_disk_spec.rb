@@ -362,9 +362,9 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.buffer.join(' ').should.match(%r{if \[ -e /path/to/main/repo/Rakefile \]; then .*; fi})
     end
     
-    it 'should make the post deployment rake tasks conditional on the deploy:post_deploy rake task being defined' do
+    it 'should make the post setup rake tasks conditional on the deploy:post_setup rake task being defined' do
       WhiskeyDisk.run_post_setup_hooks
-      WhiskeyDisk.buffer.join(' ').should.match(%r{if \[\[ \`rake --silent -T deploy:post_setup\` != "" \]\]; })      
+      WhiskeyDisk.buffer.join(' ').should.match(%r{if \[\[ \`rake -P | grep deploy:post_setup\` != "" \]\]; })      
     end
 
     it 'should attempt to run the post setup rake tasks' do
@@ -413,7 +413,7 @@ describe 'WhiskeyDisk' do
     
     it 'should make the post deployment rake tasks conditional on the deploy:post_deploy rake task being defined' do
       WhiskeyDisk.run_post_deploy_hooks
-      WhiskeyDisk.buffer.join(' ').should.match(%r{if \[\[ \`rake --silent -T deploy:post_deploy\` != "" \]\]; })      
+      WhiskeyDisk.buffer.join(' ').should.match(%r{if \[\[ \`rake -P | grep deploy:post_deploy\` != "" \]\]; })      
     end
     
     it 'should attempt to run the post deployment rake tasks' do

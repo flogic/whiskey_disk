@@ -119,7 +119,7 @@ class WhiskeyDisk
     end
     
     def if_task_defined(task, cmd)
-      %Q{if [[ `rake --silent -T #{task}` != "" ]]; then #{cmd}; fi}
+      %Q{if [[ `rake -P | grep #{task}` != "" ]]; then #{cmd}; fi}
     end
     
     def ensure_main_parent_path_is_present
