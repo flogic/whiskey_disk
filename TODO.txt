@@ -1,3 +1,9 @@
+ - convert to git-flow
+ - potential "bug":  discriminate on setup between "this repo already exists, don't clone" and "this clone failed"
+ - look at doing ssh identity file for each repo
+ 
+ Q - how do we track registries of deployment files (do we recommend people use larry/puppet or is something else going on?)
+
  - do git-deploy style change detection:  
    - get the current branch ref, then do the fetch/reset, get the current branch ref; find the differences, make them available to the rake task(s)
      we can use the ml/cl part of staleness checking to get the "before" versions of the main and config repos (i.e., leave that part in always, just not the conditional stuff), and have the main run a script which dumps the relative paths of changed files as a .whiskey_disk-paths-changed in the main checkout
