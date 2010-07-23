@@ -1,7 +1,3 @@
- - convert to git-flow
- - potential "bug":  discriminate on setup between "this repo already exists, don't clone" and "this clone failed"
- - look at doing ssh identity file for each repo
- 
  Q - how do we track registries of deployment files (do we recommend people use larry/puppet or is something else going on?)
 
  - do git-deploy style change detection:  
