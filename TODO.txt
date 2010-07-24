@@ -1,4 +1,4 @@
- Q - how do we track registries of deployment files (do we recommend people use larry/puppet or is something else going on?)
+ - allow whiskey_disk to pull configuration file from an url (which would be based on project, environment)
 
  - do git-deploy style change detection:  
    - get the current branch ref, then do the fetch/reset, get the current branch ref; find the differences, make them available to the rake task(s)
