@@ -127,6 +127,11 @@ class WhiskeyDisk
       "else git clone #{repo} #{tail_path(path)} ; fi"
     end
     
+    def run_rake_task(task_name)
+      if_file_present("#{self[:deploy_to]}/Rakefile", 
+        if_task_defined(task_name, "#{env_vars} rake --trace #{task_name} to=#{self[:environment]}"))
+    end
+    
     def ensure_main_parent_path_is_present
       needs(:deploy_to)
       enqueue "mkdir -p #{parent_path(self[:deploy_to])}"
@@ -172,17 +177,13 @@ class WhiskeyDisk
     def run_post_setup_hooks
       needs(:deploy_to)
       enqueue "cd #{self[:deploy_to]}"
-      enqueue(if_file_present("#{self[:deploy_to]}/Rakefile", 
-                if_task_defined("deploy:post_setup",
-                  "#{env_vars} rake --trace deploy:post_setup to=#{self[:environment]}")))
+      enqueue(run_rake_task("deploy:post_setup"))
     end
 
     def run_post_deploy_hooks
       needs(:deploy_to)
       enqueue "cd #{self[:deploy_to]}"
-      enqueue(if_file_present("#{self[:deploy_to]}/Rakefile", 
-                if_task_defined("deploy:post_deploy",
-                  "#{env_vars} rake --trace deploy:post_deploy to=#{self[:environment]}")))
+      enqueue(run_rake_task("deploy:post_deploy"))
     end
   end
 end
