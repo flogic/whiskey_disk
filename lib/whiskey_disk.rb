@@ -122,9 +122,22 @@ class WhiskeyDisk
       %Q{if [[ `rake -P | grep #{task}` != "" ]]; then #{cmd}; fi}
     end
     
-    def conditional_clone(repo, path)
-      "if [ -e #{path} ]; then echo 'Repository already cloned to [#{path}].  Skipping.'; " +
-      "else git clone #{repo} #{tail_path(path)} ; fi"
+    def clone_repository(repo, path)
+      enqueue "cd #{parent_path(path)}"
+      enqueue("if [ -e #{path} ]; then echo 'Repository already cloned to [#{path}].  Skipping.'; " +
+              "else git clone #{repo} #{tail_path(path)} ; fi")
+    end
+   
+    def refresh_checkout(path, repo_branch)
+      enqueue "cd #{path}"
+      enqueue "git fetch origin +refs/heads/#{repo_branch}:refs/remotes/origin/#{repo_branch}"
+      enqueue "git reset --hard origin/#{repo_branch}"
+    end
+
+    def run_rake_task(path, task_name)
+      enqueue "cd #{path}"
+      enqueue(if_file_present("#{self[:deploy_to]}/Rakefile", 
+        if_task_defined(task_name, "#{env_vars} rake --trace #{task_name} to=#{self[:environment]}")))
     end
     
     def ensure_main_parent_path_is_present
@@ -139,28 +152,22 @@ class WhiskeyDisk
 
     def checkout_main_repository
       needs(:deploy_to, :repository)
-      enqueue "cd #{parent_path(self[:deploy_to])}"
-      enqueue conditional_clone(self[:repository], self[:deploy_to])
+      clone_repository(self[:repository], self[:deploy_to])
     end
     
     def checkout_configuration_repository
       needs(:deploy_config_to, :config_repository)
-      enqueue "cd #{parent_path(self[:deploy_config_to])}"
-      enqueue conditional_clone(self[:config_repository], self[:deploy_config_to])
+      clone_repository(self[:config_repository], self[:deploy_config_to])
     end
     
     def update_main_repository_checkout
       needs(:deploy_to)
-      enqueue "cd #{self[:deploy_to]}"
-      enqueue "git fetch origin +refs/heads/#{branch}:refs/remotes/origin/#{branch}"
-      enqueue "git reset --hard origin/#{branch}"
+      refresh_checkout(self[:deploy_to], branch)
     end
     
     def update_configuration_repository_checkout
       needs(:deploy_config_to)
-      enqueue "cd #{self[:deploy_config_to]}"
-      enqueue "git fetch origin +refs/heads/#{config_branch}:refs/remotes/origin/#{config_branch}"
-      enqueue "git reset --hard origin/#{config_branch}"
+      refresh_checkout(self[:deploy_config_to], config_branch)
     end
     
     def refresh_configuration
@@ -171,18 +178,12 @@ class WhiskeyDisk
     
     def run_post_setup_hooks
       needs(:deploy_to)
-      enqueue "cd #{self[:deploy_to]}"
-      enqueue(if_file_present("#{self[:deploy_to]}/Rakefile", 
-                if_task_defined("deploy:post_setup",
-                  "#{env_vars} rake --trace deploy:post_setup to=#{self[:environment]}")))
+      run_rake_task(self[:deploy_to], "deploy:post_setup")
     end
 
     def run_post_deploy_hooks
       needs(:deploy_to)
-      enqueue "cd #{self[:deploy_to]}"
-      enqueue(if_file_present("#{self[:deploy_to]}/Rakefile", 
-                if_task_defined("deploy:post_deploy",
-                  "#{env_vars} rake --trace deploy:post_deploy to=#{self[:environment]}")))
+      run_rake_task(self[:deploy_to], "deploy:post_deploy")
     end
   end
 end
