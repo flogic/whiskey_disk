@@ -126,7 +126,13 @@ class WhiskeyDisk
       "if [ -e #{path} ]; then echo 'Repository already cloned to [#{path}].  Skipping.'; " +
       "else git clone #{repo} #{tail_path(path)} ; fi"
     end
-    
+   
+    def refresh_checkout(path, repo_branch)
+      enqueue "cd #{path}"
+      enqueue "git fetch origin +refs/heads/#{repo_branch}:refs/remotes/origin/#{repo_branch}"
+      enqueue "git reset --hard origin/#{repo_branch}"
+    end
+
     def run_rake_task(task_name)
       if_file_present("#{self[:deploy_to]}/Rakefile", 
         if_task_defined(task_name, "#{env_vars} rake --trace #{task_name} to=#{self[:environment]}"))
@@ -156,16 +162,12 @@ class WhiskeyDisk
     
     def update_main_repository_checkout
       needs(:deploy_to)
-      enqueue "cd #{self[:deploy_to]}"
-      enqueue "git fetch origin +refs/heads/#{branch}:refs/remotes/origin/#{branch}"
-      enqueue "git reset --hard origin/#{branch}"
+      refresh_checkout(self[:deploy_to], branch)
     end
     
     def update_configuration_repository_checkout
       needs(:deploy_config_to)
-      enqueue "cd #{self[:deploy_config_to]}"
-      enqueue "git fetch origin +refs/heads/#{config_branch}:refs/remotes/origin/#{config_branch}"
-      enqueue "git reset --hard origin/#{config_branch}"
+      refresh_checkout(self[:deploy_config_to], config_branch)
     end
     
     def refresh_configuration
