@@ -123,8 +123,9 @@ class WhiskeyDisk
     end
     
     def clone_repository(repo, path)
-      "if [ -e #{path} ]; then echo 'Repository already cloned to [#{path}].  Skipping.'; " +
-      "else git clone #{repo} #{tail_path(path)} ; fi"
+      enqueue "cd #{parent_path(path)}"
+      enqueue("if [ -e #{path} ]; then echo 'Repository already cloned to [#{path}].  Skipping.'; " +
+              "else git clone #{repo} #{tail_path(path)} ; fi")
     end
    
     def refresh_checkout(path, repo_branch)
@@ -150,14 +151,12 @@ class WhiskeyDisk
 
     def checkout_main_repository
       needs(:deploy_to, :repository)
-      enqueue "cd #{parent_path(self[:deploy_to])}"
-      enqueue clone_repository(self[:repository], self[:deploy_to])
+      clone_repository(self[:repository], self[:deploy_to])
     end
     
     def checkout_configuration_repository
       needs(:deploy_config_to, :config_repository)
-      enqueue "cd #{parent_path(self[:deploy_config_to])}"
-      enqueue clone_repository(self[:config_repository], self[:deploy_config_to])
+      clone_repository(self[:config_repository], self[:deploy_config_to])
     end
     
     def update_main_repository_checkout
