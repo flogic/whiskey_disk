@@ -134,9 +134,10 @@ class WhiskeyDisk
       enqueue "git reset --hard origin/#{repo_branch}"
     end
 
-    def run_rake_task(task_name)
-      if_file_present("#{self[:deploy_to]}/Rakefile", 
-        if_task_defined(task_name, "#{env_vars} rake --trace #{task_name} to=#{self[:environment]}"))
+    def run_rake_task(path, task_name)
+      enqueue "cd #{path}"
+      enqueue(if_file_present("#{self[:deploy_to]}/Rakefile", 
+        if_task_defined(task_name, "#{env_vars} rake --trace #{task_name} to=#{self[:environment]}")))
     end
     
     def ensure_main_parent_path_is_present
@@ -177,14 +178,12 @@ class WhiskeyDisk
     
     def run_post_setup_hooks
       needs(:deploy_to)
-      enqueue "cd #{self[:deploy_to]}"
-      enqueue(run_rake_task("deploy:post_setup"))
+      run_rake_task(self[:deploy_to], "deploy:post_setup")
     end
 
     def run_post_deploy_hooks
       needs(:deploy_to)
-      enqueue "cd #{self[:deploy_to]}"
-      enqueue(run_rake_task("deploy:post_deploy"))
+      run_rake_task(self[:deploy_to], "deploy:post_deploy")
     end
   end
 end
