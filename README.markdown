@@ -33,10 +33,15 @@ current local checkout.
   - You can do multi-project deployments, specifying deployment data in a single
     deploy.yml config file, or keep an entire directory of project deployment config files.
 
+  - You can separate per-deployment application configuration information (e.g., passwords, 
+    database configs, hoptoad/AWS/email config data, etc.) in separate repositories from 
+    the application, and whiskey\_disk will merge the correct data onto the deployed 
+    application at deployment time.
+
   - You can have per-developer configurations for targets (especially
     useful for "local" or "development" targets).  Use .gitignore, or
-specify a config_branch and everyone can have their own local setup that just
-works.
+    specify a config_branch and everyone can have their own local setup that just
+    works.
 
   - There's no before\_after\_before_after hooks.  You've got plenty of
     flexibility with just a handful of rake hook points to grab onto.
@@ -74,7 +79,7 @@ As a rails plugin:
 ### Configuration ###
 
  - look in the examples/ directory for sample configuration files
- - main configuration is in %lt;app_root&gt;/config/deploy.yml
+ - main configuration is in &lt;app_root&gt;/config/deploy.yml
  - config files are YAML, with a section for each target.
 
 Known config file settings (if you're familiar with capistrano and vlad these should seem eerily familiar):
