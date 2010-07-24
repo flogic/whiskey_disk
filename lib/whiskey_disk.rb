@@ -122,7 +122,7 @@ class WhiskeyDisk
       %Q{if [[ `rake -P | grep #{task}` != "" ]]; then #{cmd}; fi}
     end
     
-    def conditional_clone(repo, path)
+    def clone_repository(repo, path)
       "if [ -e #{path} ]; then echo 'Repository already cloned to [#{path}].  Skipping.'; " +
       "else git clone #{repo} #{tail_path(path)} ; fi"
     end
@@ -145,13 +145,13 @@ class WhiskeyDisk
     def checkout_main_repository
       needs(:deploy_to, :repository)
       enqueue "cd #{parent_path(self[:deploy_to])}"
-      enqueue conditional_clone(self[:repository], self[:deploy_to])
+      enqueue clone_repository(self[:repository], self[:deploy_to])
     end
     
     def checkout_configuration_repository
       needs(:deploy_config_to, :config_repository)
       enqueue "cd #{parent_path(self[:deploy_config_to])}"
-      enqueue conditional_clone(self[:config_repository], self[:deploy_config_to])
+      enqueue clone_repository(self[:config_repository], self[:deploy_config_to])
     end
     
     def update_main_repository_checkout
