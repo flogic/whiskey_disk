@@ -1,3 +1,20 @@
+ - alternate (shell script) hook to run immediately prior to post_deploy/post_setup
+   - do this via a configuration setting:
+     post_deploy: "/absolute/path/to/something"
+     post_setup: "relative/path/to/something"
+ - make sure that deployments don't require ruby or rake on the target machine
+ 
+ - batch deployments (--batch=/etc/deploy/hourly.yml)
+   - could have this simply pointing to a single yaml file with project name, target name, check value (default = true) (business value:  only need one command, or one cron, to manage all of these)
+   - could be a directory of individual yaml files with that information in each of them (representing one project, one target) (business value:  puppet/chef could more easily manage directories of files)
+   - trying to avoid re-using the deploy.yml because we may want to not auto-deploy all things that we have configurations for, or we may want to auto-deploy them at different frequencies
+   - do we want the config path to be in the meta file, or do we want that to come as part of the arguments to the deployment?
+
+     wd deploy --batch=/etc/deploy/hourly.yml --path=/etc/deploy/projects/
+     wd deploy --batch=/etc/deploy/hourly/ --path=/etc/deploy/projects/
+     wd deploy --batch=/etc/deploy/hourly.yml --path=/etc/deploy/deploy.yml
+     wd deploy --batch=/etc/deploy/hourly --path=/etc/deploy/projects/deploy.yml
+
  - allow whiskey_disk to pull configuration file from an url (which would be based on project, environment)
 
  - do git-deploy style change detection:  
@@ -15,19 +32,6 @@
          # etc. ...
        end
      end
-
----
-
- - [Q] how to specify readily which projects need to be deployed?  Metaconfig?:
-   
-     --- 
-     - config: /path/to/config
-       project: larry
-       target: staging
-     - config: /path/to/config
-       project: larry
-       target: production
-       cache: no
 
  - [Q] what about maintenance pages(?) (i.e., do we need a pre-deploy hook?; also are these per-target config stuffs?; fun managing changes to a maintenance page ;-)
  - [Q] do we want a mechanism to manage the config repo?  (add a repo, add a project, add an environment, put a file into the config repo for an environment?)
