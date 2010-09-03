@@ -180,9 +180,21 @@ class WhiskeyDisk
       needs(:deploy_to)
       run_rake_task(self[:deploy_to], "deploy:post_setup")
     end
+    
+    def build_path(path)
+      return path if path =~ %r{^/}
+      File.join(self[:deploy_to], path)
+    end
+
+    def run_script(script)
+      return unless script
+      path = build_path(script)
+      enqueue("if [ -e #{path} ]; then sh -x #{path}; fi ")
+    end
 
     def run_post_deploy_hooks
       needs(:deploy_to)
+      run_script(self[:post_deploy_script])
       run_rake_task(self[:deploy_to], "deploy:post_deploy")
     end
   end

@@ -415,6 +415,56 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.run_post_deploy_hooks
       WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo})
     end
+    
+    describe 'when a post deployment script is specified' do
+      describe 'and the script path does not start with a "/"' do      
+        before do
+          @parameters = { 'deploy_to'          => '/path/to/main/repo', 
+                          'post_deploy_script' => '/path/to/deployment/script' }
+          WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
+          WhiskeyDisk.reset
+        end
+      
+        it 'should attempt to run the post deployment script' do        
+          WhiskeyDisk.run_post_deploy_hooks
+          WhiskeyDisk.buffer.join(' ').should.match(%r{sh -x .*/path/to/deployment/script})
+        end
+      
+        it 'should use an absolute path to run the post deployment script when the script path starts with a "/"' do
+          WhiskeyDisk.run_post_deploy_hooks
+          WhiskeyDisk.buffer.join(' ').should.match(%r{sh -x /path/to/deployment/script})         
+        end
+        
+        it 'should make the post deployment script run conditional on the presence of the script' do
+          WhiskeyDisk.run_post_deploy_hooks
+          WhiskeyDisk.buffer.join(' ').should.match(%r{if \[ -e /path/to/deployment/script \]; then .*; fi})
+        end
+      end
+      
+      describe 'and the script path does not start with a "/"' do
+        before do
+          @parameters = { 'deploy_to'          => '/path/to/main/repo', 
+                          'post_deploy_script' => 'path/to/deployment/script' }
+          WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
+          WhiskeyDisk.reset         
+        end
+
+        it 'should attempt to run the post deployment script' do        
+          WhiskeyDisk.run_post_deploy_hooks
+          WhiskeyDisk.buffer.join(' ').should.match(%r{sh -x .*/path/to/deployment/script})
+        end
+      
+        it 'should use a path relative to the deployment path to run the post deployment script' do
+          WhiskeyDisk.run_post_deploy_hooks
+          WhiskeyDisk.buffer.join(' ').should.match(%r{sh -x /path/to/main/repo/path/to/deployment/script})
+        end
+        
+        it 'should make the post deployment script run conditional on the presence of the script' do
+          WhiskeyDisk.run_post_deploy_hooks
+          WhiskeyDisk.buffer.join(' ').should.match(%r{if \[ -e /path/to/main/repo/path/to/deployment/script \]; then .*; fi})
+        end
+      end
+    end
         
     it 'should attempt to run the post deployment rake tasks' do
       WhiskeyDisk.run_post_deploy_hooks
