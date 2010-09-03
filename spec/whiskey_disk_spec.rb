@@ -357,26 +357,6 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo})
     end
     
-    it 'should make the post setup rake tasks conditional on the presence of a Rakefile in the deployment path' do      
-      WhiskeyDisk.run_post_setup_hooks
-      WhiskeyDisk.buffer.join(' ').should.match(%r{if \[ -e /path/to/main/repo/Rakefile \]; then .*; fi})
-    end
-    
-    it 'should ensure that any rake ENV variable are set when checking for deploy:post_setup tasks' do
-      @parameters = { 'deploy_to' => '/path/to/main/repo', 'rake_env' => { 'RAILS_ENV' => 'production', 'FOO' => 'bar' } }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
-      WhiskeyDisk.run_post_setup_hooks
-      @parameters['rake_env'].each_pair do |k,v|
-        WhiskeyDisk.buffer.join(' ').should.match(%r{#{k}='#{v}' .*rake -P})
-      end
-    end
-    
-    it 'should make the post setup rake tasks conditional on the deploy:post_setup rake task being defined' do
-      WhiskeyDisk.run_post_setup_hooks
-      WhiskeyDisk.buffer.join(' ').should.match(%r{if \[\[ \`rake -P | grep deploy:post_setup\` != "" \]\]; })      
-    end
-
     it 'should attempt to run the post setup rake tasks' do
       WhiskeyDisk.run_post_setup_hooks
       WhiskeyDisk.buffer.join(' ').should.match(%r{rake.*deploy:post_setup})
@@ -385,6 +365,26 @@ describe 'WhiskeyDisk' do
     it 'should use the same environment when running the rake tasks' do
       WhiskeyDisk.run_post_setup_hooks
       WhiskeyDisk.buffer.join(' ').should.match(%r{to=#{@env}})      
+    end
+    
+    it 'should make the post setup rake tasks conditional on the presence of a Rakefile in the deployment path' do      
+      WhiskeyDisk.run_post_setup_hooks
+      WhiskeyDisk.buffer.join(' ').should.match(%r{if \[ -e /path/to/main/repo/Rakefile \]; then .*; fi})
+    end
+    
+    it 'should make the post setup rake tasks conditional on the deploy:post_setup rake task being defined' do
+      WhiskeyDisk.run_post_setup_hooks
+      WhiskeyDisk.buffer.join(' ').should.match(%r{if \[\[ \`rake -P | grep deploy:post_setup\` != "" \]\]; })      
+    end
+
+    it 'should ensure that any rake ENV variable are set when checking for deploy:post_setup tasks' do
+      @parameters = { 'deploy_to' => '/path/to/main/repo', 'rake_env' => { 'RAILS_ENV' => 'production', 'FOO' => 'bar' } }
+      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
+      WhiskeyDisk.reset
+      WhiskeyDisk.run_post_setup_hooks
+      @parameters['rake_env'].each_pair do |k,v|
+        WhiskeyDisk.buffer.join(' ').should.match(%r{#{k}='#{v}' .*rake -P})
+      end
     end
     
     it 'should set any rake_env variables when running the rake tasks' do
@@ -415,17 +415,17 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.run_post_deploy_hooks
       WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo})
     end
-    
-    it 'should ensure that any rake ENV variable are set when checking for deploy:post_setup tasks' do
-      @parameters = { 'deploy_to' => '/path/to/main/repo', 'rake_env' => { 'RAILS_ENV' => 'production', 'FOO' => 'bar' } }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
+        
+    it 'should attempt to run the post deployment rake tasks' do
       WhiskeyDisk.run_post_deploy_hooks
-      @parameters['rake_env'].each_pair do |k,v|
-        WhiskeyDisk.buffer.join(' ').should.match(%r{#{k}='#{v}' .*rake -P})
-      end
+      WhiskeyDisk.buffer.join(' ').should.match(%r{rake.*deploy:post_deploy})
     end
     
+    it 'should use the same environment when running the rake tasks' do
+      WhiskeyDisk.run_post_deploy_hooks
+      WhiskeyDisk.buffer.join(' ').should.match(%r{to=#{@env}})      
+    end
+
     it 'should make the post deployment rake tasks conditional on the presence of a Rakefile in the deployment path' do      
       WhiskeyDisk.run_post_deploy_hooks
       WhiskeyDisk.buffer.join(' ').should.match(%r{if \[ -e /path/to/main/repo/Rakefile \]; then .*; fi})
@@ -435,15 +435,15 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.run_post_deploy_hooks
       WhiskeyDisk.buffer.join(' ').should.match(%r{if \[\[ \`rake -P | grep deploy:post_deploy\` != "" \]\]; })      
     end
-    
-    it 'should attempt to run the post deployment rake tasks' do
+
+    it 'should ensure that any rake ENV variable are set when checking for deploy:post_setup tasks' do
+      @parameters = { 'deploy_to' => '/path/to/main/repo', 'rake_env' => { 'RAILS_ENV' => 'production', 'FOO' => 'bar' } }
+      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
+      WhiskeyDisk.reset
       WhiskeyDisk.run_post_deploy_hooks
-      WhiskeyDisk.buffer.join(' ').should.match(%r{rake.*deploy:post_deploy})
-    end
-    
-    it 'should use the same environment when running the rake tasks' do
-      WhiskeyDisk.run_post_deploy_hooks
-      WhiskeyDisk.buffer.join(' ').should.match(%r{to=#{@env}})      
+      @parameters['rake_env'].each_pair do |k,v|
+        WhiskeyDisk.buffer.join(' ').should.match(%r{#{k}='#{v}' .*rake -P})
+      end
     end
     
     it 'should set any rake_env variables when running the rake tasks' do
