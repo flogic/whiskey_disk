@@ -125,7 +125,7 @@ class WhiskeyDisk
     def clone_repository(repo, path)
       enqueue "cd #{parent_path(path)}"
       enqueue("if [ -e #{path} ]; then echo 'Repository already cloned to [#{path}].  Skipping.'; " +
-              "else git clone #{repo} #{tail_path(path)} ; fi")
+              "else git clone --depth 1 #{repo} #{tail_path(path)} ; fi")
     end
    
     def refresh_checkout(path, repo_branch)

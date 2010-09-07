@@ -5,6 +5,9 @@ A very opinionated deployment tool, designed to be as fast as technologically po
 
 Right-arrow through a short whiskey_disk presentation at [http://wd2010.rickbradley.com/](http://wd2010.rickbradley.com) (slide source available [here](http://github.com/rick/whiskey_disk_presentation).), covering the 0.2.*-era functionality.
 
+You can also right-arrow through a shorter but more up-to-date whiskey_disk "lightning talk" presentation 
+(from the 2010 Ruby Hoedown) at [http://wdlightning.rickbradley.com/](http://wdlightning.rickbradley.com) (slide source available [here](http://github.com/rick/whiskey_disk_presentation/tree/lightning).), covering the 0.4.*-era functionality.
+
 ### Selling points ###
 
   - If you share the same opinions as we do there's almost no code involved, almost no
