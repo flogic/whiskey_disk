@@ -14,10 +14,9 @@ class WhiskeyDisk
         ENV['to'].split(/:/).first
       end
 
-      def specify_project_name(data)
-        unless ENV['to'] && ENV['to'] =~ /:/
-          ENV['to'] = data[environment_name]['project'] + ':' + ENV['to'] unless data[environment_name]['project'].nil?
-        end
+      def override_project_name!(data)
+        return if ENV['to'] && ENV['to'] =~ /:/
+        ENV['to'] = data[environment_name]['project'] + ':' + ENV['to'] if data[environment_name]['project']
       end
 
       def path
@@ -101,7 +100,7 @@ class WhiskeyDisk
 
       def add_project_scoping(data)
         return data unless needs_project_scoping?(data)
-        specify_project_name(data)
+        override_project_name!(data)
         { project_name => data }
       end
 
