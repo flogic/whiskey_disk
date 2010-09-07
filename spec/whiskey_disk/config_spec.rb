@@ -267,7 +267,7 @@ describe WhiskeyDisk::Config do
       WhiskeyDisk::Config.project_name.should == 'foo'
     end
 
-    it 'should fail when ENV["to"] is unset' do
+    it 'should return "unnamed_project" when ENV["to"] is unset' do
       ENV['to'] = ''
       WhiskeyDisk::Config.project_name.should == 'unnamed_project'
     end
