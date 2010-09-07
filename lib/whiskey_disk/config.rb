@@ -14,6 +14,12 @@ class WhiskeyDisk
         ENV['to'].split(/:/).first
       end
 
+      def specify_project_name(data)
+        unless ENV['to'] && ENV['to'] =~ /:/
+          ENV['to'] = data[environment_name]['project'] + ':' + ENV['to'] unless data[environment_name]['project'].nil?
+        end
+      end
+
       def path
         (ENV['path'] && ENV['path'] != '') ? ENV['path'] : false
       end
@@ -72,10 +78,6 @@ class WhiskeyDisk
         specified_project_name || 'unnamed_project'
       end
 
-      def extract_project_name(data)
-        data[environment_name][:project] || project_name
-      end
-
       def repository_depth(data, depth = 0)
         raise 'no repository found' unless data.respond_to?(:has_key?)
         return depth if data.has_key?('repository')
@@ -99,7 +101,8 @@ class WhiskeyDisk
 
       def add_project_scoping(data)
         return data unless needs_project_scoping?(data)
-        { extract_project_name(data) => data }
+        specify_project_name(data)
+        { project_name => data }
       end
 
       def normalize_data(data)
