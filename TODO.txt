@@ -1,6 +1,3 @@
- - make sure that deployments don't require ruby or rake on the target machine
- - we should probably do --depth 1 on setup, for even fastertude
- - support 'check=yes' as a wd --check flag
  - if someone specifies :project in a config repo block in a localized config (say a RAILS app), then use that for determining which project to use when loading the config repo
 
  - batch deployments (--batch=/etc/deploy/hourly.yml)
