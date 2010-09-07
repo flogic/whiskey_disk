@@ -5,10 +5,9 @@ desc 'Default: run unit tests.'
 task :default => :test
 
 desc 'Test RubyCloud'
-Rake::TestTask.new(:test) do |t|
-  t.libs << 'lib'
-  t.pattern = 'spec/**/*_spec.rb'
-  t.verbose = true
+task :test do
+  files = Dir['spec/**/*_spec.rb'].join(" ")
+  system("bacon #{files}")
 end
 
 begin
