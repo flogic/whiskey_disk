@@ -57,17 +57,30 @@ current local checkout.
     do hands-free automated deployments whenever code is pushed to your
     deployment branch of choice!
 
-#### Dependencies ####
-
-rake, ssh, git, rsync on the deployment target server (affectionately referred to as the "g-node" by vinbarnes), bash-ish shell on deployment server.
-
-#### Assumptions ####
+### Assumptions ###
 
  - your project is managed via git
  - you are deploying over ssh, or deploying locally and have a bash-compatible shell
  - you are comfortable defining (optional) post-setup and post-deployment actions with rake
  - you have an optional second git repository for per-application/per-target configuration files
  - you have an optional Rakefile in the top directory of your project's checkout
+
+### Dependencies ###
+
+On the server from which the whiskey_disk process will be kicked off:  
+
+ - ruby
+ - rake
+ - whiskey\_disk
+ - ssh (if doing a remote deployment).  
+
+On the deployment target server (which may be the same as the first server):  
+
+ - a bash-compatible shell
+ - rsync (only if using a configuration repository)
+ - ruby, rake, whiskey\_disk (only if running post\_setup or post\_deploy hooks)
+
+If you're running on OS X or Linux you probably have all of these installed already.  Note that the deployment target system doesn't even have to have ruby installed unless post\_* rake hooks are being run.
 
 ### Installation ###
 
@@ -119,7 +132,7 @@ of deploy:setup
 at the end of deploy:now
 
 
-#### post\_deploy\_script and post\_setup\_script ###
+### post\_deploy\_script and post\_setup\_script ###
 
 Whiskey\_disk provides rake task hooks (deploy:post\_setup and deploy:post\_deploy) to allow running custom
 code after setup or deployment.  There are situations where it is desirable to run some commands prior to 
@@ -152,24 +165,6 @@ The post\_deploy\_script will be run from /var/www/www.ogtastic.com/bin/post-dep
 target system.
 
 
-
-### Running via rake ###
-
-In your Rakefile:
-
-    require 'whiskey_disk/rake'
-
-  Then, from the command-line:
-
-    % rake deploy:setup to=<target>   (e.g., "qa", "staging", "production", etc.)
-    % rake deploy:now   to=<target>
-
-  or, specifying the project name:
-
-    % rake deploy:setup to=<project>:<target>   (e.g., "foo:qa", "bar:production", etc.)
-    % rake deploy:now   to=<project>:<target>
-
-
 ### Running from the command-line ###
   
     % wd setup --to=<target>
@@ -197,6 +192,24 @@ deployed).  Whiskey\_disk provides the basic deploy:post\_setup and deploy:post\
 You can also define these tasks yourself if you want to eliminate the dependency on whiskey\_disk on the
 deployment target system.
 
+
+### Running via rake ###
+
+In your Rakefile:
+
+    require 'whiskey_disk/rake'
+
+  Then, from the command-line:
+
+    % rake deploy:setup to=<target>   (e.g., "qa", "staging", "production", etc.)
+    % rake deploy:now   to=<target>
+
+  or, specifying the project name:
+
+    % rake deploy:setup to=<project>:<target>   (e.g., "foo:qa", "bar:production", etc.)
+    % rake deploy:now   to=<project>:<target>
+
+
 ### Staleness checks ###
 
 Enabling staleness checking will cause whiskey\_disk to check whether the deployed checkout of the repository
@@ -209,6 +222,11 @@ so that it will automatically perform a deployment whenever changes are pushed t
 To turn on staleness checking, simply specify the '--check' flag when deploying (or the shorter '-c')
 
     wd deploy --check --to=foobar:production
+
+If running whiskey\_disk purely via rake, you can also enable staleness checking.  This works by setting the 'check'
+environment variable to the string 'true' or 'yes':
+
+    % check='true' to='whiskey_disk:testing' rake deploy:now
 
 
 ### Configuration Repository ###
