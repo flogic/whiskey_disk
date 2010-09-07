@@ -84,15 +84,17 @@ As a rails plugin:
 
 Known config file settings (if you're familiar with capistrano and vlad these should seem eerily familiar):
  
-    domain:            host on which to deploy (this is an ssh connect string) 
-    deploy_to:         path to which to deploy main application
-    repository:        git repo path for main application
-    branch:            git branch to deploy from main application git repo (default: master)
-    deploy_config_to:  where to deploy the configuration repository
-    config_repository: git repository for configuration files
-    config_branch:     git branch to deploy from configuration git repo (default: master)
-    project:           project name (used to compute path in configuration checkout)
-    rake_env:          hash of environment variables to set when running post_setup and post_deploy rake tasks
+    domain:              host on which to deploy (this is an ssh connect string) 
+    deploy_to:           path to which to deploy main application
+    repository:          git repo path for main application
+    branch:              git branch to deploy from main application git repo (default: master)
+    deploy_config_to:    where to deploy the configuration repository
+    config_repository:   git repository for configuration files
+    config_branch:       git branch to deploy from configuration git repo (default: master)
+    project:             project name (used to compute path in configuration checkout)
+    post_deploy_script:  path to a shell script to run after deployment
+    post_setup_script:   path to a shell script to run after setup
+    rake_env:            hash of environment variables to set when running post_setup and post_deploy rake tasks
 
 
 A simple config/deploy.yml might look like:
@@ -112,6 +114,39 @@ of deploy:setup
  - defining a deploy:&lt;target&gt;:post_deploy rake task (e.g., in
    lib/tasks/ or in your project's Rakefile) will cause that task to be run
 at the end of deploy:now
+
+
+#### post\_deploy\_script and post\_setup\_script ###
+
+Whiskey\_disk provides rake task hooks (deploy:post\_setup and deploy:post\_deploy) to allow running custom
+code after setup or deployment.  There are situations where it is desirable to run some commands prior to 
+running those rake tasks (e.g., if using bundler and needing to do a 'bundle install' before running rake).
+It may also be the case that the target system doesn't have rake (and/or ruby) installed, but some post-setup
+or post-deploy operations need to happen.  For these reasons, whiskey\_disk allows specifying a (bash-compatible)
+shell script to run after setup and/or deployment via the post\_deploy\_script and post\_setup\_script settings
+in the configuration file.  These scripts, when specified, are run immediately before running the deploy:post\_setup 
+or deploy:post\_deploy rake tasks, if they are present.
+
+The paths provided to post\_deploy\_script and post\_setup\_script can be either absolute or relative.  A path
+starting with a '/' is an absolute path, and the script specified should be at that exact location on the 
+target filesystem.  A path which does not start with a '/' is a relative path, and the script specified should
+be located at the specified path under the deployed application path.  This implies that it's possible to 
+manage post\_setup and post\_deploy scripts out of a configuration repository.
+
+A config/deploy.yml using post\_deploy\_script and post\_setup\_script might look like this:
+  
+    production:
+      domain: "ogc@www.ogtastic.com"
+      deploy_to: "/var/www/www.ogtastic.com"
+      repository: "git@ogtastic.com:www.ogtastic.com.git"
+      branch: "stable"
+      post_setup_script: "/home/ogc/horrible_place_for_this/prod-setup.sh"
+      post_deploy_script: "bin/post-deploy.sh"
+      rake_env:
+        RAILS_ENV: 'production'
+
+The post\_deploy\_script will be run from /var/www/www.ogtastic.com/bin/post-deploy.sh on the 
+target system.
 
 
 
@@ -150,7 +185,7 @@ The --path argument can take either a file or a directory.  When given a file it
 All this means you can manage a large number of project deployments (local or remote) and have a single scripted deployment manager that keeps them up to date.  Configurations can live in a centralized location, and developers don't have to be actively involved in ensuring code gets shipped up to a server.  Win.
 
 
-### A note about post\__{setup,deploy} Rake tasks
+### A note about post\_{setup,deploy} Rake tasks
 
 If you want actions to run on the deployment target after you do a whiskey\_disk setup or whiskey\_disk deploy, 
 you will need to make sure that whiskey\_disk is available on the target system (either by gem installation,

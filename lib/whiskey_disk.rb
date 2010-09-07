@@ -140,6 +140,17 @@ class WhiskeyDisk
         if_task_defined(task_name, "#{env_vars} rake --trace #{task_name} to=#{self[:environment]}")))
     end
     
+    def build_path(path)
+      return path if path =~ %r{^/}
+      File.join(self[:deploy_to], path)
+    end
+
+    def run_script(script)
+      return unless script
+      path = build_path(script)
+      enqueue("if [ -e #{path} ]; then sh -x #{path}; fi ")
+    end
+
     def ensure_main_parent_path_is_present
       needs(:deploy_to)
       enqueue "mkdir -p #{parent_path(self[:deploy_to])}"
@@ -178,11 +189,13 @@ class WhiskeyDisk
     
     def run_post_setup_hooks
       needs(:deploy_to)
+      run_script(self[:post_setup_script])
       run_rake_task(self[:deploy_to], "deploy:post_setup")
     end
-
+    
     def run_post_deploy_hooks
       needs(:deploy_to)
+      run_script(self[:post_deploy_script])
       run_rake_task(self[:deploy_to], "deploy:post_deploy")
     end
   end
