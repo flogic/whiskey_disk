@@ -206,9 +206,9 @@ If the checkouts are already up-to-date the deployment process will print an up-
 than proceeding with any of the deployment actions.  This makes it easy to simply run whiskey\_disk out of cron
 so that it will automatically perform a deployment whenever changes are pushed to the upstream git repositories.
 
-To turn on staleness checking, simply set the 'check' environment variable:
+To turn on staleness checking, simply specify the '--check' flag when deploying (or the shorter '-c')
 
-    check='yes' wd deploy --to=foobar:production
+    wd deploy --check --to=foobar:production
 
 
 ### Configuration Repository ###
