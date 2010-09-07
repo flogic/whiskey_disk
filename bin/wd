@@ -15,6 +15,10 @@ op = OptionParser.new do |opts|
     options[:path] = path
   end
     
+  opts.on('-c', '--check', "do a staleness check before deploying") do |path|
+    options[:check] = 'true'
+  end
+    
   opts.on_tail('-h', '--help', 'show this message') do
     raise opts.to_s
   end
@@ -28,6 +32,7 @@ raise op.to_s unless ['deploy', 'setup'].include?(command)
 
 ENV['to'] = options[:target]
 ENV['path'] = options[:path]
+ENV['check'] = options[:check]
 
 if command == 'deploy'
   Rake::Task['deploy:now'].invoke
