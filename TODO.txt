@@ -1,9 +1,8 @@
- - alternate (shell script) hook to run immediately prior to post_deploy/post_setup
-   - do this via a configuration setting:
-     post_deploy: "/absolute/path/to/something"
-     post_setup: "relative/path/to/something"
  - make sure that deployments don't require ruby or rake on the target machine
- 
+ - we should probably do --depth 1 on setup, for even fastertude
+ - support 'check=yes' as a wd --check flag
+ - if someone specifies :project in a config repo block in a localized config (say a RAILS app), then use that for determining which project to use when loading the config repo
+
  - batch deployments (--batch=/etc/deploy/hourly.yml)
    - could have this simply pointing to a single yaml file with project name, target name, check value (default = true) (business value:  only need one command, or one cron, to manage all of these)
    - could be a directory of individual yaml files with that information in each of them (representing one project, one target) (business value:  puppet/chef could more easily manage directories of files)
