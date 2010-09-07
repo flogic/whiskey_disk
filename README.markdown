@@ -364,3 +364,8 @@ to see what we have in mind for the near future.
  - [http://toroid.org/ams/git-website-howto](http://toroid.org/ams/git-website-howto)
 
 
+### Contributors ###
+
+ - Rick Bradley (rick@rickbradley.com, github:rick)
+ - Jeremy Holland (jeremy@jeremypholland.com, github:therubyneck): feature/bugfix contributions
+
