@@ -244,6 +244,51 @@ describe 'wd command' do
         run_command
         ENV['to'].should == 'foo'
       end
+    
+      describe 'and a --check argument is specified' do
+        before do
+          ARGV.push '--check'
+          @rake = Rake::Task['deploy:now']
+          @rake.stub!(:invoke)
+        end
+           
+        it 'should not fail' do
+          lambda { run_command }.should.not.raise
+        end
+      
+        it 'should run the deploy:now rake task' do
+          @rake.should.receive(:invoke)
+          run_command
+        end
+      
+        it 'should make the specified target available as a "check" argument to the rake task' do
+          run_command
+          ENV['check'].should == 'true'
+        end
+      end
+
+      describe 'and a -c argument is specified' do
+        before do
+          ARGV.push '-c'
+          @rake = Rake::Task['deploy:now']
+          @rake.stub!(:invoke)
+        end
+           
+        it 'should not fail' do
+          lambda { run_command }.should.not.raise
+        end
+      
+        it 'should run the deploy:now rake task' do
+          @rake.should.receive(:invoke)
+          run_command
+        end
+      
+        it 'should make the specified target available as a "check" argument to the rake task' do
+          run_command
+          ENV['check'].should == 'true'
+        end
+      end
+
       describe 'and a --path argument is specified' do
         before do
           ARGV.push '--path=/path/to/foo'
@@ -324,6 +369,50 @@ describe 'wd command' do
       it 'should make the specified target available as a "to" argument to the rake task' do
         run_command
         ENV['to'].should == 'foo'
+      end
+  
+      describe 'and a --check argument is specified' do
+        before do
+          ARGV.push '--check'
+          @rake = Rake::Task['deploy:now']
+          @rake.stub!(:invoke)
+        end
+         
+        it 'should not fail' do
+          lambda { run_command }.should.not.raise
+        end
+    
+        it 'should run the deploy:now rake task' do
+          @rake.should.receive(:invoke)
+          run_command
+        end
+    
+        it 'should make the specified target available as a "check" argument to the rake task' do
+          run_command
+          ENV['check'].should == 'true'
+        end
+      end
+
+      describe 'and a -c argument is specified' do
+        before do
+          ARGV.push '-c'
+          @rake = Rake::Task['deploy:now']
+          @rake.stub!(:invoke)
+        end
+         
+        it 'should not fail' do
+          lambda { run_command }.should.not.raise
+        end
+    
+        it 'should run the deploy:now rake task' do
+          @rake.should.receive(:invoke)
+          run_command
+        end
+    
+        it 'should make the specified target available as a "check" argument to the rake task' do
+          run_command
+          ENV['check'].should == 'true'
+        end
       end
 
       describe 'and a --path argument is specified' do
