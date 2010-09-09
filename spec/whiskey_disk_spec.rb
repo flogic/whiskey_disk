@@ -4,8 +4,7 @@ require 'rake'
 
 # helper to set up configuration scenarios
 def use_config(parameters = {})
-  WhiskeyDisk::Config.stub!(:fetch).and_return(parameters)
-  WhiskeyDisk.reset
+  WhiskeyDisk.configuration = parameters
 end
 
 describe 'requiring the main library' do
