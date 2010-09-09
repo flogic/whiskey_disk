@@ -514,7 +514,6 @@ describe 'WhiskeyDisk' do
       before do
         WhiskeyDisk.configuration = { 'domain' => 'www.domain.com', 'deploy_to' => '/path/to/main/repo' }
         WhiskeyDisk.stub!(:bundle).and_return('command string')
-        WhiskeyDisk.stub!(:register_configuration)
         WhiskeyDisk.stub!(:run)
       end
       
