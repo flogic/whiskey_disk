@@ -2,9 +2,16 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper.rb
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'lib', 'whiskey_disk', 'config'))
 require 'yaml'
 require 'tmpdir'
+require 'fileutils'
 
 CURRENT_FILE = File.expand_path(__FILE__)           # Bacon evidently mucks around with __FILE__ or something related :-/
 CURRENT = File.expand_path(File.dirname(__FILE__))  # Bacon evidently mucks around with __FILE__ or something related :-/
+
+# create a file at the specified path
+def make(path)
+  FileUtils.mkdir_p(File.dirname(path))
+  FileUtils.touch(path)
+end
 
 describe WhiskeyDisk::Config do
   describe 'when computing the environment name' do
@@ -287,8 +294,20 @@ describe WhiskeyDisk::Config do
     describe 'and no path is specified' do
       before do
         ENV['path'] = @path = nil
-        @path = '/path/to/project/config'
-        WhiskeyDisk::Config.stub!(:base_path).and_return(@path)
+        @base_path = Dir.tmpdir
+        WhiskeyDisk::Config.stub!(:base_path).and_return(@base_path)
+        
+        [ 
+          "/deploy/foo/staging.yml", 
+          "/deploy/foo.yml", 
+          "/deploy/staging.yml",
+          "/staging.yml", 
+          "/deploy.yml"
+        ].each { |file| make(File.join(@base_path, file)) }
+      end
+      
+      after do
+        FileUtils.rm_rf(@base_path)
       end
       
       describe 'and a project name is specified in ENV["to"]' do
@@ -297,73 +316,65 @@ describe WhiskeyDisk::Config do
         end
 
         it 'should return the path to deploy/foo/<environment>.yml under the project base path if it exists' do
-          File.stub!(:exists?).with("#{@path}/deploy/foo/staging.yml").and_return(true)
-          WhiskeyDisk::Config.configuration_file.should == "#{@path}/deploy/foo/staging.yml"
+          WhiskeyDisk::Config.configuration_file.should == "#{@base_path}/deploy/foo/staging.yml"
         end
 
         it 'should return the path to deploy/foo.yml under the project base path if it exists' do
-          File.stub!(:exists?).with("#{@path}/deploy/foo/staging.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/deploy/foo.yml").and_return(true)
-          WhiskeyDisk::Config.configuration_file.should == "#{@path}/deploy/foo.yml"
+          File.unlink("#{@base_path}/deploy/foo/staging.yml")
+          WhiskeyDisk::Config.configuration_file.should == "#{@base_path}/deploy/foo.yml"
         end
 
         it 'should return the path to a per-environment configuration file in the deploy/ directory under the project base path if it exists' do
-          File.stub!(:exists?).with("#{@path}/deploy/foo/staging.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/deploy/foo.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/deploy/staging.yml").and_return(true)
-          WhiskeyDisk::Config.configuration_file.should == "#{@path}/deploy/staging.yml"
+          File.unlink("#{@base_path}/deploy/foo/staging.yml")
+          File.unlink("#{@base_path}/deploy/foo.yml")
+          WhiskeyDisk::Config.configuration_file.should == "#{@base_path}/deploy/staging.yml"
         end
 
         it 'should return the path to a per-environment configuration file under the project base path if it exists' do
-          File.stub!(:exists?).with("#{@path}/deploy/foo/staging.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/deploy/foo.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/deploy/staging.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/staging.yml").and_return(true)
-          WhiskeyDisk::Config.configuration_file.should == "#{@path}/staging.yml"
+          File.unlink("#{@base_path}/deploy/foo/staging.yml")
+          File.unlink("#{@base_path}/deploy/foo.yml")
+          File.unlink("#{@base_path}/deploy/staging.yml")
+          WhiskeyDisk::Config.configuration_file.should == "#{@base_path}/staging.yml"
         end
 
         it 'should return the path to deploy.yml under the project base path' do
-          File.stub!(:exists?).with("#{@path}/deploy/foo/staging.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/deploy/foo.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/deploy/staging.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/staging.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/deploy.yml").and_return(true)
-          WhiskeyDisk::Config.configuration_file.should == "#{@path}/deploy.yml"
+          File.unlink("#{@base_path}/deploy/foo/staging.yml")
+          File.unlink("#{@base_path}/deploy/foo.yml")
+          File.unlink("#{@base_path}/deploy/staging.yml")
+          File.unlink("#{@base_path}/staging.yml")
+          WhiskeyDisk::Config.configuration_file.should == "#{@base_path}/deploy.yml"
         end
 
         it 'should fail if no per-environment config file nor deploy.yml exists under the project base path' do
-          File.stub!(:exists?).with("#{@path}/deploy/foo/staging.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/deploy/foo.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/deploy/staging.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/staging.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/deploy.yml").and_return(false)
+          File.unlink("#{@base_path}/deploy/foo/staging.yml")
+          File.unlink("#{@base_path}/deploy/foo.yml")
+          File.unlink("#{@base_path}/deploy/staging.yml")
+          File.unlink("#{@base_path}/staging.yml")
+          File.unlink("#{@base_path}/deploy.yml")
           lambda { WhiskeyDisk::Config.configuration_file }.should.raise
         end
       end
 
       describe 'and no project name is specified in ENV["to"]' do
         it 'should return the path to a per-environment configuration file in the deploy/ directory under the project base path if it exists' do
-          File.stub!(:exists?).with("#{@path}/deploy/staging.yml").and_return(true)
-          WhiskeyDisk::Config.configuration_file.should == "#{@path}/deploy/staging.yml"
+          WhiskeyDisk::Config.configuration_file.should == "#{@base_path}/deploy/staging.yml"
         end
 
         it 'should return the path to a per-environment configuration file under the project base path if it exists' do
-          File.stub!(:exists?).with("#{@path}/deploy/staging.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/staging.yml").and_return(true)
-          WhiskeyDisk::Config.configuration_file.should == "#{@path}/staging.yml"
+          File.unlink("#{@base_path}/deploy/staging.yml")
+          WhiskeyDisk::Config.configuration_file.should == "#{@base_path}/staging.yml"
         end
 
         it 'should return the path to deploy.yml under the project base path' do
-          File.stub!(:exists?).with("#{@path}/deploy/staging.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/staging.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/deploy.yml").and_return(true)
-          WhiskeyDisk::Config.configuration_file.should == "#{@path}/deploy.yml"
+          File.unlink("#{@base_path}/deploy/staging.yml")
+          File.unlink("#{@base_path}/staging.yml")
+          WhiskeyDisk::Config.configuration_file.should == "#{@base_path}/deploy.yml"
         end
 
         it 'should fail if no per-environment config file nor deploy.yml exists under the project base path' do
-          File.stub!(:exists?).with("#{@path}/deploy/staging.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/staging.yml").and_return(false)
-          File.stub!(:exists?).with("#{@path}/deploy.yml").and_return(false)
+          File.unlink("#{@base_path}/deploy/staging.yml")
+          File.unlink("#{@base_path}/staging.yml")
+          File.unlink("#{@base_path}/deploy.yml")
           lambda { WhiskeyDisk::Config.configuration_file }.should.raise
         end
       end
