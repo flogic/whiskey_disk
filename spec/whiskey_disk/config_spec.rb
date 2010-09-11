@@ -393,83 +393,87 @@ describe WhiskeyDisk::Config do
 
     describe 'and a path which points to a directory is specified' do
       before do
-        ENV['path'] = @path = CURRENT
+        ENV['path'] = @path = Dir.tmpdir
         WhiskeyDisk::Config.stub!(:base_path).and_return(@path)
+        
+        [ 
+          "/deploy/foo/staging.yml", 
+          "/deploy/foo.yml", 
+          "/deploy/staging.yml",
+          "/staging.yml", 
+          "/deploy.yml"
+        ].each { |file| make(File.join(@path, file)) }
       end
 
+      after do
+        FileUtils.rm_rf(@path)
+      end
+      
       describe 'and a project name is specified in ENV["to"]' do
         before do
           ENV['to'] = @env = 'foo:staging'
         end
 
         it 'should return the path to deploy/foo/<environment>.yml under the project base path if it exists' do
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'foo', 'staging.yml')).and_return(true)
           WhiskeyDisk::Config.configuration_file.should == File.join(@path, 'deploy', 'foo' ,'staging.yml')
         end
 
         it 'should return the path to deploy/foo.yml under the project base path if it exists' do
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'foo', 'staging.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'foo.yml')).and_return(true)
+          File.unlink(File.join(@path, 'deploy', 'foo', 'staging.yml'))
           WhiskeyDisk::Config.configuration_file.should == File.join(@path, 'deploy', 'foo.yml')
         end
 
         it 'should return the path to a per-environment configuration file under deploy/ in the path specified if that file exists' do
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'foo', 'staging.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'foo.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'staging.yml')).and_return(true)
+          File.unlink(File.join(@path, 'deploy', 'foo', 'staging.yml'))
+          File.unlink(File.join(@path, 'deploy', 'foo.yml'))
           WhiskeyDisk::Config.configuration_file.should == File.join(@path, 'deploy', 'staging.yml')
         end
 
         it 'should return the path to a per-environment configuration file in the path specified if that file exists' do
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'foo', 'staging.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'foo.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'staging.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'staging.yml')).and_return(true)
+          File.unlink(File.join(@path, 'deploy', 'foo', 'staging.yml'))
+          File.unlink(File.join(@path, 'deploy', 'foo.yml'))
+          File.unlink(File.join(@path, 'deploy', 'staging.yml'))
           WhiskeyDisk::Config.configuration_file.should == File.join(@path, 'staging.yml')
         end
 
         it 'should return the path to deploy.yaml in the path specified if deploy.yml exists' do
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'foo', 'staging.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'foo.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'staging.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'staging.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'deploy.yml')).and_return(true)
+          File.unlink(File.join(@path, 'deploy', 'foo', 'staging.yml'))
+          File.unlink(File.join(@path, 'deploy', 'foo.yml'))
+          File.unlink(File.join(@path, 'deploy', 'staging.yml'))
+          File.unlink(File.join(@path, 'staging.yml'))
           WhiskeyDisk::Config.configuration_file.should == File.join(@path, 'deploy.yml')
         end
 
         it 'should fail if no per-environment configuration file nor deploy.yml exists in the path specified' do
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'foo', 'staging.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'foo.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'staging.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'staging.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'deploy.yml')).and_return(false)
+          File.unlink(File.join(@path, 'deploy', 'foo', 'staging.yml'))
+          File.unlink(File.join(@path, 'deploy', 'foo.yml'))
+          File.unlink(File.join(@path, 'deploy', 'staging.yml'))
+          File.unlink(File.join(@path, 'staging.yml'))
+          File.unlink(File.join(@path, 'deploy.yml'))
           lambda { WhiskeyDisk::Config.configuration_file }.should.raise
         end
       end
 
       describe 'and no project name is specified in ENV["to"]' do
         it 'should return the path to a per-environment configuration file under deploy/ in the path specified if that file exists' do
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'staging.yml')).and_return(true)
           WhiskeyDisk::Config.configuration_file.should == File.join(@path, 'deploy', 'staging.yml')
         end
 
         it 'should return the path to a per-environment configuration file in the path specified if that file exists' do
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'staging.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'staging.yml')).and_return(true)
+          File.unlink(File.join(@path, 'deploy', 'staging.yml'))
           WhiskeyDisk::Config.configuration_file.should == File.join(@path, 'staging.yml')
         end
 
         it 'should return the path to deploy.yaml in the path specified if deploy.yml exists' do
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'staging.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'staging.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'deploy.yml')).and_return(true)
+          File.unlink(File.join(@path, 'deploy', 'staging.yml'))
+          File.unlink(File.join(@path, 'staging.yml'))
           WhiskeyDisk::Config.configuration_file.should == File.join(@path, 'deploy.yml')
         end
 
         it 'should fail if no per-environment configuration file nor deploy.yml exists in the path specified' do
-          File.stub!(:exists?).with(File.join(@path, 'deploy', 'staging.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'staging.yml')).and_return(false)
-          File.stub!(:exists?).with(File.join(@path, 'deploy.yml')).and_return(false)
+          File.unlink(File.join(@path, 'deploy', 'staging.yml'))
+          File.unlink(File.join(@path, 'staging.yml'))
+          File.unlink(File.join(@path, 'deploy.yml'))
           lambda { WhiskeyDisk::Config.configuration_file }.should.raise
         end
       end
