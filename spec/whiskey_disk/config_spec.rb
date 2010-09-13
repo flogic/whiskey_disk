@@ -4,8 +4,6 @@ require 'yaml'
 require 'tmpdir'
 require 'fileutils'
 
-CURRENT_FILE = File.expand_path(__FILE__)           # Bacon evidently mucks around with __FILE__ or something related :-/
-
 # create a file at the specified path
 def make(path)
   FileUtils.mkdir_p(File.dirname(path))
@@ -150,15 +148,23 @@ describe WhiskeyDisk::Config do
   end
 
   describe 'returning configuration data from a configuration file' do
+    before do
+      @path = Dir.mktmpdir
+      @config_file = File.join(@path, 'deploy.yml')
+      WhiskeyDisk::Config.stub!(:configuration_file).and_return(@config_file)
+    end
+    
+    after do
+      FileUtils.rm_rf(@path)
+    end
+
     it 'should fail if the configuration file does not exist' do
-      WhiskeyDisk::Config.stub!(:configuration_file).and_return(CURRENT_FILE + '._crap')
       lambda { WhiskeyDisk::Config.configuration_data }.should.raise
     end
 
     it 'should return the contents of the configuration file' do
-      WhiskeyDisk::Config.stub!(:configuration_file).and_return(CURRENT_FILE)
-      File.stub!(:read).with(CURRENT_FILE).and_return('file contents')
-      WhiskeyDisk::Config.configuration_data.should == 'file contents'
+      File.open(@config_file, 'w') { |f| f.puts "file contents" }
+      WhiskeyDisk::Config.configuration_data.should == "file contents\n"
     end
   end
 
@@ -379,15 +385,24 @@ describe WhiskeyDisk::Config do
       end
     end
 
-    it 'should fail if a path is specified which does not exist' do
-      ENV['path'] = @path = (CURRENT_FILE + "_.crap")
-      lambda { WhiskeyDisk::Config.configuration_file }.should.raise
-    end
+    describe 'and looking up a file' do
+      before do
+        @path = Dir.mktmpdir
+        ENV['path'] = @config_file = File.join(@path, 'deploy.yml')
+      end
+      
+      after do
+        FileUtils.rm_rf(@path)
+      end
+    
+      it 'should fail if a path is specified which does not exist' do
+        lambda { WhiskeyDisk::Config.configuration_file }.should.raise
+      end
 
-    it 'should return the file path when a path which points to an existing file is specified' do
-      ENV['path'] = @path = CURRENT_FILE
-      File.stub!(:exists?).with(@path).and_return(true)
-      WhiskeyDisk::Config.configuration_file.should == @path
+      it 'should return the file path when a path which points to an existing file is specified' do
+        FileUtils.touch(@config_file)
+        WhiskeyDisk::Config.configuration_file.should == @config_file
+      end
     end
 
     describe 'and a path which points to a directory is specified' do
