@@ -73,6 +73,12 @@ describe WhiskeyDisk::Config do
   describe 'when fetching configuration' do
     before do
       ENV['to'] = @env = 'foo:staging'
+      @path = Dir.mktmpdir
+      ENV['path'] = @config_file = File.join(@path, 'deploy.yml')
+    end
+
+    after do
+      FileUtils.rm_rf(@path)
     end
 
     it 'should fail if the current environment cannot be determined' do
@@ -81,28 +87,28 @@ describe WhiskeyDisk::Config do
     end
 
     it 'should fail if the configuration file does not exist' do
-      WhiskeyDisk::Config.stub!(:configuration_file).and_return(__FILE__ + "_.crap")
       lambda { WhiskeyDisk::Config.fetch }.should.raise
     end
 
     it 'should fail if the configuration file cannot be read' do
-      WhiskeyDisk::Config.stub!(:configuration_file).and_return("/tmp")
+      Dir.mkdir(File.join(@path, 'tmp'))
       lambda { WhiskeyDisk::Config.fetch }.should.raise
     end
 
     it 'should fail if the configuration file is invalid' do
+      FileUtils.touch(@config_file)
       YAML.stub!(:load).and_raise
       lambda { WhiskeyDisk::Config.fetch }.should.raise
     end
 
     it 'should fail if the configuration file does not define data for this environment' do
-      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({'foo' => { 'production' => { 'a' => 'b'}}}))
+      File.open(@config_file, 'w') {|f| f.puts YAML.dump({'foo' => { 'production' => { 'a' => 'b'}}}) }
       lambda { WhiskeyDisk::Config.fetch }.should.raise
     end
 
     it 'should return the configuration yaml file data for this environment as a hash' do
       staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
-      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}))
+      File.open(@config_file, 'w') {|f| f.puts YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}) }
       result = WhiskeyDisk::Config.fetch
       staging.each_pair do |k,v|
         result[k].should == v
@@ -111,38 +117,38 @@ describe WhiskeyDisk::Config do
 
     it 'should not include configuration information for other environments in the returned hash' do
       staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
-      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({ 'production' => { 'repository' => 'c', 'a' => 'b'}, 'staging' => staging }))
+      File.open(@config_file, 'w') {|f| f.puts YAML.dump({ 'production' => { 'repository' => 'c', 'a' => 'b'}, 'staging' => staging }) }
       WhiskeyDisk::Config.fetch['a'].should.be.nil
     end
 
     it 'should include the environment in the hash' do
       staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
-      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}))
+      File.open(@config_file, 'w') {|f| f.puts YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}) }
       WhiskeyDisk::Config.fetch['environment'].should == 'staging'
     end
 
     it 'should not allow overriding the environment in the configuration file' do
       staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'environment' => 'production' }
-      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}))
+      File.open(@config_file, 'w') {|f| f.puts YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}) }
       WhiskeyDisk::Config.fetch['environment'].should == 'staging'
     end
 
     it 'should include the project handle in the hash' do
       staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
-      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}))
+      File.open(@config_file, 'w') {|f| f.puts YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}) }
       WhiskeyDisk::Config.fetch['project'].should == 'foo'
     end
 
     it 'should not allow overriding the project handle in the configuration file when a project root is specified' do
       staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
-      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}))
+      File.open(@config_file, 'w') {|f| f.puts YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}) }
       WhiskeyDisk::Config.fetch['project'].should == 'foo'
     end
 
     it 'should allow overriding the project handle in the configuration file when a project root is not specified' do
       ENV['to'] = @env = 'staging'
       staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
-      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump({'production' => { 'repository' => 'b'}, 'staging' => staging }))
+      File.open(@config_file, 'w') {|f| f.puts YAML.dump({'production' => { 'repository' => 'b'}, 'staging' => staging }) }
       WhiskeyDisk::Config.fetch['project'].should == 'diskey_whisk'
     end
   end
@@ -150,8 +156,7 @@ describe WhiskeyDisk::Config do
   describe 'returning configuration data from a configuration file' do
     before do
       @path = Dir.mktmpdir
-      @config_file = File.join(@path, 'deploy.yml')
-      WhiskeyDisk::Config.stub!(:configuration_file).and_return(@config_file)
+      ENV['path'] = @config_file = File.join(@path, 'deploy.yml')
     end
     
     after do
