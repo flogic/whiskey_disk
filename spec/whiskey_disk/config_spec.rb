@@ -96,8 +96,7 @@ describe WhiskeyDisk::Config do
     end
 
     it 'should fail if the configuration file is invalid' do
-      FileUtils.touch(@config_file)
-      YAML.stub!(:load).and_raise
+      File.open(@config_file, 'w') {|f| f.puts "}" }
       lambda { WhiskeyDisk::Config.fetch }.should.raise
     end
 
