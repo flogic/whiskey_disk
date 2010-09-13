@@ -173,22 +173,28 @@ describe WhiskeyDisk::Config do
   end
 
   describe 'transforming data from the configuration file' do
+    before do
+      ENV['to'] = 'foo:bar'
+      @path = Dir.mktmpdir
+      ENV['path'] = @config_file = File.join(@path, 'deploy.yml')
+    end
+    
+    after do
+      FileUtils.rm_rf(@path)
+    end
+    
     it 'should fail if the configuration data cannot be loaded' do
-      WhiskeyDisk::Config.stub!(:configuration_data).and_raise
       lambda { WhiskeyDisk::Config.load_data }.should.raise
     end
 
     it 'should fail if converting the configuration data from YAML fails' do
-      WhiskeyDisk::Config.stub!(:configuration_data).and_return('configuration data')
-      YAML.stub!(:load).and_raise
+      File.open(@config_file, 'w') { |f| f.puts "}" }
       lambda { WhiskeyDisk::Config.load_data }.should.raise
     end
 
     it 'should return a normalized version of the un-YAMLized configuration data' do
-      data = { 'a' => 'b', 'c' => 'd' }
-      WhiskeyDisk::Config.stub!(:configuration_data).and_return(YAML.dump(data))
-      WhiskeyDisk::Config.stub!(:normalize_data).with(data).and_return('normalized data')
-      WhiskeyDisk::Config.load_data.should == 'normalized data'
+      File.open(@config_file, 'w') { |f| f.puts YAML.dump({ 'repository' => 'x'}) }
+      WhiskeyDisk::Config.load_data.should == { 'foo' => { 'bar' => { 'repository' => 'x' } } }
     end
   end
 
