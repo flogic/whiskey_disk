@@ -10,6 +10,11 @@ def make(path)
   FileUtils.touch(path)
 end
 
+def build_temp_dir
+  return Dir.mktmpdir(nil, '/private/tmp') if File.exists?('/private/tmp')
+  Dir.mktmpdir
+end
+
 describe WhiskeyDisk::Config do
   describe 'when computing the environment name' do
     it 'should return false when there is no ENV["to"] setting' do
@@ -73,7 +78,7 @@ describe WhiskeyDisk::Config do
   describe 'when fetching configuration' do
     before do
       ENV['to'] = @env = 'foo:staging'
-      @path = Dir.mktmpdir
+      @path = build_temp_dir
       ENV['path'] = @config_file = File.join(@path, 'deploy.yml')
     end
 
@@ -154,7 +159,7 @@ describe WhiskeyDisk::Config do
 
   describe 'returning configuration data from a configuration file' do
     before do
-      @path = Dir.mktmpdir
+      @path = build_temp_dir
       ENV['path'] = @config_file = File.join(@path, 'deploy.yml')
     end
     
@@ -175,7 +180,7 @@ describe WhiskeyDisk::Config do
   describe 'transforming data from the configuration file' do
     before do
       ENV['to'] = 'foo:bar'
-      @path = Dir.mktmpdir
+      @path = build_temp_dir
       ENV['path'] = @config_file = File.join(@path, 'deploy.yml')
     end
     
@@ -309,8 +314,12 @@ describe WhiskeyDisk::Config do
     describe 'and no path is specified' do
       before do
         ENV['path'] = @path = nil
-        @base_path = Dir.mktmpdir
-        WhiskeyDisk::Config.stub!(:base_path).and_return(@base_path)
+        @original_path = Dir.pwd
+        @base_path = build_temp_dir
+        Dir.chdir(@base_path)
+        FileUtils.touch(File.join(@base_path, 'Rakefile'))
+        @dir = File.join(@base_path, 'config')
+        Dir.mkdir(@dir)
         
         [ 
           "/deploy/foo/staging.yml", 
@@ -318,11 +327,12 @@ describe WhiskeyDisk::Config do
           "/deploy/staging.yml",
           "/staging.yml", 
           "/deploy.yml"
-        ].each { |file| make(File.join(@base_path, file)) }
+        ].each { |file| make(File.join(@dir, file)) }
       end
       
       after do
         FileUtils.rm_rf(@base_path)
+        Dir.chdir(@original_path)
       end
       
       describe 'and a project name is specified in ENV["to"]' do
@@ -331,65 +341,65 @@ describe WhiskeyDisk::Config do
         end
 
         it 'should return the path to deploy/foo/<environment>.yml under the project base path if it exists' do
-          WhiskeyDisk::Config.configuration_file.should == "#{@base_path}/deploy/foo/staging.yml"
+          WhiskeyDisk::Config.configuration_file.should == "#{@dir}/deploy/foo/staging.yml"
         end
 
         it 'should return the path to deploy/foo.yml under the project base path if it exists' do
-          File.unlink("#{@base_path}/deploy/foo/staging.yml")
-          WhiskeyDisk::Config.configuration_file.should == "#{@base_path}/deploy/foo.yml"
+          File.unlink("#{@dir}/deploy/foo/staging.yml")
+          WhiskeyDisk::Config.configuration_file.should == "#{@dir}/deploy/foo.yml"
         end
 
         it 'should return the path to a per-environment configuration file in the deploy/ directory under the project base path if it exists' do
-          File.unlink("#{@base_path}/deploy/foo/staging.yml")
-          File.unlink("#{@base_path}/deploy/foo.yml")
-          WhiskeyDisk::Config.configuration_file.should == "#{@base_path}/deploy/staging.yml"
+          File.unlink("#{@dir}/deploy/foo/staging.yml")
+          File.unlink("#{@dir}/deploy/foo.yml")
+          WhiskeyDisk::Config.configuration_file.should == "#{@dir}/deploy/staging.yml"
         end
 
         it 'should return the path to a per-environment configuration file under the project base path if it exists' do
-          File.unlink("#{@base_path}/deploy/foo/staging.yml")
-          File.unlink("#{@base_path}/deploy/foo.yml")
-          File.unlink("#{@base_path}/deploy/staging.yml")
-          WhiskeyDisk::Config.configuration_file.should == "#{@base_path}/staging.yml"
+          File.unlink("#{@dir}/deploy/foo/staging.yml")
+          File.unlink("#{@dir}/deploy/foo.yml")
+          File.unlink("#{@dir}/deploy/staging.yml")
+          WhiskeyDisk::Config.configuration_file.should == "#{@dir}/staging.yml"
         end
 
         it 'should return the path to deploy.yml under the project base path' do
-          File.unlink("#{@base_path}/deploy/foo/staging.yml")
-          File.unlink("#{@base_path}/deploy/foo.yml")
-          File.unlink("#{@base_path}/deploy/staging.yml")
-          File.unlink("#{@base_path}/staging.yml")
-          WhiskeyDisk::Config.configuration_file.should == "#{@base_path}/deploy.yml"
+          File.unlink("#{@dir}/deploy/foo/staging.yml")
+          File.unlink("#{@dir}/deploy/foo.yml")
+          File.unlink("#{@dir}/deploy/staging.yml")
+          File.unlink("#{@dir}/staging.yml")
+          WhiskeyDisk::Config.configuration_file.should == "#{@dir}/deploy.yml"
         end
 
         it 'should fail if no per-environment config file nor deploy.yml exists under the project base path' do
-          File.unlink("#{@base_path}/deploy/foo/staging.yml")
-          File.unlink("#{@base_path}/deploy/foo.yml")
-          File.unlink("#{@base_path}/deploy/staging.yml")
-          File.unlink("#{@base_path}/staging.yml")
-          File.unlink("#{@base_path}/deploy.yml")
+          File.unlink("#{@dir}/deploy/foo/staging.yml")
+          File.unlink("#{@dir}/deploy/foo.yml")
+          File.unlink("#{@dir}/deploy/staging.yml")
+          File.unlink("#{@dir}/staging.yml")
+          File.unlink("#{@dir}/deploy.yml")
           lambda { WhiskeyDisk::Config.configuration_file }.should.raise
         end
       end
 
       describe 'and no project name is specified in ENV["to"]' do
         it 'should return the path to a per-environment configuration file in the deploy/ directory under the project base path if it exists' do
-          WhiskeyDisk::Config.configuration_file.should == "#{@base_path}/deploy/staging.yml"
+          WhiskeyDisk::Config.configuration_file.should == "#{@dir}/deploy/staging.yml"
         end
 
         it 'should return the path to a per-environment configuration file under the project base path if it exists' do
-          File.unlink("#{@base_path}/deploy/staging.yml")
-          WhiskeyDisk::Config.configuration_file.should == "#{@base_path}/staging.yml"
+          File.unlink("#{@dir}/deploy/staging.yml")
+          WhiskeyDisk::Config.configuration_file.should == "#{@dir}/staging.yml"
         end
 
         it 'should return the path to deploy.yml under the project base path' do
-          File.unlink("#{@base_path}/deploy/staging.yml")
-          File.unlink("#{@base_path}/staging.yml")
-          WhiskeyDisk::Config.configuration_file.should == "#{@base_path}/deploy.yml"
+          File.unlink("#{@dir}/deploy/staging.yml")
+          File.unlink("#{@dir}/staging.yml")
+          WhiskeyDisk::Config.configuration_file.should == "#{@dir}/deploy.yml"
         end
 
         it 'should fail if no per-environment config file nor deploy.yml exists under the project base path' do
-          File.unlink("#{@base_path}/deploy/staging.yml")
-          File.unlink("#{@base_path}/staging.yml")
-          File.unlink("#{@base_path}/deploy.yml")
+          File.unlink("#{@dir}/deploy/staging.yml")
+          File.unlink("#{@dir}/staging.yml")
+          File.unlink("#{@dir}/deploy.yml")
           lambda { WhiskeyDisk::Config.configuration_file }.should.raise
         end
       end
@@ -397,7 +407,7 @@ describe WhiskeyDisk::Config do
 
     describe 'and looking up a file' do
       before do
-        @path = Dir.mktmpdir
+        @path = build_temp_dir
         ENV['path'] = @config_file = File.join(@path, 'deploy.yml')
       end
       
@@ -417,8 +427,7 @@ describe WhiskeyDisk::Config do
 
     describe 'and a path which points to a directory is specified' do
       before do
-        ENV['path'] = @path = Dir.mktmpdir
-        WhiskeyDisk::Config.stub!(:base_path).and_return(@path)
+        ENV['path'] = @path = build_temp_dir
         
         [ 
           "/deploy/foo/staging.yml", 
@@ -516,7 +525,7 @@ describe WhiskeyDisk::Config do
 
     describe 'and a "path" environment variable is set' do
       before do
-        ENV['path'] = @path = Dir.mktmpdir
+        ENV['path'] = @path = build_temp_dir
         @original_path = Dir.pwd
       end
       
@@ -538,7 +547,7 @@ describe WhiskeyDisk::Config do
     describe 'and there is no Rakefile in the root path to the current directory' do
       before do
         @original_path = Dir.pwd
-        @path = Dir.mktmpdir
+        @path = build_temp_dir
         Dir.chdir(@path)
       end
 
@@ -547,13 +556,9 @@ describe WhiskeyDisk::Config do
         FileUtils.rm_rf(@path)
       end
 
-      # TODO:  this spec fails on OSX because traversing the root path from a tmpdir results in
-      #        /private/tmp/..., while the original file was given as /tmp/...  (similarly /private/var vs. /var)
-      # it 'should return the config directory under the current directory if there is no Rakefile along the root path to the current directory' do
-      #   STDERR.puts WhiskeyDisk::Config.base_path
-      #   STDERR.puts File.join(@path, 'config')  
-      #   File.identical?(WhiskeyDisk::Config.base_path, File.join(@path, 'config')).should.be.true
-      # end
+      it 'should return the config directory under the current directory if there is no Rakefile along the root path to the current directory' do
+        WhiskeyDisk::Config.base_path.should == File.join(@path, 'config')
+      end
 
       it 'should leave the current working path the same as when the base path lookup started' do
         prior = Dir.pwd
@@ -565,7 +570,7 @@ describe WhiskeyDisk::Config do
     describe 'and there is a Rakefile in the root path to the current directory' do
       before do
         @original_path = Dir.pwd
-        @path = Dir.mktmpdir
+        @path = build_temp_dir
         Dir.chdir(@path)
         FileUtils.touch(File.join(@path, 'Rakefile'))
       end
@@ -575,11 +580,9 @@ describe WhiskeyDisk::Config do
         FileUtils.rm_rf(@path)
       end
 
-      # TODO:  this spec fails on OSX because traversing the root path from a tmpdir results in
-      #        /private/tmp/..., while the original file was given as /tmp/...  (similarly /private/var vs. /var)
-      # it 'return the config directory in the nearest enclosing path with a Rakefile along the root path to the current directory' do
-      #   WhiskeyDisk::Config.base_path.should == File.join(@path, 'config')
-      # end
+      it 'return the config directory in the nearest enclosing path with a Rakefile along the root path to the current directory' do
+        WhiskeyDisk::Config.base_path.should == File.join(@path, 'config')
+      end
 
       it 'should leave the current working path the same as when the base path lookup started' do
         prior = Dir.pwd
