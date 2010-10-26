@@ -2,6 +2,8 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'whiskey_disk', 'conf
 
 class WhiskeyDisk
   class << self
+    attr_writer :configuration
+    
     def reset
       @configuration = nil
       @buffer = nil

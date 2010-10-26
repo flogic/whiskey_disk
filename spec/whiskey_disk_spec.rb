@@ -25,8 +25,7 @@ describe 'WhiskeyDisk' do
   describe 'determining if the deployment is remote' do
     before do
       @parameters = { 'deploy_to' => '/path/to/main/repo' }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters
     end
     
     it 'should work without arguments' do
@@ -56,8 +55,7 @@ describe 'WhiskeyDisk' do
   describe 'determining if the deployment has a configuration repository' do
     before do
       @parameters = { 'deploy_to' => '/path/to/main/repo' }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters
     end
     
     it 'should work without arguments' do
@@ -107,14 +105,11 @@ describe 'WhiskeyDisk' do
 
   describe 'ensuring that the parent path for the main repository checkout is present' do
     before do
-      @parameters = { 'deploy_to' => '/path/to/main/repo' }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo' }
     end
     
     it 'should fail if the deployment path is not specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return({})
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = {}
       lambda { WhiskeyDisk.ensure_main_parent_path_is_present }.should.raise
     end
     
@@ -127,14 +122,11 @@ describe 'WhiskeyDisk' do
 
   describe 'ensuring that the parent path for the configuration repository checkout is present' do
     before do
-      @parameters = { 'deploy_config_to' => '/path/to/config/repo' }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = { 'deploy_config_to' => '/path/to/config/repo' }
     end
     
     it 'should fail if the configuration deployment path is not specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return({})
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = {}
       lambda { WhiskeyDisk.ensure_config_parent_path_is_present }.should.raise
     end
     
@@ -148,19 +140,16 @@ describe 'WhiskeyDisk' do
   describe 'checking out the main repository' do
     before do
       @parameters = { 'deploy_to' => '/path/to/main/repo', 'repository' => 'git@ogtastic.com:whiskey_disk.git' }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters
     end
     
     it 'should fail if the deployment path is not specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge('deploy_to' => nil))
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters.merge('deploy_to' => nil)
       lambda { WhiskeyDisk.checkout_main_repository }.should.raise
     end
     
     it 'should fail if the repository is not specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge('repository' => nil))
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters.merge('repository' => nil)
       lambda { WhiskeyDisk.checkout_main_repository }.should.raise
     end
     
@@ -184,19 +173,16 @@ describe 'WhiskeyDisk' do
   describe 'checking out the configuration repository' do
     before do
       @parameters = { 'deploy_config_to' => '/path/to/config/repo', 'config_repository' => 'git@ogtastic.com:config.git' }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters
     end
 
     it 'should fail if the configuration deployment path is not specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge('deploy_config_to' => nil))
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters.merge('deploy_config_to' => nil)
       lambda { WhiskeyDisk.checkout_configuration_repository }.should.raise
     end
 
     it 'should fail if the configuration repository is not specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge('config_repository' => nil))
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters.merge('config_repository' => nil)
       lambda { WhiskeyDisk.checkout_configuration_repository }.should.raise
     end
 
@@ -220,13 +206,11 @@ describe 'WhiskeyDisk' do
   describe 'updating the main repository checkout' do
     before do
       @parameters = { 'deploy_to' => '/path/to/main/repo' }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters
     end
     
     it 'should fail if the deployment path is not specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge('deploy_to' => nil))
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters.merge('deploy_to' => nil)
       lambda { WhiskeyDisk.update_main_repository_checkout }.should.raise
     end
     
@@ -241,8 +225,7 @@ describe 'WhiskeyDisk' do
     end
     
     it 'should attempt to fetch the specified branch from the origin if a branch is specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'branch' => 'production'}))
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters.merge({'branch' => 'production'})
       WhiskeyDisk.update_main_repository_checkout
       WhiskeyDisk.buffer.join(' ').should.match(%r{git fetch origin \+refs/heads/production:refs/remotes/origin/production})
     end
@@ -253,8 +236,7 @@ describe 'WhiskeyDisk' do
     end
     
     it 'should attempt to reset the specified branch from the origin if a branch is specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'branch' => 'production'}))
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters.merge({'branch' => 'production'})
       WhiskeyDisk.update_main_repository_checkout
       WhiskeyDisk.buffer.join(' ').should.match(%r{git reset --hard origin/production})
     end
@@ -263,13 +245,11 @@ describe 'WhiskeyDisk' do
   describe 'updating the configuration repository checkout' do
     before do
       @parameters = { 'deploy_config_to' => '/path/to/config/repo' }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters
     end
     
     it 'should fail if the configuration deployment path is not specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge('deploy_config_to' => nil))
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters.merge('deploy_config_to' => nil)
       lambda { WhiskeyDisk.update_configuration_repository_checkout }.should.raise
     end
     
@@ -284,8 +264,7 @@ describe 'WhiskeyDisk' do
     end
     
     it 'should attempt to fetch the specified branch from the origin if a configuration branch is specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'config_branch' => 'production'}))
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters.merge({'config_branch' => 'production'})
       WhiskeyDisk.update_configuration_repository_checkout
       WhiskeyDisk.buffer.join(' ').should.match(%r{git fetch origin \+refs/heads/production:refs/remotes/origin/production})
     end
@@ -296,8 +275,7 @@ describe 'WhiskeyDisk' do
     end
 
     it 'should attempt to reset the master branch from the origin if no configuration branch is specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'config_branch' => 'production'}))
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters.merge({'config_branch' => 'production'})
       WhiskeyDisk.update_configuration_repository_checkout
       WhiskeyDisk.buffer.join(' ').should.match(%r{git reset --hard origin/production})
     end
@@ -311,25 +289,21 @@ describe 'WhiskeyDisk' do
                       'config_repository' => 'git@git://foo.bar.git',
                       'config_branch' => 'master',
                       'project' => 'whiskey_disk' }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters
     end
-    
+
     it 'should fail if the main deployment path is not specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge('deploy_to' => nil))
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters.merge('deploy_to' => nil)
       lambda { WhiskeyDisk.refresh_configuration }.should.raise
     end
     
     it 'should fail if the configuration deployment path is not specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge('deploy_config_to' => nil))
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters.merge('deploy_config_to' => nil)
       lambda { WhiskeyDisk.refresh_configuration }.should.raise
     end
     
     it 'should fail if no project name was specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge('project' => 'unnamed_project'))
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters.merge('project' => 'unnamed_project')
       lambda { WhiskeyDisk.refresh_configuration }.should.raise      
     end
     
@@ -341,14 +315,11 @@ describe 'WhiskeyDisk' do
   
   describe 'running post setup hooks' do
     before do
-      @parameters = { 'deploy_to' => '/path/to/main/repo' }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo' }
     end
     
     it 'should fail if the deployment path is not specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return({})
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = {}
       lambda { WhiskeyDisk.run_post_setup_hooks }.should.raise
     end
     
@@ -360,10 +331,7 @@ describe 'WhiskeyDisk' do
     describe 'when a post setup script is specified' do
       describe 'and the script path does not start with a "/"' do      
         before do
-          @parameters = { 'deploy_to'          => '/path/to/main/repo', 
-                          'post_setup_script' => '/path/to/setup/script' }
-          WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-          WhiskeyDisk.reset
+          WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo', 'post_setup_script' => '/path/to/setup/script' }
         end
       
         it 'should attempt to run the post setup script' do        
@@ -384,10 +352,7 @@ describe 'WhiskeyDisk' do
       
       describe 'and the script path does not start with a "/"' do
         before do
-          @parameters = { 'deploy_to'          => '/path/to/main/repo', 
-                          'post_setup_script' => 'path/to/setup/script' }
-          WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-          WhiskeyDisk.reset         
+          WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo', 'post_setup_script' => 'path/to/setup/script' }
         end
 
         it 'should attempt to run the post setup script' do        
@@ -429,8 +394,7 @@ describe 'WhiskeyDisk' do
 
     it 'should ensure that any rake ENV variable are set when checking for deploy:post_setup tasks' do
       @parameters = { 'deploy_to' => '/path/to/main/repo', 'rake_env' => { 'RAILS_ENV' => 'production', 'FOO' => 'bar' } }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters
       WhiskeyDisk.run_post_setup_hooks
       @parameters['rake_env'].each_pair do |k,v|
         WhiskeyDisk.buffer.join(' ').should.match(%r{#{k}='#{v}' .*rake -P})
@@ -439,8 +403,7 @@ describe 'WhiskeyDisk' do
     
     it 'should set any rake_env variables when running the rake tasks' do
       @parameters = { 'deploy_to' => '/path/to/main/repo', 'rake_env' => { 'RAILS_ENV' => 'production', 'FOO' => 'bar' } }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters
       WhiskeyDisk.run_post_setup_hooks
       @parameters['rake_env'].each_pair do |k,v|
         WhiskeyDisk.buffer.join(' ').should.match(%r{#{k}='#{v}' })
@@ -450,14 +413,11 @@ describe 'WhiskeyDisk' do
   
   describe 'running post deployment hooks' do
     before do
-      @parameters = { 'deploy_to' => '/path/to/main/repo' }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo' }
     end
     
     it 'should fail if the deployment path is not specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return({})
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = {}
       lambda { WhiskeyDisk.run_post_deploy_hooks }.should.raise
     end
     
@@ -469,10 +429,7 @@ describe 'WhiskeyDisk' do
     describe 'when a post deployment script is specified' do
       describe 'and the script path does not start with a "/"' do      
         before do
-          @parameters = { 'deploy_to'          => '/path/to/main/repo', 
-                          'post_deploy_script' => '/path/to/deployment/script' }
-          WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-          WhiskeyDisk.reset
+          WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo', 'post_deploy_script' => '/path/to/deployment/script' }
         end
       
         it 'should attempt to run the post deployment script' do        
@@ -493,10 +450,7 @@ describe 'WhiskeyDisk' do
       
       describe 'and the script path does not start with a "/"' do
         before do
-          @parameters = { 'deploy_to'          => '/path/to/main/repo', 
-                          'post_deploy_script' => 'path/to/deployment/script' }
-          WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-          WhiskeyDisk.reset         
+          WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo', 'post_deploy_script' => 'path/to/deployment/script' }
         end
 
         it 'should attempt to run the post deployment script' do        
@@ -538,8 +492,7 @@ describe 'WhiskeyDisk' do
 
     it 'should ensure that any rake ENV variable are set when checking for deploy:post_setup tasks' do
       @parameters = { 'deploy_to' => '/path/to/main/repo', 'rake_env' => { 'RAILS_ENV' => 'production', 'FOO' => 'bar' } }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters
       WhiskeyDisk.run_post_deploy_hooks
       @parameters['rake_env'].each_pair do |k,v|
         WhiskeyDisk.buffer.join(' ').should.match(%r{#{k}='#{v}' .*rake -P})
@@ -548,8 +501,7 @@ describe 'WhiskeyDisk' do
     
     it 'should set any rake_env variables when running the rake tasks' do
       @parameters = { 'deploy_to' => '/path/to/main/repo', 'rake_env' => { 'RAILS_ENV' => 'production', 'FOO' => 'bar' } }
-      WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = @parameters
       WhiskeyDisk.run_post_deploy_hooks
       @parameters['rake_env'].each_pair do |k,v|
         WhiskeyDisk.buffer.join(' ').should.match(%r{#{k}='#{v}' })
@@ -560,18 +512,15 @@ describe 'WhiskeyDisk' do
   describe 'flushing changes' do
     describe 'when running remotely' do
       before do
-        @parameters = { 'domain' => 'www.domain.com', 'deploy_to' => '/path/to/main/repo' }
-        WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-        WhiskeyDisk.reset
+        WhiskeyDisk.configuration = { 'domain' => 'www.domain.com', 'deploy_to' => '/path/to/main/repo' }
         WhiskeyDisk.stub!(:bundle).and_return('command string')
-        WhiskeyDisk.stub!(:register_configuration)
         WhiskeyDisk.stub!(:run)
       end
       
       it 'should bundle the buffer of commands' do
         WhiskeyDisk.enqueue('x')
         WhiskeyDisk.enqueue('y')
-        WhiskeyDisk.should.receive(:bundle).and_return('command string')
+        WhiskeyDisk.should.receive(:bundle)
         WhiskeyDisk.flush
       end
       
@@ -583,9 +532,7 @@ describe 'WhiskeyDisk' do
     
     describe 'when running locally' do
       before do
-        @parameters = { 'deploy_to' => '/path/to/main/repo' }
-        WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-        WhiskeyDisk.reset
+        WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo' }
         WhiskeyDisk.stub!(:bundle).and_return('command string')
         WhiskeyDisk.stub!(:system)
       end
@@ -664,8 +611,7 @@ describe 'WhiskeyDisk' do
             @deploy_to = '/path/to/main/repo'
             @repository = 'git@git://foo.bar.git'
             @parameters = { 'deploy_to' => @deploy_to, 'repository' => @repository }
-            WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-            WhiskeyDisk.reset
+            WhiskeyDisk.configuration = @parameters
             WhiskeyDisk.enable_staleness_checks
           end
           
@@ -695,8 +641,7 @@ describe 'WhiskeyDisk' do
           end
           
           it "should query the head of the main checkout's specified branch if a branch is specified" do
-            WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'branch' => 'production'}))
-            WhiskeyDisk.reset
+            WhiskeyDisk.configuration = @parameters.merge({'branch' => 'production'})
             WhiskeyDisk.enable_staleness_checks
             WhiskeyDisk.enqueue("COMMAND")
             WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`cat .git/refs/heads/production\`;")))
@@ -708,8 +653,7 @@ describe 'WhiskeyDisk' do
           end
           
           it "should query the head of the main repository's specified branch if a branch is specified" do
-            WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'branch' => 'production'}))
-            WhiskeyDisk.reset
+            WhiskeyDisk.configuration = @parameters.merge({'branch' => 'production'})
             WhiskeyDisk.enable_staleness_checks
             WhiskeyDisk.enqueue("COMMAND")
             WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("mr=\`git ls-remote #{@repository} refs/heads/production\`;")))
@@ -731,8 +675,7 @@ describe 'WhiskeyDisk' do
               'deploy_to' => @deploy_to, 'repository' => @repository,
               'deploy_config_to' => @deploy_config_to, 'config_repository' => @config_repository
             }
-            WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters)
-            WhiskeyDisk.reset
+            WhiskeyDisk.configuration = @parameters
             WhiskeyDisk.enable_staleness_checks
           end
           
@@ -762,8 +705,7 @@ describe 'WhiskeyDisk' do
           end
           
           it "should query the head of the main checkout's specified branch if a branch is specified" do
-            WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'branch' => 'production'}))
-            WhiskeyDisk.reset
+            WhiskeyDisk.configuration = @parameters.merge({'branch' => 'production'})
             WhiskeyDisk.enable_staleness_checks
             WhiskeyDisk.enqueue("COMMAND")
             WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`cat .git/refs/heads/production\`;")))
@@ -775,8 +717,7 @@ describe 'WhiskeyDisk' do
           end
           
           it "should query the head of the main repository's specified branch if a branch is specified" do
-            WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'branch' => 'production'}))
-            WhiskeyDisk.reset
+            WhiskeyDisk.configuration = @parameters.merge({'branch' => 'production'})
             WhiskeyDisk.enable_staleness_checks
             WhiskeyDisk.enqueue("COMMAND")
             WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("mr=\`git ls-remote #{@repository} refs/heads/production\`;")))
@@ -788,8 +729,7 @@ describe 'WhiskeyDisk' do
           end
           
           it "should query the head of the config checkout's specified branch if a branch is specified" do
-            WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'config_branch' => 'production'}))
-            WhiskeyDisk.reset
+            WhiskeyDisk.configuration = @parameters.merge({'config_branch' => 'production'})
             WhiskeyDisk.enable_staleness_checks
             WhiskeyDisk.enqueue("COMMAND")
             WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_config_to}; cl=\`cat .git/refs/heads/production\`;")))
@@ -801,8 +741,7 @@ describe 'WhiskeyDisk' do
           end
           
           it "should query the head of the config repository's specified branch if a branch is specified" do
-            WhiskeyDisk::Config.stub!(:fetch).and_return(@parameters.merge({'config_branch' => 'production'}))
-            WhiskeyDisk.reset
+            WhiskeyDisk.configuration = @parameters.merge({'config_branch' => 'production'})
             WhiskeyDisk.enable_staleness_checks
             WhiskeyDisk.enqueue("COMMAND")
             WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cr=\`git ls-remote #{@config_repository} refs/heads/production\`;")))
@@ -815,8 +754,7 @@ describe 'WhiskeyDisk' do
   describe 'when running a command string remotely' do
     before do
       @domain = 'ogc@ogtastic.com'
-      WhiskeyDisk::Config.stub!(:fetch).and_return({ 'domain' => @domain })
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = { 'domain' => @domain }
       WhiskeyDisk.stub!(:system)      
     end
     
@@ -829,8 +767,7 @@ describe 'WhiskeyDisk' do
     end
     
     it 'should fail if the domain path is not specified' do
-      WhiskeyDisk::Config.stub!(:fetch).and_return({})
-      WhiskeyDisk.reset
+      WhiskeyDisk.configuration = {}
       lambda { WhiskeyDisk.run('ls') }.should.raise
     end
     
