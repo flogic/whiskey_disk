@@ -23,6 +23,6 @@ begin
   end
   Jeweler::GemcutterTasks.new  
 rescue LoadError
-  puts "Jeweler not available. Install it with: sudo gem install jeweler -s http://gemcutter.org"
+  # if you get here, you need Jeweler installed to do packaging and gem installation, yo.
 end
 
