@@ -50,6 +50,16 @@ describe 'WhiskeyDisk' do
       @parameters['domain'] = ''
       WhiskeyDisk.remote?.should == false
     end
+    
+    it 'should return false if the configuration includes an empty list of domain settings' do
+      @parameters['domain'] = []
+      WhiskeyDisk.remote?.should == false      
+    end
+    
+    it 'should return false if the configuration includes a list of blank or nil domain settings' do
+      @parameters['domain'] = [nil, '', nil, '']
+      WhiskeyDisk.remote?.should == false      
+    end
   end
   
   describe 'determining if the deployment has a configuration repository' do
