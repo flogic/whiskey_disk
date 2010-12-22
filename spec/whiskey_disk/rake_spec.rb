@@ -30,6 +30,8 @@ describe 'rake tasks' do
       ].each do |meth| 
         WhiskeyDisk.stub!(meth)
       end
+
+      WhiskeyDisk.stub!(:success?).and_return(true)
     end
     
     it 'should make changes on the specified domain when a domain is specified' do
@@ -132,6 +134,15 @@ describe 'rake tasks' do
       WhiskeyDisk.should.receive(:summarize)
       @rake["deploy:setup"].invoke
     end
+  
+    it 'should not exit in error if all setup runs were successful' do
+      lambda { @rake["deploy:setup"].invoke }.should.not.raise(SystemExit)
+    end
+    
+    it 'should exit in error if some setup run was unsuccessful' do
+      WhiskeyDisk.stub!(:success?).and_return(false)
+      lambda { @rake["deploy:setup"].invoke }.should.raise(SystemExit)
+    end
   end
   
   describe 'deploy:now' do
@@ -148,6 +159,8 @@ describe 'rake tasks' do
       ].each do |meth| 
         WhiskeyDisk.stub!(meth) 
       end
+      
+      WhiskeyDisk.stub!(:success?).and_return(true)
     end
     
     it 'should make changes on the specified domain when a domain is specified' do
@@ -213,6 +226,15 @@ describe 'rake tasks' do
     it 'should summarize the results of the deployment run' do
       WhiskeyDisk.should.receive(:summarize)
       @rake["deploy:now"].invoke
+    end
+    
+    it 'should not exit in error if all deployment runs were successful' do
+      lambda { @rake["deploy:now"].invoke }.should.not.raise(SystemExit)
+    end
+    
+    it 'should exit in error if some deployment run was unsuccessful' do
+      WhiskeyDisk.stub!(:success?).and_return(false)
+      lambda { @rake["deploy:now"].invoke }.should.raise(SystemExit)
     end
   end
       

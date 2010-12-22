@@ -14,6 +14,8 @@ namespace :deploy do
     WhiskeyDisk.run_post_setup_hooks
     WhiskeyDisk.flush
     WhiskeyDisk.summarize
+
+    exit(1) unless WhiskeyDisk.success?
   end
   
   desc "Deploy now."
@@ -25,6 +27,8 @@ namespace :deploy do
     WhiskeyDisk.run_post_deploy_hooks
     WhiskeyDisk.flush
     WhiskeyDisk.summarize
+
+    exit(1) unless WhiskeyDisk.success?
   end
   
   task :post_setup do
