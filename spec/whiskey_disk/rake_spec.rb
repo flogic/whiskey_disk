@@ -32,13 +32,13 @@ describe 'rake tasks' do
     end
     
     it 'should make changes on the specified domain when a domain is specified' do
-      WhiskeyDisk.configuration = { 'domain' => 'some domain' }
+      WhiskeyDisk.configuration = { 'domain' => [ 'some domain' ] }
       @rake["deploy:setup"].invoke
       WhiskeyDisk.should.be.remote
     end
     
     it 'should make changes on the local system when no domain is specified' do
-      WhiskeyDisk.configuration = { 'domain' => '' }
+      WhiskeyDisk.configuration = { 'domain' => nil }
       WhiskeyDisk.should.not.be.remote
     end
     
@@ -144,7 +144,7 @@ describe 'rake tasks' do
     end
     
     it 'should make changes on the specified domain when a domain is specified' do
-      WhiskeyDisk.configuration = { 'domain' => 'some domain'}
+      WhiskeyDisk.configuration = { 'domain' => [ 'some domain' ]}
       @rake["deploy:now"].invoke
       WhiskeyDisk.should.be.remote
     end

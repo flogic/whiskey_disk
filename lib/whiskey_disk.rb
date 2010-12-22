@@ -39,7 +39,7 @@ class WhiskeyDisk
     end
     
     def remote?
-      ! [ self[:domain] ].flatten.all? {|d| d.nil? or d == '' }
+      !! self[:domain]
     end
     
     def has_config_repo?

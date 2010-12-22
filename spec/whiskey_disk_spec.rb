@@ -36,29 +36,19 @@ describe 'WhiskeyDisk' do
       lambda { WhiskeyDisk.remote?(:foo) }.should.raise(ArgumentError)
     end
     
-    it 'should return true if the configuration includes a non-empty domain setting' do
-      @parameters['domain'] = 'smeghost'
-      WhiskeyDisk.remote?.should == true
-    end
-    
     it 'should return false if the configuration includes a nil domain setting' do
       @parameters['domain'] = nil
       WhiskeyDisk.remote?.should == false
     end
-    
-    it 'should return false if the configuration includes a blank domain setting' do
-      @parameters['domain'] = ''
-      WhiskeyDisk.remote?.should == false
+
+    it 'should return true if the configuration includes a non-empty domain setting' do
+      @parameters['domain'] = ['smeghost']
+      WhiskeyDisk.remote?.should == true
     end
     
-    it 'should return false if the configuration includes an empty list of domain settings' do
-      @parameters['domain'] = []
-      WhiskeyDisk.remote?.should == false      
-    end
-    
-    it 'should return false if the configuration includes a list of blank or nil domain settings' do
-      @parameters['domain'] = [nil, '', nil, '']
-      WhiskeyDisk.remote?.should == false      
+    it 'should return true if the configuration includes a multiple domain settings' do
+      @parameters['domain'] = ['smeghost', 'faphost']
+      WhiskeyDisk.remote?.should == true
     end
   end
   
