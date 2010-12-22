@@ -123,7 +123,8 @@ class WhiskeyDisk
     end
     
     def flush
-      remote? ? run(bundle) : system(bundle)
+      return run(bundle) if remote?
+      record_result('local', system(bundle))
     end
     
     def if_file_present(path, cmd)

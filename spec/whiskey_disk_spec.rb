@@ -547,6 +547,7 @@ describe 'WhiskeyDisk' do
     
     describe 'when running locally' do
       before do
+        WhiskeyDisk.reset
         WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo' }
         WhiskeyDisk.stub!(:bundle).and_return('command string')
         WhiskeyDisk.stub!(:system)
@@ -562,6 +563,18 @@ describe 'WhiskeyDisk' do
       it 'should use "system" to run all the bundled commands at once' do
         WhiskeyDisk.should.receive(:system).with('command string')
         WhiskeyDisk.flush
+      end
+      
+      it 'should record a failure result when the system command fails' do
+        WhiskeyDisk.stub!(:system).and_return(false)
+        WhiskeyDisk.flush
+        WhiskeyDisk.results.should == [ { :domain => 'local', :status => false } ]
+      end
+      
+      it 'should record a success result when the system command succeeds' do
+        WhiskeyDisk.stub!(:system).and_return(true)
+        WhiskeyDisk.flush
+        WhiskeyDisk.results.should == [ { :domain => 'local', :status => true } ]
       end
     end
   end
