@@ -205,13 +205,80 @@ describe WhiskeyDisk::Config do
       write_config_file('repository' => 'x')
       WhiskeyDisk::Config.load_data.should == { 'foo' => { 'bar' => { 'repository' => 'x' } } }
     end
+    
+    describe 'normalizing domains' do
+      before do
+        write_config_file(
+          'foo' => { 
+            'bar' => { 'repository' => 'x', 'domain' => [ 'user@example.com', nil, 'foo@domain.com', '' ]}, 
+            'baz' => { 'repository' => 'x', 'domain' => [ 'bar@example.com', 'baz@domain.com' ]},
+            'xyz' => { 'repository' => 'x' },
+            'abc' => { 'repository' => 'x', 'domain' => 'what@example.com' },
+            'eee' => { 'repository' => 'x', 'domain' => '' }
+          },
+          'zyx' => {
+            'def' => { 'repository' => 'x', 'domain' => [ 'user@example.com', nil, 'foo@domain.com', '' ]}, 
+            'hij' => { 'repository' => 'x', 'domain' => [ 'bar@example.com', 'baz@domain.com' ]},
+            'xyz' => { 'repository' => 'x' },
+            'abc' => { 'repository' => 'x', 'domain' => 'what@example.com' },
+            'eee' => { 'repository' => 'x', 'domain' => '' }
+          }
+        )
+      end
+    
+      describe 'and no domain has been specified' do
+        it 'should leave the domain as nil' do
+          WhiskeyDisk::Config.load_data['foo']['xyz']['domain'].should.be.nil     
+        end
+        
+        it 'should handle nil domains across all projects and targets' do
+          WhiskeyDisk::Config.load_data['zyx']['xyz']['domain'].should.be.nil     
+        end
+      end
+    
+      describe 'and a single domain has been specified' do
+        it 'should return domain as nil if the specified domain was empty' do
+          WhiskeyDisk::Config.load_data['foo']['eee']['domain'].should.be.nil       
+        end
+        
+        it 'should handle empty specified domains across all projects and targets' do
+          WhiskeyDisk::Config.load_data['zyx']['eee']['domain'].should.be.nil                 
+        end
+      
+        it 'should return domain as a single list of the specified domain if the specified domain was not empty' do
+          WhiskeyDisk::Config.load_data['foo']['abc']['domain'].should == ['what@example.com']
+        end
+    
+        it 'should handle single specified domains across all projects and targets' do
+          WhiskeyDisk::Config.load_data['zyx']['abc']['domain'].should == ['what@example.com']
+        end
+      end
+    
+      describe 'and a list of domains was specified' do
+        it 'should return the list of domains' do
+          WhiskeyDisk::Config.load_data['foo']['baz']['domain'].should == [ 'bar@example.com', 'baz@domain.com' ]
+        end
+      
+        it 'should handle lists of domains across all projects and targets' do
+          WhiskeyDisk::Config.load_data['zyx']['hij']['domain'].should == [ 'bar@example.com', 'baz@domain.com' ]
+        end
+      
+        it 'should remove any blank or nil domains from the list' do
+          WhiskeyDisk::Config.load_data['foo']['bar']['domain'].should == ['user@example.com', 'foo@domain.com' ]
+        end
+    
+        it 'should handle cleaning up blanks and nils across all projects and targets' do
+          WhiskeyDisk::Config.load_data['zyx']['def']['domain'].should == ['user@example.com', 'foo@domain.com' ]
+        end
+      end
+    end
   end
 
   describe 'normalizing YAML data from the configuration file' do
     before do
       ENV['to'] = @env = 'foo:staging'
 
-      @bare_data  = { 'repository' => 'git://foo/bar.git', 'domain' => 'ogc@ogtastic.com' }
+      @bare_data  = { 'repository' => 'git://foo/bar.git', 'domain' => ['ogc@ogtastic.com'] }
       @env_data   = { 'staging' => @bare_data }
       @proj_data  = { 'foo' => @env_data }
     end
