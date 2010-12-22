@@ -25,9 +25,10 @@ describe 'rake tasks' do
         :update_configuration_repository_checkout,
         :refresh_configuration,
         :run_post_setup_hooks, 
-        :flush
+        :flush,
+        :summarize
       ].each do |meth| 
-        WhiskeyDisk.stub!(meth) 
+        WhiskeyDisk.stub!(meth)
       end
     end
     
@@ -126,6 +127,11 @@ describe 'rake tasks' do
       WhiskeyDisk.should.receive(:flush)
       @rake["deploy:setup"].invoke
     end
+    
+    it 'should summarize the results of the setup run' do
+      WhiskeyDisk.should.receive(:summarize)
+      @rake["deploy:setup"].invoke
+    end
   end
   
   describe 'deploy:now' do
@@ -137,7 +143,8 @@ describe 'rake tasks' do
         :update_configuration_repository_checkout,
         :refresh_configuration,
         :run_post_deploy_hooks,
-        :flush
+        :flush, 
+        :summarize
       ].each do |meth| 
         WhiskeyDisk.stub!(meth) 
       end
@@ -200,6 +207,11 @@ describe 'rake tasks' do
     
     it 'should flush WhiskeyDisk changes' do
       WhiskeyDisk.should.receive(:flush)
+      @rake["deploy:now"].invoke
+    end
+    
+    it 'should summarize the results of the deployment run' do
+      WhiskeyDisk.should.receive(:summarize)
       @rake["deploy:now"].invoke
     end
   end

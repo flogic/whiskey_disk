@@ -842,4 +842,44 @@ describe 'WhiskeyDisk' do
       end
     end
   end
+  
+  describe 'summarizing the results of a run' do
+    before do
+      WhiskeyDisk.reset
+      WhiskeyDisk.stub!(:puts)
+    end
+    
+    it 'should work without arguments' do
+      lambda { WhiskeyDisk.summarize }.should.not.raise(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { WhiskeyDisk.summarize(:foo) }.should.raise(ArgumentError)      
+    end
+    
+    it 'should output a no runs message when no results are recorded' do
+      WhiskeyDisk.should.receive(:puts).with('No deployments to report.')
+      WhiskeyDisk.summarize
+    end
+    
+    describe 'and there are results recorded' do
+      before do
+        WhiskeyDisk.record_result('foo@bar.com', false)
+        WhiskeyDisk.record_result('ogc@ogtastic.com', true)
+        WhiskeyDisk.record_result('user@example.com', true)
+      end
+      
+      it 'should output a status line for each recorded deployment run' do
+        WhiskeyDisk.should.receive(:puts).with('foo@bar.com => failed.')
+        WhiskeyDisk.should.receive(:puts).with('ogc@ogtastic.com => succeeded.')
+        WhiskeyDisk.should.receive(:puts).with('user@example.com => succeeded.')
+        WhiskeyDisk.summarize
+      end
+    
+      it 'should output a summary line including the total runs, count of failures and count of successes.' do
+        WhiskeyDisk.should.receive(:puts).with('Total: 3 deployments, 2 successes, 1 failure.')        
+        WhiskeyDisk.summarize
+      end
+    end
+  end
 end

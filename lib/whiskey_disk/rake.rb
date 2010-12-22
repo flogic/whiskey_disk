@@ -13,6 +13,7 @@ namespace :deploy do
     WhiskeyDisk.refresh_configuration                     if WhiskeyDisk.has_config_repo?
     WhiskeyDisk.run_post_setup_hooks
     WhiskeyDisk.flush
+    WhiskeyDisk.summarize
   end
   
   desc "Deploy now."
@@ -23,6 +24,7 @@ namespace :deploy do
     WhiskeyDisk.refresh_configuration                     if WhiskeyDisk.has_config_repo?
     WhiskeyDisk.run_post_deploy_hooks
     WhiskeyDisk.flush
+    WhiskeyDisk.summarize
   end
   
   task :post_setup do

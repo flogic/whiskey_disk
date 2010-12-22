@@ -117,14 +117,35 @@ class WhiskeyDisk
       end
     end
     
+    def flush
+      return run(bundle) if remote?
+      record_result('local', system(bundle))
+    end
+    
     def record_result(domain, status)
       @results ||= []
       @results << { :domain => domain, :status => status }
     end
     
-    def flush
-      return run(bundle) if remote?
-      record_result('local', system(bundle))
+    def summarize
+      if results and not results.empty?
+        successes = failures = total = 0
+        results.each do |result|
+          total += 1
+          if result[:status]
+            successes += 1 
+          else
+            failures += 1
+          end
+          
+          puts "#{result[:domain]} => #{result[:status] ? 'succeeded' : 'failed'}."
+        end
+        puts "Total: #{total} deployment#{total == 1 ? '' : 's'}, " +
+          "#{successes} success#{successes == 1 ? '' : 'es'}, " +
+          "#{failures} failure#{failures == 1 ? '' : 's'}."
+      else
+        puts "No deployments to report."
+      end       
     end
     
     def if_file_present(path, cmd)
