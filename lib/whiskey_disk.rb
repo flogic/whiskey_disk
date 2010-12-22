@@ -3,11 +3,13 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'whiskey_disk', 'conf
 class WhiskeyDisk
   class << self
     attr_writer :configuration
+    attr_reader :results
     
     def reset
       @configuration = nil
       @buffer = nil
       @staleness_checks = nil
+      @results = nil
     end
     
     def buffer
@@ -109,7 +111,15 @@ class WhiskeyDisk
     
     def run(cmd)
       needs(:domain)
-      system('ssh', '-v', self[:domain], "set -x; " + cmd)
+      self[:domain].each do |domain|
+        status = system('ssh', '-v', domain, "set -x; " + cmd)
+        record_result(domain, status)
+      end
+    end
+    
+    def record_result(domain, status)
+      @results ||= []
+      @results << { :domain => domain, :status => status }
     end
     
     def flush

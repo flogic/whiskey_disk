@@ -2,6 +2,21 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'spec_helper.rb'))
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib', 'whiskey_disk'))
 require 'rake'
 
+# WhiskeyDisk subclass that allows us to test in what order ssh commands are 
+#   issued by WhiskeyDisk.run
+class TestOrderedExecution < WhiskeyDisk
+  class << self
+    def commands
+      @commands
+    end
+    
+    def system(*args)
+      @commands ||= []
+      @commands << args.join(' ')
+    end
+  end
+end
+
 describe 'requiring the main library' do
   before do
     Rake.application = @rake = Rake::Application.new
@@ -753,6 +768,7 @@ describe 'WhiskeyDisk' do
   
   describe 'when running a command string remotely' do
     before do
+      WhiskeyDisk.reset
       @domain = 'ogc@ogtastic.com'
       WhiskeyDisk.configuration = { 'domain' => @domain }
       WhiskeyDisk.stub!(:system)      
@@ -770,11 +786,47 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.configuration = {}
       lambda { WhiskeyDisk.run('ls') }.should.raise
     end
-    
+
     it 'should pass the string to ssh with verbosity enabled' do
       WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain, "set -x; ls")
       WhiskeyDisk.run('ls')
     end
+    
+    describe 'and multiple domains are specified' do
+      before do
+        @domains = [ 'ogc@ogtastic.com', 'foo@example.com' ]
+      end
+            
+      it 'should run the command via ssh on each domain in the order specified in the configuration file' do
+        TestOrderedExecution.configuration = { 'domain' => @domains }
+        TestOrderedExecution.run('ls')
+        TestOrderedExecution.commands.should == [
+          "ssh -v ogc@ogtastic.com set -x; ls", 
+          "ssh -v foo@example.com set -x; ls"
+        ]
+      end
+      
+      it 'should not fail if an ssh command fails' do
+        WhiskeyDisk.configuration = { 'domain' => @domains }
+        WhiskeyDisk.stub!(:system).with('ssh', '-v', 'ogc@ogtastic.com', 'set -x; ls').and_return(false)
+        lambda { WhiskeyDisk.run('ls') }.should.not.raise(RuntimeError)
+      end
+      
+      it 'should continue to run the remaining ssh commands when an ssh fails' do
+        WhiskeyDisk.configuration = { 'domain' => @domains }
+        WhiskeyDisk.stub!(:system).with('ssh', '-v', 'ogc@ogtastic.com', 'set -x; ls').and_return(false)
+        WhiskeyDisk.should.receive(:system).with('ssh', '-v', 'foo@example.com', 'set -x; ls')
+        WhiskeyDisk.run('ls')   
+      end
+      
+      it 'should record failure and success status for issued ssh commands' do
+        WhiskeyDisk.configuration = { 'domain' => @domains }
+        WhiskeyDisk.stub!(:system).with('ssh', '-v', 'ogc@ogtastic.com', 'set -x; ls').and_return(false)
+        WhiskeyDisk.stub!(:system).with('ssh', '-v', 'foo@example.com', 'set -x; ls').and_return(true)
+        WhiskeyDisk.run('ls')   
+        WhiskeyDisk.results.should == [ { :domain => 'ogc@ogtastic.com', :status => false }, 
+                                        { :domain => 'foo@example.com', :status => true} ]
+      end
+    end
   end
 end
-
