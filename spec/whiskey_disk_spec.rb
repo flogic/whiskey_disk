@@ -2,6 +2,21 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'spec_helper.rb'))
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib', 'whiskey_disk'))
 require 'rake'
 
+# WhiskeyDisk subclass that allows us to test in what order ssh commands are 
+#   issued by WhiskeyDisk.run
+class TestOrderedExecution < WhiskeyDisk
+  class << self
+    def commands
+      @commands
+    end
+    
+    def system(*args)
+      @commands ||= []
+      @commands << args.join(' ')
+    end
+  end
+end
+
 describe 'requiring the main library' do
   before do
     Rake.application = @rake = Rake::Application.new
@@ -36,19 +51,19 @@ describe 'WhiskeyDisk' do
       lambda { WhiskeyDisk.remote?(:foo) }.should.raise(ArgumentError)
     end
     
-    it 'should return true if the configuration includes a non-empty domain setting' do
-      @parameters['domain'] = 'smeghost'
-      WhiskeyDisk.remote?.should == true
-    end
-    
     it 'should return false if the configuration includes a nil domain setting' do
       @parameters['domain'] = nil
       WhiskeyDisk.remote?.should == false
     end
+
+    it 'should return true if the configuration includes a non-empty domain setting' do
+      @parameters['domain'] = ['smeghost']
+      WhiskeyDisk.remote?.should == true
+    end
     
-    it 'should return false if the configuration includes a blank domain setting' do
-      @parameters['domain'] = ''
-      WhiskeyDisk.remote?.should == false
+    it 'should return true if the configuration includes a multiple domain settings' do
+      @parameters['domain'] = ['smeghost', 'faphost']
+      WhiskeyDisk.remote?.should == true
     end
   end
   
@@ -532,6 +547,7 @@ describe 'WhiskeyDisk' do
     
     describe 'when running locally' do
       before do
+        WhiskeyDisk.reset
         WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo' }
         WhiskeyDisk.stub!(:bundle).and_return('command string')
         WhiskeyDisk.stub!(:system)
@@ -547,6 +563,18 @@ describe 'WhiskeyDisk' do
       it 'should use "system" to run all the bundled commands at once' do
         WhiskeyDisk.should.receive(:system).with('command string')
         WhiskeyDisk.flush
+      end
+      
+      it 'should record a failure result when the system command fails' do
+        WhiskeyDisk.stub!(:system).and_return(false)
+        WhiskeyDisk.flush
+        WhiskeyDisk.results.should == [ { :domain => 'local', :status => false } ]
+      end
+      
+      it 'should record a success result when the system command succeeds' do
+        WhiskeyDisk.stub!(:system).and_return(true)
+        WhiskeyDisk.flush
+        WhiskeyDisk.results.should == [ { :domain => 'local', :status => true } ]
       end
     end
   end
@@ -753,6 +781,7 @@ describe 'WhiskeyDisk' do
   
   describe 'when running a command string remotely' do
     before do
+      WhiskeyDisk.reset
       @domain = 'ogc@ogtastic.com'
       WhiskeyDisk.configuration = { 'domain' => @domain }
       WhiskeyDisk.stub!(:system)      
@@ -770,11 +799,119 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.configuration = {}
       lambda { WhiskeyDisk.run('ls') }.should.raise
     end
-    
+
     it 'should pass the string to ssh with verbosity enabled' do
       WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain, "set -x; ls")
       WhiskeyDisk.run('ls')
     end
+    
+    describe 'and multiple domains are specified' do
+      before do
+        @domains = [ 'ogc@ogtastic.com', 'foo@example.com' ]
+      end
+            
+      it 'should run the command via ssh on each domain in the order specified in the configuration file' do
+        TestOrderedExecution.configuration = { 'domain' => @domains }
+        TestOrderedExecution.run('ls')
+        TestOrderedExecution.commands.should == [
+          "ssh -v ogc@ogtastic.com set -x; ls", 
+          "ssh -v foo@example.com set -x; ls"
+        ]
+      end
+      
+      it 'should not fail if an ssh command fails' do
+        WhiskeyDisk.configuration = { 'domain' => @domains }
+        WhiskeyDisk.stub!(:system).with('ssh', '-v', 'ogc@ogtastic.com', 'set -x; ls').and_return(false)
+        lambda { WhiskeyDisk.run('ls') }.should.not.raise(RuntimeError)
+      end
+      
+      it 'should continue to run the remaining ssh commands when an ssh fails' do
+        WhiskeyDisk.configuration = { 'domain' => @domains }
+        WhiskeyDisk.stub!(:system).with('ssh', '-v', 'ogc@ogtastic.com', 'set -x; ls').and_return(false)
+        WhiskeyDisk.should.receive(:system).with('ssh', '-v', 'foo@example.com', 'set -x; ls')
+        WhiskeyDisk.run('ls')   
+      end
+      
+      it 'should record failure and success status for issued ssh commands' do
+        WhiskeyDisk.configuration = { 'domain' => @domains }
+        WhiskeyDisk.stub!(:system).with('ssh', '-v', 'ogc@ogtastic.com', 'set -x; ls').and_return(false)
+        WhiskeyDisk.stub!(:system).with('ssh', '-v', 'foo@example.com', 'set -x; ls').and_return(true)
+        WhiskeyDisk.run('ls')   
+        WhiskeyDisk.results.should == [ { :domain => 'ogc@ogtastic.com', :status => false }, 
+                                        { :domain => 'foo@example.com', :status => true} ]
+      end
+    end
+  end
+  
+  describe 'determining if all the deployments succeeded' do
+    before do
+      WhiskeyDisk.reset
+    end
+    
+    it 'should work without arguments' do
+      lambda { WhiskeyDisk.success? }.should.not.raise(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { WhiskeyDisk.success?(:foo) }.should.raise(ArgumentError)
+    end
+    
+    it 'should return true if there are no results recorded' do
+      WhiskeyDisk.success?.should.be.true
+    end
+    
+    it 'should return true if all recorded results have true statuses' do
+      WhiskeyDisk.record_result('1', true)
+      WhiskeyDisk.record_result('2', true)
+      WhiskeyDisk.record_result('3', true)
+      WhiskeyDisk.success?.should.be.true
+    end
+    
+    it 'should return false if any recorded result has a false status' do
+      WhiskeyDisk.record_result('1', true)
+      WhiskeyDisk.record_result('2', false)
+      WhiskeyDisk.record_result('3', true)
+      WhiskeyDisk.success?.should.be.false      
+    end
+  end
+  
+  describe 'summarizing the results of a run' do
+    before do
+      WhiskeyDisk.reset
+      WhiskeyDisk.stub!(:puts)
+    end
+    
+    it 'should work without arguments' do
+      lambda { WhiskeyDisk.summarize }.should.not.raise(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { WhiskeyDisk.summarize(:foo) }.should.raise(ArgumentError)      
+    end
+    
+    it 'should output a no runs message when no results are recorded' do
+      WhiskeyDisk.should.receive(:puts).with('No deployments to report.')
+      WhiskeyDisk.summarize
+    end
+    
+    describe 'and there are results recorded' do
+      before do
+        WhiskeyDisk.record_result('foo@bar.com', false)
+        WhiskeyDisk.record_result('ogc@ogtastic.com', true)
+        WhiskeyDisk.record_result('user@example.com', true)
+      end
+      
+      it 'should output a status line for each recorded deployment run' do
+        WhiskeyDisk.should.receive(:puts).with('foo@bar.com => failed.')
+        WhiskeyDisk.should.receive(:puts).with('ogc@ogtastic.com => succeeded.')
+        WhiskeyDisk.should.receive(:puts).with('user@example.com => succeeded.')
+        WhiskeyDisk.summarize
+      end
+    
+      it 'should output a summary line including the total runs, count of failures and count of successes.' do
+        WhiskeyDisk.should.receive(:puts).with('Total: 3 deployments, 2 successes, 1 failure.')        
+        WhiskeyDisk.summarize
+      end
+    end
   end
 end
-

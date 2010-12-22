@@ -15,6 +15,10 @@ def build_temp_dir
   Dir.mktmpdir
 end
 
+def write_config_file(data)
+  File.open(@config_file, 'w') { |f| f.puts YAML.dump(data) }
+end
+
 describe WhiskeyDisk::Config do
   describe 'when computing the environment name' do
     it 'should return false when there is no ENV["to"] setting' do
@@ -106,53 +110,53 @@ describe WhiskeyDisk::Config do
     end
 
     it 'should fail if the configuration file does not define data for this environment' do
-      File.open(@config_file, 'w') {|f| f.puts YAML.dump({'foo' => { 'production' => { 'a' => 'b'}}}) }
+      write_config_file('foo' => { 'production' => { 'a' => 'b'} })
       lambda { WhiskeyDisk::Config.fetch }.should.raise
     end
 
     it 'should return the configuration yaml file data for this environment as a hash' do
       staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
-      File.open(@config_file, 'w') {|f| f.puts YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}) }
+      write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
       result = WhiskeyDisk::Config.fetch
       staging.each_pair do |k,v|
         result[k].should == v
       end
     end
-
+    
     it 'should not include configuration information for other environments in the returned hash' do
       staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
-      File.open(@config_file, 'w') {|f| f.puts YAML.dump({ 'production' => { 'repository' => 'c', 'a' => 'b'}, 'staging' => staging }) }
+      write_config_file('production' => { 'repository' => 'c', 'a' => 'b'}, 'staging' => staging)
       WhiskeyDisk::Config.fetch['a'].should.be.nil
     end
 
     it 'should include the environment in the hash' do
       staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
-      File.open(@config_file, 'w') {|f| f.puts YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}) }
+      write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
       WhiskeyDisk::Config.fetch['environment'].should == 'staging'
     end
 
     it 'should not allow overriding the environment in the configuration file' do
       staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'environment' => 'production' }
-      File.open(@config_file, 'w') {|f| f.puts YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}) }
+      write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
       WhiskeyDisk::Config.fetch['environment'].should == 'staging'
     end
 
     it 'should include the project handle in the hash' do
       staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
-      File.open(@config_file, 'w') {|f| f.puts YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}) }
+      write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
       WhiskeyDisk::Config.fetch['project'].should == 'foo'
     end
 
     it 'should not allow overriding the project handle in the configuration file when a project root is specified' do
       staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
-      File.open(@config_file, 'w') {|f| f.puts YAML.dump({'foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging }}) }
+      write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
       WhiskeyDisk::Config.fetch['project'].should == 'foo'
     end
 
     it 'should allow overriding the project handle in the configuration file when a project root is not specified' do
       ENV['to'] = @env = 'staging'
       staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
-      File.open(@config_file, 'w') {|f| f.puts YAML.dump({'production' => { 'repository' => 'b'}, 'staging' => staging }) }
+      write_config_file('production' => { 'repository' => 'b'}, 'staging' => staging)
       WhiskeyDisk::Config.fetch['project'].should == 'diskey_whisk'
     end
   end
@@ -198,8 +202,75 @@ describe WhiskeyDisk::Config do
     end
 
     it 'should return a normalized version of the un-YAMLized configuration data' do
-      File.open(@config_file, 'w') { |f| f.puts YAML.dump({ 'repository' => 'x'}) }
+      write_config_file('repository' => 'x')
       WhiskeyDisk::Config.load_data.should == { 'foo' => { 'bar' => { 'repository' => 'x' } } }
+    end
+    
+    describe 'normalizing domains' do
+      before do
+        write_config_file(
+          'foo' => { 
+            'bar' => { 'repository' => 'x', 'domain' => [ 'user@example.com', nil, 'foo@domain.com', '' ]}, 
+            'baz' => { 'repository' => 'x', 'domain' => [ 'bar@example.com', 'baz@domain.com' ]},
+            'xyz' => { 'repository' => 'x' },
+            'abc' => { 'repository' => 'x', 'domain' => 'what@example.com' },
+            'eee' => { 'repository' => 'x', 'domain' => '' }
+          },
+          'zyx' => {
+            'def' => { 'repository' => 'x', 'domain' => [ 'user@example.com', nil, 'foo@domain.com', '' ]}, 
+            'hij' => { 'repository' => 'x', 'domain' => [ 'bar@example.com', 'baz@domain.com' ]},
+            'xyz' => { 'repository' => 'x' },
+            'abc' => { 'repository' => 'x', 'domain' => 'what@example.com' },
+            'eee' => { 'repository' => 'x', 'domain' => '' }
+          }
+        )
+      end
+    
+      describe 'and no domain has been specified' do
+        it 'should leave the domain as nil' do
+          WhiskeyDisk::Config.load_data['foo']['xyz']['domain'].should.be.nil     
+        end
+        
+        it 'should handle nil domains across all projects and targets' do
+          WhiskeyDisk::Config.load_data['zyx']['xyz']['domain'].should.be.nil     
+        end
+      end
+    
+      describe 'and a single domain has been specified' do
+        it 'should return domain as nil if the specified domain was empty' do
+          WhiskeyDisk::Config.load_data['foo']['eee']['domain'].should.be.nil       
+        end
+        
+        it 'should handle empty specified domains across all projects and targets' do
+          WhiskeyDisk::Config.load_data['zyx']['eee']['domain'].should.be.nil                 
+        end
+      
+        it 'should return domain as a single list of the specified domain if the specified domain was not empty' do
+          WhiskeyDisk::Config.load_data['foo']['abc']['domain'].should == ['what@example.com']
+        end
+    
+        it 'should handle single specified domains across all projects and targets' do
+          WhiskeyDisk::Config.load_data['zyx']['abc']['domain'].should == ['what@example.com']
+        end
+      end
+    
+      describe 'and a list of domains was specified' do
+        it 'should return the list of domains' do
+          WhiskeyDisk::Config.load_data['foo']['baz']['domain'].should == [ 'bar@example.com', 'baz@domain.com' ]
+        end
+      
+        it 'should handle lists of domains across all projects and targets' do
+          WhiskeyDisk::Config.load_data['zyx']['hij']['domain'].should == [ 'bar@example.com', 'baz@domain.com' ]
+        end
+      
+        it 'should remove any blank or nil domains from the list' do
+          WhiskeyDisk::Config.load_data['foo']['bar']['domain'].should == ['user@example.com', 'foo@domain.com' ]
+        end
+    
+        it 'should handle cleaning up blanks and nils across all projects and targets' do
+          WhiskeyDisk::Config.load_data['zyx']['def']['domain'].should == ['user@example.com', 'foo@domain.com' ]
+        end
+      end
     end
   end
 
@@ -207,7 +278,7 @@ describe WhiskeyDisk::Config do
     before do
       ENV['to'] = @env = 'foo:staging'
 
-      @bare_data  = { 'repository' => 'git://foo/bar.git', 'domain' => 'ogc@ogtastic.com' }
+      @bare_data  = { 'repository' => 'git://foo/bar.git', 'domain' => ['ogc@ogtastic.com'] }
       @env_data   = { 'staging' => @bare_data }
       @proj_data  = { 'foo' => @env_data }
     end

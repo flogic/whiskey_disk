@@ -57,6 +57,12 @@ current local checkout.
     do hands-free automated deployments whenever code is pushed to your
     deployment branch of choice!
 
+  - You can deploy to multiple remote targets at once.  Currently this is limited
+    to one-after-the-other synchronous deployments, but we're thinking about 
+    doing them in parallel once we're happy with the stability of this (new)
+    feature.
+
+
 ### Assumptions ###
 
  - your project is managed via git
@@ -100,7 +106,7 @@ As a rails plugin:
 
 Known config file settings (if you're familiar with capistrano and vlad these should seem eerily familiar):
  
-    domain:              host on which to deploy (this is an ssh connect string) 
+    domain:              host or list of hosts on which to deploy (these are ssh connect strings)
     deploy_to:           path to which to deploy main application
     repository:          git repo path for main application
     branch:              git branch to deploy from main application git repo (default: master)
@@ -116,7 +122,7 @@ Known config file settings (if you're familiar with capistrano and vlad these sh
 A simple config/deploy.yml might look like:
   
     qa:
-      domain: "ogc@www.ogtastic.com"
+      domain: "ogc@qa.ogtastic.com"
       deploy_to: "/var/www/www.ogtastic.com"
       repository: "git@ogtastic.com:www.ogtastic.com.git"
       branch: "stable"
@@ -130,6 +136,19 @@ of deploy:setup
  - defining a deploy:&lt;target&gt;:post_deploy rake task (e.g., in
    lib/tasks/ or in your project's Rakefile) will cause that task to be run
 at the end of deploy:now
+
+
+For deploying to multiple hosts, the config/deploy.yml might look like:
+
+    qa:
+      domain:
+      - "ogc@qa1.ogtastic.com"
+      - "ogc@qa2.ogtastic.com""
+      deploy_to: "/var/www/www.ogtastic.com"
+      repository: "git@ogtastic.com:www.ogtastic.com.git"
+      branch: "stable"
+      rake_env:
+        RAILS_ENV: 'production'
 
 
 ### post\_deploy\_script and post\_setup\_script ###

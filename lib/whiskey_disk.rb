@@ -3,11 +3,13 @@ require File.expand_path(File.join(File.dirname(__FILE__), 'whiskey_disk', 'conf
 class WhiskeyDisk
   class << self
     attr_writer :configuration
+    attr_reader :results
     
     def reset
       @configuration = nil
       @buffer = nil
       @staleness_checks = nil
+      @results = nil
     end
     
     def buffer
@@ -39,7 +41,7 @@ class WhiskeyDisk
     end
     
     def remote?
-      ! (self[:domain].nil? or self[:domain] == '')
+      !! self[:domain]
     end
     
     def has_config_repo?
@@ -109,11 +111,48 @@ class WhiskeyDisk
     
     def run(cmd)
       needs(:domain)
-      system('ssh', '-v', self[:domain], "set -x; " + cmd)
+      self[:domain].each do |domain|
+        status = system('ssh', '-v', domain, "set -x; " + cmd)
+        record_result(domain, status)
+      end
     end
     
     def flush
-      remote? ? run(bundle) : system(bundle)
+      return run(bundle) if remote?
+      record_result('local', system(bundle))
+    end
+    
+    def record_result(domain, status)
+      @results ||= []
+      @results << { :domain => domain, :status => status }
+    end
+    
+    def summarize
+      puts
+      puts "Results:"
+      if results and not results.empty?
+        successes = failures = total = 0
+        results.each do |result|
+          total += 1
+          if result[:status]
+            successes += 1 
+          else
+            failures += 1
+          end
+          
+          puts "#{result[:domain]} => #{result[:status] ? 'succeeded' : 'failed'}."
+        end
+        puts "Total: #{total} deployment#{total == 1 ? '' : 's'}, " +
+          "#{successes} success#{successes == 1 ? '' : 'es'}, " +
+          "#{failures} failure#{failures == 1 ? '' : 's'}."
+      else
+        puts "No deployments to report."
+      end       
+    end
+    
+    def success?
+      return true if !results or results.empty?
+      results.all? {|result| result[:status] }
     end
     
     def if_file_present(path, cmd)
