@@ -128,6 +128,8 @@ class WhiskeyDisk
     end
     
     def summarize
+      puts
+      puts "Results:"
       if results and not results.empty?
         successes = failures = total = 0
         results.each do |result|
