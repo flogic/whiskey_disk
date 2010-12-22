@@ -843,6 +843,38 @@ describe 'WhiskeyDisk' do
     end
   end
   
+  describe 'determining if all the deployments succeeded' do
+    before do
+      WhiskeyDisk.reset
+    end
+    
+    it 'should work without arguments' do
+      lambda { WhiskeyDisk.success? }.should.not.raise(ArgumentError)
+    end
+    
+    it 'should not allow arguments' do
+      lambda { WhiskeyDisk.success?(:foo) }.should.raise(ArgumentError)
+    end
+    
+    it 'should return true if there are no results recorded' do
+      WhiskeyDisk.success?.should.be.true
+    end
+    
+    it 'should return true if all recorded results have true statuses' do
+      WhiskeyDisk.record_result('1', true)
+      WhiskeyDisk.record_result('2', true)
+      WhiskeyDisk.record_result('3', true)
+      WhiskeyDisk.success?.should.be.true
+    end
+    
+    it 'should return false if any recorded result has a false status' do
+      WhiskeyDisk.record_result('1', true)
+      WhiskeyDisk.record_result('2', false)
+      WhiskeyDisk.record_result('3', true)
+      WhiskeyDisk.success?.should.be.false      
+    end
+  end
+  
   describe 'summarizing the results of a run' do
     before do
       WhiskeyDisk.reset

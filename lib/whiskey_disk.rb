@@ -148,6 +148,11 @@ class WhiskeyDisk
       end       
     end
     
+    def success?
+      return true if !results or results.empty?
+      results.all? {|result| result[:status] }
+    end
+    
     def if_file_present(path, cmd)
       "if [ -e #{path} ]; then #{cmd}; fi"
     end
