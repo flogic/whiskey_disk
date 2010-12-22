@@ -25,20 +25,23 @@ describe 'rake tasks' do
         :update_configuration_repository_checkout,
         :refresh_configuration,
         :run_post_setup_hooks, 
-        :flush
+        :flush,
+        :summarize
       ].each do |meth| 
-        WhiskeyDisk.stub!(meth) 
+        WhiskeyDisk.stub!(meth)
       end
+
+      WhiskeyDisk.stub!(:success?).and_return(true)
     end
     
     it 'should make changes on the specified domain when a domain is specified' do
-      WhiskeyDisk.configuration = { 'domain' => 'some domain' }
+      WhiskeyDisk.configuration = { 'domain' => [ 'some domain' ] }
       @rake["deploy:setup"].invoke
       WhiskeyDisk.should.be.remote
     end
     
     it 'should make changes on the local system when no domain is specified' do
-      WhiskeyDisk.configuration = { 'domain' => '' }
+      WhiskeyDisk.configuration = { 'domain' => nil }
       WhiskeyDisk.should.not.be.remote
     end
     
@@ -126,6 +129,20 @@ describe 'rake tasks' do
       WhiskeyDisk.should.receive(:flush)
       @rake["deploy:setup"].invoke
     end
+    
+    it 'should summarize the results of the setup run' do
+      WhiskeyDisk.should.receive(:summarize)
+      @rake["deploy:setup"].invoke
+    end
+  
+    it 'should not exit in error if all setup runs were successful' do
+      lambda { @rake["deploy:setup"].invoke }.should.not.raise(SystemExit)
+    end
+    
+    it 'should exit in error if some setup run was unsuccessful' do
+      WhiskeyDisk.stub!(:success?).and_return(false)
+      lambda { @rake["deploy:setup"].invoke }.should.raise(SystemExit)
+    end
   end
   
   describe 'deploy:now' do
@@ -137,14 +154,17 @@ describe 'rake tasks' do
         :update_configuration_repository_checkout,
         :refresh_configuration,
         :run_post_deploy_hooks,
-        :flush
+        :flush, 
+        :summarize
       ].each do |meth| 
         WhiskeyDisk.stub!(meth) 
       end
+      
+      WhiskeyDisk.stub!(:success?).and_return(true)
     end
     
     it 'should make changes on the specified domain when a domain is specified' do
-      WhiskeyDisk.configuration = { 'domain' => 'some domain'}
+      WhiskeyDisk.configuration = { 'domain' => [ 'some domain' ]}
       @rake["deploy:now"].invoke
       WhiskeyDisk.should.be.remote
     end
@@ -201,6 +221,20 @@ describe 'rake tasks' do
     it 'should flush WhiskeyDisk changes' do
       WhiskeyDisk.should.receive(:flush)
       @rake["deploy:now"].invoke
+    end
+    
+    it 'should summarize the results of the deployment run' do
+      WhiskeyDisk.should.receive(:summarize)
+      @rake["deploy:now"].invoke
+    end
+    
+    it 'should not exit in error if all deployment runs were successful' do
+      lambda { @rake["deploy:now"].invoke }.should.not.raise(SystemExit)
+    end
+    
+    it 'should exit in error if some deployment run was unsuccessful' do
+      WhiskeyDisk.stub!(:success?).and_return(false)
+      lambda { @rake["deploy:now"].invoke }.should.raise(SystemExit)
     end
   end
       

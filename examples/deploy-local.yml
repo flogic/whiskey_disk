@@ -1,0 +1,4 @@
+local:
+  deploy_to: "/Users/rick/deploy/whiskey_disk/local"
+  repository: "/Users/rick/git/whiskey_disk"
+  branch: "develop"

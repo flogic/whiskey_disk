@@ -1,0 +1,14 @@
+multi:
+  domain:
+  - "ogc@hoenir.websages.com"
+  - "ogc@nerthus.websages.com"
+  deploy_to: "/tmp/test-deployment/"
+  repository: "git@git.ogtastic.com:whiskey_disk.git"
+  branch: "develop"
+badmulti:
+  domain:
+  - "ogc@hoenir.websages.com"
+  - "ogc@bogus.example.com"
+  deploy_to: "/tmp/test-deployment/"
+  repository: "git@git.ogtastic.com:whiskey_disk.git"
+  branch: "develop"

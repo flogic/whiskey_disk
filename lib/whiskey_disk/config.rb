@@ -103,9 +103,20 @@ class WhiskeyDisk
         override_project_name!(data)
         { project_name => data }
       end
+      
+      def normalize_domain(data)
+        data.each_pair do |project, project_data|
+          project_data.each_pair do |target, target_data|
+            if target_data['domain']
+              cleaned = [ target_data['domain'] ].flatten.delete_if { |m| m.nil? or m == '' }
+              target_data['domain'] = (cleaned.empty? ? nil : cleaned)
+            end
+          end
+        end
+      end
 
       def normalize_data(data)
-        add_project_scoping(add_environment_scoping(data.clone))
+        normalize_domain(add_project_scoping(add_environment_scoping(data.clone)))
       end
 
       def load_data
