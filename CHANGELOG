@@ -1,0 +1,129 @@
+
+0.6.0 / 2010-12-22 
+==================
+
+  * Version bump to 0.6.0
+  * Merge branch 'feature/multiple-domain-support' into develop
+  * adding a set of multi-domain examples
+  * adding a local deployment example
+  * updating output summary to be more readable
+  * updating README to document multi-domain deployments
+  * rake exit statuses reflect overall deployment/setup success
+  * adding WhiskeyDisk.success? method
+  * We now summarize runs, both local and remote.
+  * record results for local runs as well as remote ones
+  * now run SSH commands on multiple domains, serially, synchronously
+  * propagating changes allowed by normalizing 'domain' in config data
+  * normalize 'domain' values pulled from config files
+  * refactor config file writing in config spec
+  * WD.remote? now understands arrays of 'domain' entries in the config
+  * Merge branch 'release/0.5.4' into develop
+  * bump gemspec for 0.5.4 release
+  * Version bump to 0.5.4
+  * Removing Jeweler warning from Rakefile
+  * Merge branch 'feature/reduce-mocking-code-in-tests' into develop
+  * eliminating more stubbing specs from config_spec
+  * Removing more stub! calls from config specs
+  * removing YAML.load exception stub
+  * replacing some configuration_data stubs in config spec
+  * Remove CURRENT_FILE from config specs
+  * Removing CURRENT from config specs
+  * Removing more File.exists? stubs from config spec.
+  * Removing File.exists? stubs in config specs
+  * spec refactorings
+  * Removing has_config_repo? stubs from rake specs
+  * Using non-stubbed configuration in rake specs
+  * removing useless stub of :register_configuration
+  * And removing unneeded spec helper
+  * removing whiskey_disk config stubbing
+  * introducing use_config() spec helper
+  * Merge branch 'release/0.5.3' into develop
+  * updating gemspec for 0.5.3
+  * updating Contributors section of README
+  * Version bump to 0.5.3
+  * Merge branch 'feature/merge-pull-request-2' into develop
+  * Cosmetic and naming change in new config method
+  * fixing spec example description
+  * Reworking the config to append project name overrides to the env, since everything else is dependent thereupon
+  * tidying up the spec
+  * Allowing a manually specified project name in the bare config hash to be used as the parent project in the absence of one specified from the 'to' env setting
+  * Merge branch 'release/0.5.2' into develop
+  * updating gemspec for version 0.5.2
+  * Bumping version to 0.5.2
+  * Merge branch 'feature/ensure_target_needs_no_ruby' into develop
+  * Updating TODO list
+  * Updating README
+  * Merge branch 'feature/make_check_a_wd_option' into develop
+  * Updating TODO list
+  * Adding --check flag to wd command-line script
+  * Updating README with --check changes
+  * Merge branch 'feature/use_shallow_clone_on_setup' into develop
+  * Updating TODO list
+  * Adding lightning talk info to README
+  * Making shallow clones on initial setup
+  * Merge branch 'release/0.5.0' into develop
+  * updating gemspec for 0.5.0
+  * Version bump to 0.5.0
+  * Merge branch 'feature/alternate-hook-mechanism' into develop
+  * TODO list updates
+  * Make the rake test task do right by bacon
+  * Adding post_setup_script support
+  * Adding post_deploy_script support
+  * Reordering specs for post-setup/deployment tasks
+  * Updating README for post_*_script functionality
+  * TODO file updates
+  * Merge branch 'release/0.4.5' into develop
+  * new gemspec for 0.4.5 release
+  * Version bump to 0.4.5
+  * ENV settings now available to rake when searching for tasks
+  * Merge branch 'feature/refactor-methods' into develop
+  * refactoring common code for rake tasks
+  * further refactoring of clone_repository
+  * refactoring update checkout methods
+  * renaming conditional_clone
+  * Refactoring rake task code
+  * Merge branch 'release/0.4.4' into develop
+  * 0.4.4 gemspec
+  * Version bump to 0.4.4
+  * Merge branch 'feature/readme-updates' into develop
+  * TODO list tweakage
+  * README updates
+  * Merge branch 'release/0.4.3' into develop
+  * updating gemspec
+  * Version bump to 0.4.3
+  * Updating TODO
+  * Smarter setups
+  * TODO updates
+  * Version bump to 0.4.2
+  * Taking a different approach to rake task detection
+  * bumping gemspec
+  * Version bump to 0.4.1
+  * Fixing post_* hook edge case
+  * More README updates
+  * updating README
+  * updated gemspec
+  * adding staleness check docs to README
+  * Version bump to 0.4.0
+  * Make the staleness check actually work with bash.
+  * Adding "else" block to provide feedback when not stale
+  * More complete implementation of staleness checks
+  * Removing earlier abortive implementation of staleness checking
+  * Support for staleness checks
+  * Adding first pass at conditional staleness checks
+  * updating TODO list
+  * README note about post_* rake task dependencies
+  * updated gemspec
+  * Version bump to 0.3.1
+  * No longer require a Rakefile when --path isn't used
+  * We no longer do per-target config file overrides
+  * Don't run post_{setup,deploy} rake tasks without a deployed Rakefile
+  * use 'target' instead of 'environment' in README
+  * encoding < and >
+  * more README tweaks
+  * readme formatting tweak
+  * make sure README.markdown is displayed on install
+  * new and improved README
+  * adding a simple deploy.yml example to the README
+  * add link to live presentation to README
+  * adding a check flag for use with staleness checks
+  * english spike of staleness check in todo file
