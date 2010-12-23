@@ -103,13 +103,21 @@ class WhiskeyDisk
         override_project_name!(data)
         { project_name => data }
       end
+
+      def compact_list(list)
+        [ list ].flatten.delete_if { |d| d.nil? or d == '' }
+      end
       
       def normalize_domain(data)
-        compacted = [ data ].flatten.delete_if { |d| d.nil? or d == '' }
+        compacted = compact_list(data)
         return nil if compacted.empty?
+        
         compacted.collect do |d|
           if d.respond_to?(:keys)
-            { :name => (d['name'] || d[:name]) }
+            row = { :name => (d['name'] || d[:name]) }
+            roles = compact_list(d['roles'] || d[:roles])
+            row[:roles] = roles unless roles.empty?
+            row
           else
             { :name => d }
           end

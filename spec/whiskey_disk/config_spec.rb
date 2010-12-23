@@ -218,11 +218,15 @@ describe WhiskeyDisk::Config do
             'hsh' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, { 'name' => 'baz@domain.com' } ]},
             'mix' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, 'baz@domain.com' ]},            
             'erl' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => nil }, 
-                                                          { 'name' => 'baz@domain.com', 'roles' => [] } ]},
+                                                          { 'name' => 'baz@domain.com', 'roles' => '' },
+                                                          { 'name' => 'aok@domain.com', 'roles' => [] } ]},
             'rol' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => [ 'web', 'db' ] }, 
-                                                          { 'name' => 'baz@domain.com', 'roles' => [ 'db' ] } ]},            
+                                                          { 'name' => 'baz@domain.com', 'roles' => [ 'db' ] },            
+                                                          { 'name' => 'aok@domain.com', 'roles' => 'app' } ]},            
             'wow' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => [ 'web', 'db' ] }, 
-                                                          { 'name' => 'baz@domain.com' }, '', nil, 'foo@barbaz.com' ]},            
+                                                          { 'name' => 'baz@domain.com', 'roles' => [ 'db' ] },   
+                                                          nil, '', [], 'foo@bar.example.com',      
+                                                          { 'name' => 'aok@domain.com', 'roles' => 'app' } ]},            
           },
 
           'zyx' => {
@@ -234,11 +238,15 @@ describe WhiskeyDisk::Config do
             'hsh' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, { 'name' => 'baz@domain.com' } ]},
             'mix' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, 'baz@domain.com' ]},
             'erl' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => nil }, 
-                                                          { 'name' => 'baz@domain.com', 'roles' => [] } ]},
+                                                          { 'name' => 'baz@domain.com', 'roles' => '' },
+                                                          { 'name' => 'aok@domain.com', 'roles' => [] } ]},
             'rol' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => [ 'web', 'db' ] }, 
-                                                          { 'name' => 'baz@domain.com', 'roles' => [ 'db' ] } ]},
+                                                          { 'name' => 'baz@domain.com', 'roles' => [ 'db' ] },         
+                                                          { 'name' => 'aok@domain.com', 'roles' => 'app' } ]},            
             'wow' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => [ 'web', 'db' ] }, 
-                                                          { 'name' => 'baz@domain.com' }, '', nil, 'foo@barbaz.com' ]},            
+                                                          { 'name' => 'baz@domain.com', 'roles' => [ 'db' ] },   
+                                                          nil, '', [], 'foo@bar.example.com',      
+                                                          { 'name' => 'aok@domain.com', 'roles' => 'app' } ]},            
           }
         )
       end
@@ -269,30 +277,72 @@ describe WhiskeyDisk::Config do
     
       it 'should return the list of domain name hashes when a list of domains is specified' do
         WhiskeyDisk::Config.load_data['foo']['baz']['domain'].should == [ 
-          { :name => 'bar@example.com' }, 
-          { :name => 'baz@domain.com' } 
+          { :name => 'bar@example.com' }, { :name => 'baz@domain.com' } 
         ]
       end
     
       it 'should handle lists of domains across all projects and targets' do
         WhiskeyDisk::Config.load_data['zyx']['hij']['domain'].should == [ 
-          { :name => 'bar@example.com' },
-          { :name => 'baz@domain.com' }
+          { :name => 'bar@example.com' }, { :name => 'baz@domain.com' }
          ]
       end
       
       it 'should remove any blank or nil domains from a simple list of domains' do
         WhiskeyDisk::Config.load_data['foo']['bar']['domain'].should == [
-          { :name => 'user@example.com' }, 
-          { :name => 'foo@domain.com' }
+          { :name => 'user@example.com' }, { :name => 'foo@domain.com' }
          ]
       end
   
       it 'should handle cleaning up blanks and nils across all projects and targets' do
         WhiskeyDisk::Config.load_data['zyx']['def']['domain'].should == [
-          { :name => 'user@example.com' }, 
-          { :name => 'foo@domain.com' }
+          { :name => 'user@example.com' }, { :name => 'foo@domain.com' }
          ]
+      end
+      
+      it 'should not include roles when only nil, blank or empty roles lists are specified' do
+        WhiskeyDisk::Config.load_data['foo']['erl']['domain'].should == [
+          { :name => 'bar@example.com' }, { :name => 'baz@domain.com' }, { :name => 'aok@domain.com' }
+         ]        
+      end
+
+      it 'should handle filtering empty roles across all projects and targets ' do
+        WhiskeyDisk::Config.load_data['zyx']['erl']['domain'].should == [
+          { :name => 'bar@example.com' }, { :name => 'baz@domain.com' }, { :name => 'aok@domain.com' }
+         ]        
+      end
+      
+      it 'should include and normalize roles when specified as strings or lists' do
+        WhiskeyDisk::Config.load_data['foo']['rol']['domain'].should == [
+          { :name => 'bar@example.com', :roles => [ 'web', 'db' ] }, 
+          { :name => 'baz@domain.com',  :roles => [ 'db' ] }, 
+          { :name => 'aok@domain.com',  :roles => [ 'app' ] }
+         ]        
+      end
+
+      it 'should handle normalizing roles across all projects and targets ' do
+        WhiskeyDisk::Config.load_data['zyx']['rol']['domain'].should == [
+          { :name => 'bar@example.com', :roles => [ 'web', 'db' ] }, 
+          { :name => 'baz@domain.com',  :roles => [ 'db' ] }, 
+          { :name => 'aok@domain.com',  :roles => [ 'app' ] }
+         ]        
+      end
+      
+      it 'should respect empty domains among role data' do
+        WhiskeyDisk::Config.load_data['foo']['wow']['domain'].should == [
+          { :name => 'bar@example.com', :roles => [ 'web', 'db' ] }, 
+          { :name => 'baz@domain.com',  :roles => [ 'db' ] }, 
+          { :name => 'foo@bar.example.com' },
+          { :name => 'aok@domain.com',  :roles => [ 'app' ] }
+         ]                
+      end
+      
+      it 'should handle empty domain filtering among roles across all projects and targets' do
+        WhiskeyDisk::Config.load_data['zyx']['wow']['domain'].should == [
+          { :name => 'bar@example.com', :roles => [ 'web', 'db' ] }, 
+          { :name => 'baz@domain.com',  :roles => [ 'db' ] }, 
+          { :name => 'foo@bar.example.com' },
+          { :name => 'aok@domain.com',  :roles => [ 'app' ] }
+         ]        
       end
     end
   end
