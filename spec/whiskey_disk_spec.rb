@@ -57,12 +57,12 @@ describe 'WhiskeyDisk' do
     end
 
     it 'should return true if the configuration includes a non-empty domain setting' do
-      @parameters['domain'] = ['smeghost']
+      @parameters['domain'] = [ { :name => 'smeghost' } ]
       WhiskeyDisk.remote?.should == true
     end
     
     it 'should return true if the configuration includes a multiple domain settings' do
-      @parameters['domain'] = ['smeghost', 'faphost']
+      @parameters['domain'] = [ { :name => 'smeghost' }, { :name => 'faphost' } ]
       WhiskeyDisk.remote?.should == true
     end
   end
@@ -527,7 +527,7 @@ describe 'WhiskeyDisk' do
   describe 'flushing changes' do
     describe 'when running remotely' do
       before do
-        WhiskeyDisk.configuration = { 'domain' => 'www.domain.com', 'deploy_to' => '/path/to/main/repo' }
+        WhiskeyDisk.configuration = { 'domain' => [ { :name => 'www.domain.com' } ], 'deploy_to' => '/path/to/main/repo' }
         WhiskeyDisk.stub!(:bundle).and_return('command string')
         WhiskeyDisk.stub!(:run)
       end
@@ -783,7 +783,7 @@ describe 'WhiskeyDisk' do
     before do
       WhiskeyDisk.reset
       @domain = 'ogc@ogtastic.com'
-      WhiskeyDisk.configuration = { 'domain' => @domain }
+      WhiskeyDisk.configuration = { 'domain' => [ { :name => @domain } ] }
       WhiskeyDisk.stub!(:system)      
     end
     
@@ -807,7 +807,7 @@ describe 'WhiskeyDisk' do
     
     describe 'and multiple domains are specified' do
       before do
-        @domains = [ 'ogc@ogtastic.com', 'foo@example.com' ]
+        @domains = [ { :name => 'ogc@ogtastic.com' }, { :name => 'foo@example.com' } ]
       end
             
       it 'should run the command via ssh on each domain in the order specified in the configuration file' do

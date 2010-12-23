@@ -259,28 +259,40 @@ describe WhiskeyDisk::Config do
         WhiskeyDisk::Config.load_data['zyx']['eee']['domain'].should.be.nil                 
       end
       
-      it 'should return domain as a single element list if a single non-empty domain was specified' do
-        WhiskeyDisk::Config.load_data['foo']['abc']['domain'].should == ['what@example.com']
+      it 'should return domain as a single element list with a name if a single non-empty domain was specified' do
+        WhiskeyDisk::Config.load_data['foo']['abc']['domain'].should == [ { :name => 'what@example.com' } ]
       end
   
       it 'should handle single specified domains across all projects and targets' do
-        WhiskeyDisk::Config.load_data['zyx']['abc']['domain'].should == ['what@example.com']
+        WhiskeyDisk::Config.load_data['zyx']['abc']['domain'].should == [ { :name => 'what@example.com' } ]
       end
     
-      it 'should return the list of domains when a list of domains is specified' do
-        WhiskeyDisk::Config.load_data['foo']['baz']['domain'].should == [ 'bar@example.com', 'baz@domain.com' ]
+      it 'should return the list of domain name hashes when a list of domains is specified' do
+        WhiskeyDisk::Config.load_data['foo']['baz']['domain'].should == [ 
+          { :name => 'bar@example.com' }, 
+          { :name => 'baz@domain.com' } 
+        ]
       end
     
       it 'should handle lists of domains across all projects and targets' do
-        WhiskeyDisk::Config.load_data['zyx']['hij']['domain'].should == [ 'bar@example.com', 'baz@domain.com' ]
+        WhiskeyDisk::Config.load_data['zyx']['hij']['domain'].should == [ 
+          { :name => 'bar@example.com' },
+          { :name => 'baz@domain.com' }
+         ]
       end
       
       it 'should remove any blank or nil domains from a simple list of domains' do
-        WhiskeyDisk::Config.load_data['foo']['bar']['domain'].should == ['user@example.com', 'foo@domain.com' ]
+        WhiskeyDisk::Config.load_data['foo']['bar']['domain'].should == [
+          { :name => 'user@example.com' }, 
+          { :name => 'foo@domain.com' }
+         ]
       end
   
       it 'should handle cleaning up blanks and nils across all projects and targets' do
-        WhiskeyDisk::Config.load_data['zyx']['def']['domain'].should == ['user@example.com', 'foo@domain.com' ]
+        WhiskeyDisk::Config.load_data['zyx']['def']['domain'].should == [
+          { :name => 'user@example.com' }, 
+          { :name => 'foo@domain.com' }
+         ]
       end
     end
   end
@@ -289,7 +301,7 @@ describe WhiskeyDisk::Config do
     before do
       ENV['to'] = @env = 'foo:staging'
 
-      @bare_data  = { 'repository' => 'git://foo/bar.git', 'domain' => ['ogc@ogtastic.com'] }
+      @bare_data  = { 'repository' => 'git://foo/bar.git', 'domain' => [ { :name => 'ogc@ogtastic.com' } ] }
       @env_data   = { 'staging' => @bare_data }
       @proj_data  = { 'foo' => @env_data }
     end

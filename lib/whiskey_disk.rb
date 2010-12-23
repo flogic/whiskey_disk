@@ -112,8 +112,8 @@ class WhiskeyDisk
     def run(cmd)
       needs(:domain)
       self[:domain].each do |domain|
-        status = system('ssh', '-v', domain, "set -x; " + cmd)
-        record_result(domain, status)
+        status = system('ssh', '-v', domain[:name], "set -x; " + cmd)
+        record_result(domain[:name], status)
       end
     end
     

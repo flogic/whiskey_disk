@@ -105,8 +105,15 @@ class WhiskeyDisk
       end
       
       def normalize_domain(data)
-        cleaned = [ data ].flatten.delete_if { |m| m.nil? or m == '' }
-        cleaned.empty? ? nil : cleaned
+        compacted = [ data ].flatten.delete_if { |d| d.nil? or d == '' }
+        return nil if compacted.empty?
+        compacted.collect do |d|
+          if d.respond_to?(:keys)
+            { :name => (d['name'] || d[:name]) }
+          else
+            { :name => d }
+          end
+        end
       end
       
       def normalize_domains(data)
