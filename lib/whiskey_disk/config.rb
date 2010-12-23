@@ -105,18 +105,20 @@ class WhiskeyDisk
       end
       
       def normalize_domain(data)
+        cleaned = [ data ].flatten.delete_if { |m| m.nil? or m == '' }
+        cleaned.empty? ? nil : cleaned
+      end
+      
+      def normalize_domains(data)
         data.each_pair do |project, project_data|
           project_data.each_pair do |target, target_data|
-            if target_data['domain']
-              cleaned = [ target_data['domain'] ].flatten.delete_if { |m| m.nil? or m == '' }
-              target_data['domain'] = (cleaned.empty? ? nil : cleaned)
-            end
+            target_data['domain'] = normalize_domain(target_data['domain']) if target_data['domain']
           end
         end
       end
 
       def normalize_data(data)
-        normalize_domain(add_project_scoping(add_environment_scoping(data.clone)))
+        normalize_domains(add_project_scoping(add_environment_scoping(data.clone)))
       end
 
       def load_data
