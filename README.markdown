@@ -307,7 +307,7 @@ sounds if you're using gitosis, btw.)
 Anyway, a config repo is just a git repo.  In it are directories for every
 project whose configuration information is managed in that repo.  For example,
 there's a "larry" directory in our main config repo, because we're deploying
-the [larry project](http://github.com/rick/larry) to manage our high-level
+the [larry project](http://github.com/flogic/larry) to manage our high-level
 configuration data.
 
 Note, if you set the 'project' setting in deploy.yml, that determines the
@@ -363,10 +363,7 @@ overlaid on top of the most recent checkout of the project.  Snap.
 
 ### More Examples: ###
 
- - We are using this to manage larry.  See [http://github.com/rick/larry/blob/master/config/deploy.yml](http://github.com/rick/larry/blob/master/config/deploy.yml) and 
-    [http://github.com/rick/larry/blob/master/lib/tasks/deploy.rake](http://github.com/rick/larry/blob/master/lib/tasks/deploy.rake)
-
- - We are using whiskey\_disk on a private project with lots of config files, but here's a gist showing a bit more interesting deploy.rake file for post\_setup and post\_deploy work:  [https://gist.github.com/47e23f2980943531beeb](https://gist.github.com/47e23f2980943531beeb)
+ - We are using this to manage larry.  See [https://github.com/flogic/larry/blob/master/config/deploy-local.yml.example](https://github.com/flogic/larry/blob/master/config/deploy-local.yml.example) and [http://github.com/flogic/larry/blob/master/lib/tasks/deploy.rake](http://github.com/flogic/larry/blob/master/lib/tasks/deploy.rake)
 
  - Here is a sample of a lib/tasks/deploy.rake from a Rails application we deployed once upon a time:
 
@@ -428,4 +425,5 @@ to see what we have in mind for the near future.
 
  - Rick Bradley (rick@rickbradley.com, github:rick)
  - Jeremy Holland (jeremy@jeremypholland.com, github:therubyneck): feature/bugfix contributions
-
+ - Kevin Barnes (@vinbarnes), Yossef Mendellsohn (cardioid) for design help and proofreading
+ - Cristi Balan (evilchelu) for feedback and proofreading
