@@ -210,18 +210,18 @@ describe WhiskeyDisk::Config do
       before do
         write_config_file(
           'foo' => { 
-            'bar' => { 'repository' => 'x', 'domain' => [ 'user@example.com', nil, 'foo@domain.com', '' ]}, 
-            'baz' => { 'repository' => 'x', 'domain' => [ 'bar@example.com', 'baz@domain.com' ]},
             'xyz' => { 'repository' => 'x' },
+            'eee' => { 'repository' => 'x', 'domain' => '' },
             'abc' => { 'repository' => 'x', 'domain' => 'what@example.com' },
-            'eee' => { 'repository' => 'x', 'domain' => '' }
+            'baz' => { 'repository' => 'x', 'domain' => [ 'bar@example.com', 'baz@domain.com' ]},
+            'bar' => { 'repository' => 'x', 'domain' => [ 'user@example.com', nil, 'foo@domain.com', '' ]}
           },
           'zyx' => {
-            'def' => { 'repository' => 'x', 'domain' => [ 'user@example.com', nil, 'foo@domain.com', '' ]}, 
-            'hij' => { 'repository' => 'x', 'domain' => [ 'bar@example.com', 'baz@domain.com' ]},
             'xyz' => { 'repository' => 'x' },
+            'eee' => { 'repository' => 'x', 'domain' => '' },
             'abc' => { 'repository' => 'x', 'domain' => 'what@example.com' },
-            'eee' => { 'repository' => 'x', 'domain' => '' }
+            'hij' => { 'repository' => 'x', 'domain' => [ 'bar@example.com', 'baz@domain.com' ]},
+            'def' => { 'repository' => 'x', 'domain' => [ 'user@example.com', nil, 'foo@domain.com', '' ]}
           }
         )
       end
