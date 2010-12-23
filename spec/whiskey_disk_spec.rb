@@ -7,7 +7,9 @@ require 'rake'
 class TestOrderedExecution < WhiskeyDisk
   class << self
     def commands
-      @commands
+      result = @commands
+      @commands = []
+      result
     end
     
     def system(*args)
@@ -800,9 +802,22 @@ describe 'WhiskeyDisk' do
       lambda { WhiskeyDisk.run('ls') }.should.raise
     end
 
-    it 'should pass the string to ssh with verbosity enabled' do
-      WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain, "set -x; ls")
-      WhiskeyDisk.run('ls')
+    describe 'and a single domain is specified' do
+      before do
+        @domain = 'ogc@ogtastic.com'
+        WhiskeyDisk.configuration = { 'domain' => [ { :name => @domain } ] }
+      end
+      
+      it 'should pass the string to ssh with verbosity enabled' do
+        WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain, "set -x; ls")
+        WhiskeyDisk.run('ls')
+      end
+      
+      it 'should include domain role settings when the domain has roles' do
+        WhiskeyDisk.configuration = { 'domain' => [ { :name => @domain, :roles => [ 'web', 'db' ] } ] }
+        WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain, "set -x; export WD_ROLES='web:db'; ls")
+        WhiskeyDisk.run('ls')        
+      end
     end
     
     describe 'and multiple domains are specified' do
@@ -816,6 +831,19 @@ describe 'WhiskeyDisk' do
         TestOrderedExecution.commands.should == [
           "ssh -v ogc@ogtastic.com set -x; ls", 
           "ssh -v foo@example.com set -x; ls"
+        ]
+      end
+      
+      it 'should include role settings for each domain when available' do
+        @domains = [ 
+          { :name => 'ogc@ogtastic.com', :roles => [ 'db', 'web' ] }, 
+          { :name => 'foo@example.com', :roles => [ 'app' ] } 
+        ]
+        TestOrderedExecution.configuration = { 'domain' => @domains }
+        TestOrderedExecution.run('ls')
+        TestOrderedExecution.commands.should == [
+          "ssh -v ogc@ogtastic.com set -x; export WD_ROLES='db:web'; ls", 
+          "ssh -v foo@example.com set -x; export WD_ROLES='app'; ls"
         ]
       end
       

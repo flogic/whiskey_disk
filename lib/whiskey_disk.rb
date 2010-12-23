@@ -109,10 +109,15 @@ class WhiskeyDisk
       (staleness_checks_enabled? and check_staleness?) ? apply_staleness_check(join_commands) : join_commands
     end
     
+    def encode_roles(roles)
+      return '' unless roles and !roles.empty?
+      "export WD_ROLES='#{roles.join(':')}'; "
+    end
+    
     def run(cmd)
       needs(:domain)
       self[:domain].each do |domain|
-        status = system('ssh', '-v', domain[:name], "set -x; " + cmd)
+        status = system('ssh', '-v', domain[:name], "set -x; " + encode_roles(domain[:roles]) + cmd)
         record_result(domain[:name], status)
       end
     end
