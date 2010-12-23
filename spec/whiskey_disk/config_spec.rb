@@ -214,14 +214,31 @@ describe WhiskeyDisk::Config do
             'eee' => { 'repository' => 'x', 'domain' => '' },
             'abc' => { 'repository' => 'x', 'domain' => 'what@example.com' },
             'baz' => { 'repository' => 'x', 'domain' => [ 'bar@example.com', 'baz@domain.com' ]},
-            'bar' => { 'repository' => 'x', 'domain' => [ 'user@example.com', nil, 'foo@domain.com', '' ]}
+            'bar' => { 'repository' => 'x', 'domain' => [ 'user@example.com', nil, 'foo@domain.com', '' ]},
+            'hsh' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, { 'name' => 'baz@domain.com' } ]},
+            'mix' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, 'baz@domain.com' ]},            
+            'erl' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => nil }, 
+                                                          { 'name' => 'baz@domain.com', 'roles' => [] } ]},
+            'rol' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => [ 'web', 'db' ] }, 
+                                                          { 'name' => 'baz@domain.com', 'roles' => [ 'db' ] } ]},            
+            'wow' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => [ 'web', 'db' ] }, 
+                                                          { 'name' => 'baz@domain.com' }, '', nil, 'foo@barbaz.com' ]},            
           },
+
           'zyx' => {
             'xyz' => { 'repository' => 'x' },
             'eee' => { 'repository' => 'x', 'domain' => '' },
             'abc' => { 'repository' => 'x', 'domain' => 'what@example.com' },
             'hij' => { 'repository' => 'x', 'domain' => [ 'bar@example.com', 'baz@domain.com' ]},
-            'def' => { 'repository' => 'x', 'domain' => [ 'user@example.com', nil, 'foo@domain.com', '' ]}
+            'def' => { 'repository' => 'x', 'domain' => [ 'user@example.com', nil, 'foo@domain.com', '' ]},
+            'hsh' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, { 'name' => 'baz@domain.com' } ]},
+            'mix' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, 'baz@domain.com' ]},
+            'erl' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => nil }, 
+                                                          { 'name' => 'baz@domain.com', 'roles' => [] } ]},
+            'rol' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => [ 'web', 'db' ] }, 
+                                                          { 'name' => 'baz@domain.com', 'roles' => [ 'db' ] } ]},
+            'wow' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => [ 'web', 'db' ] }, 
+                                                          { 'name' => 'baz@domain.com' }, '', nil, 'foo@barbaz.com' ]},            
           }
         )
       end
