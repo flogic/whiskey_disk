@@ -7,7 +7,9 @@ require 'rake'
 class TestOrderedExecution < WhiskeyDisk
   class << self
     def commands
-      @commands
+      result = @commands
+      @commands = []
+      result
     end
     
     def system(*args)
@@ -57,12 +59,12 @@ describe 'WhiskeyDisk' do
     end
 
     it 'should return true if the configuration includes a non-empty domain setting' do
-      @parameters['domain'] = ['smeghost']
+      @parameters['domain'] = [ { :name => 'smeghost' } ]
       WhiskeyDisk.remote?.should == true
     end
     
     it 'should return true if the configuration includes a multiple domain settings' do
-      @parameters['domain'] = ['smeghost', 'faphost']
+      @parameters['domain'] = [ { :name => 'smeghost' }, { :name => 'faphost' } ]
       WhiskeyDisk.remote?.should == true
     end
   end
@@ -527,7 +529,7 @@ describe 'WhiskeyDisk' do
   describe 'flushing changes' do
     describe 'when running remotely' do
       before do
-        WhiskeyDisk.configuration = { 'domain' => 'www.domain.com', 'deploy_to' => '/path/to/main/repo' }
+        WhiskeyDisk.configuration = { 'domain' => [ { :name => 'www.domain.com' } ], 'deploy_to' => '/path/to/main/repo' }
         WhiskeyDisk.stub!(:bundle).and_return('command string')
         WhiskeyDisk.stub!(:run)
       end
@@ -783,7 +785,7 @@ describe 'WhiskeyDisk' do
     before do
       WhiskeyDisk.reset
       @domain = 'ogc@ogtastic.com'
-      WhiskeyDisk.configuration = { 'domain' => @domain }
+      WhiskeyDisk.configuration = { 'domain' => [ { :name => @domain } ] }
       WhiskeyDisk.stub!(:system)      
     end
     
@@ -800,14 +802,27 @@ describe 'WhiskeyDisk' do
       lambda { WhiskeyDisk.run('ls') }.should.raise
     end
 
-    it 'should pass the string to ssh with verbosity enabled' do
-      WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain, "set -x; ls")
-      WhiskeyDisk.run('ls')
+    describe 'and a single domain is specified' do
+      before do
+        @domain = 'ogc@ogtastic.com'
+        WhiskeyDisk.configuration = { 'domain' => [ { :name => @domain } ] }
+      end
+      
+      it 'should pass the string to ssh with verbosity enabled' do
+        WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain, "set -x; ls")
+        WhiskeyDisk.run('ls')
+      end
+      
+      it 'should include domain role settings when the domain has roles' do
+        WhiskeyDisk.configuration = { 'domain' => [ { :name => @domain, :roles => [ 'web', 'db' ] } ] }
+        WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain, "set -x; export WD_ROLES='web:db'; ls")
+        WhiskeyDisk.run('ls')        
+      end
     end
     
     describe 'and multiple domains are specified' do
       before do
-        @domains = [ 'ogc@ogtastic.com', 'foo@example.com' ]
+        @domains = [ { :name => 'ogc@ogtastic.com' }, { :name => 'foo@example.com' } ]
       end
             
       it 'should run the command via ssh on each domain in the order specified in the configuration file' do
@@ -816,6 +831,19 @@ describe 'WhiskeyDisk' do
         TestOrderedExecution.commands.should == [
           "ssh -v ogc@ogtastic.com set -x; ls", 
           "ssh -v foo@example.com set -x; ls"
+        ]
+      end
+      
+      it 'should include role settings for each domain when available' do
+        @domains = [ 
+          { :name => 'ogc@ogtastic.com', :roles => [ 'db', 'web' ] }, 
+          { :name => 'foo@example.com', :roles => [ 'app' ] } 
+        ]
+        TestOrderedExecution.configuration = { 'domain' => @domains }
+        TestOrderedExecution.run('ls')
+        TestOrderedExecution.commands.should == [
+          "ssh -v ogc@ogtastic.com set -x; export WD_ROLES='db:web'; ls", 
+          "ssh -v foo@example.com set -x; export WD_ROLES='app'; ls"
         ]
       end
       
