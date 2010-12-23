@@ -20,7 +20,7 @@ everything done.
   - 1 ssh connection per run -- so everything needed to do a full setup
     is done in one shot.  Everything needed to do a full deployment is done in
 one shot.  (Having 8 minute deploys failing because I was on CDMA wireless on a
-train in india where the connection won't stay up for more than 2-3 minutes is
+train in India where the connection won't stay up for more than 2-3 minutes is
 not where I want to be any more.)
 
   - Deployment configuration is specified as YAML data, not as code.
@@ -46,8 +46,8 @@ current local checkout.
     specify a config_branch and everyone can have their own local setup that just
     works.
 
-  - There's no before\_after\_before_after hooks.  You've got plenty of
-    flexibility with just a handful of rake hook points to grab onto.
+  - There's no before\_after\_before_after hooks.  You can use a well-defined rake hook and/or a 
+    bash script to run additional tasks.
  
   - You can enable "staleness checks" so that deployments only happen if
     either the main repo, or the config repo (if you're using one) has
