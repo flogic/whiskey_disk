@@ -62,6 +62,8 @@ current local checkout.
     doing them in parallel once we're happy with the stability of this (new)
     feature.
 
+  - Assign hosts to roles (e.g., "web", "db", "app") and vary the shell or rake 
+    post-setup/post-deploy actions you run based on those roles.
 
 ### Assumptions ###
 
@@ -107,6 +109,7 @@ As a rails plugin:
 Known config file settings (if you're familiar with capistrano and vlad these should seem eerily familiar):
  
     domain:              host or list of hosts on which to deploy (these are ssh connect strings)
+                         can also optionally include role information for each host
     deploy_to:           path to which to deploy main application
     repository:          git repo path for main application
     branch:              git branch to deploy from main application git repo (default: master)
@@ -151,6 +154,85 @@ For deploying to multiple hosts, the config/deploy.yml might look like:
         RAILS_ENV: 'production'
 
 
+### Specifying domains, with or without roles ###
+
+There are a number of ways to specify domains (the ssh connection strings denoting the hosts
+where your code will be deployed).  Here are just a few examples:
+
+Just a single domain:
+
+    staging:
+      domain: "foo@staging.example.com"
+
+Just a single domain, but specified as a one-item list:
+
+    qa:
+      domain: 
+      - "foo@qa.example.com"
+
+A list of multiple domains:
+
+    production:
+      domain:
+      - "foo@appserver1.example.com"
+      - "foo@appserver2.example.com"
+      - "foo@www.example.com"
+
+Using the "name" label for the domain names (if using roles, as described below, the "name" label is required,
+otherwise it's optional and superfluous):
+
+    ci:
+      domain:
+      - name: "build@ci.example.com"
+
+
+It's also possible to assign various "roles" to the domains to which you deploy.  Some common usages would be
+"www", which might need a post\_deploy task which notifies some web server software (apache, nginx, passenger, 
+unicorn, etc.) that it should refresh the contents being served; or perhaps "db", which might need some set of
+post-deployment database migrations run (and which shouldn't be run from multiple servers).
+
+The role names are simply strings and you can create whichever roles you wish.  See the section below entitled
+"Taking actions based on roles" to see how to use roles to control actions when setting up or deploying to a
+target.
+
+Roles are described in the domain: section of the configuration file.  There are, of course, a few different
+valid ways to specify roles.  Note that the domain name must now be labeled when roles are being specified
+for the domain.
+
+A single role for a domain can be specified inline:
+
+    production:
+      domain:
+      - name: "foo@appserver1.example.com"
+        roles: "web"
+
+While multiple roles for a domain must be specified as a list:
+
+    production:
+      domain:
+      - name: "foo@appserver1.example.com"
+        roles: 
+        - "web"
+        - "app"
+        - "db"
+
+But domains with roles can be specified alongside simple domains as well:
+
+    production:
+      domain:
+      - name: "bar@demo.example.com"
+      - "user@otherhost.domain.com"
+      - name: "foo@appserver1.example.com"
+        roles: 
+        - "web"
+        - "app"
+        - "db"
+
+
+All that said, it's often simpler to refrain from carving up hosts into roles.  But who's going to listen to reason?
+
+
+
 ### post\_deploy\_script and post\_setup\_script ###
 
 Whiskey\_disk provides rake task hooks (deploy:post\_setup and deploy:post\_deploy) to allow running custom
@@ -184,7 +266,98 @@ The post\_deploy\_script will be run from /var/www/www.ogtastic.com/bin/post-dep
 target system.
 
 
-### Running from the command-line ###
+### Taking actions based on roles ###
+
+#### When running rake tasks or other ruby scripts ####
+
+Whiskey\_disk includes a helper library for use in rake tasks and other ruby scripts.  In that library you'll
+find a ruby function 'role?' which returns true if you're currently being deployed to a domain with the given
+role.  For example:
+
+<code>
+    
+    require 'whiskey_disk/helpers'
+
+    namespace :deploy do
+      task :create_rails_directories do
+        if role? :www
+          puts "creating log/ and tmp/ directories"
+          Dir.chdir(RAILS_ROOT)
+          system("mkdir -p log tmp")
+        end
+      end        
+
+      task :db_migrate_if_necessary do
+				Rake::Task['db:migrate'] if role? :db
+      end
+
+      # whytf is this even necessary?  Come on.  This should be built into ts:restart.
+      task :thinking_sphinx_restart => [:environment] do
+        if role? :app
+          Rake::Task['ts:stop'].invoke rescue nil
+          Rake::Task['ts:index'].invoke
+          Rake::Task['ts:start'].invoke
+        end
+      end
+    
+      task :bounce_passenger do
+        if role? :www
+          puts "restarting Passenger web server"
+          Dir.chdir(RAILS_ROOT)
+          system("touch tmp/restart.txt")    
+        end
+      end
+
+      # etc...
+    
+      task :post_setup  => [ :create_rails_directories ]
+      task :post_deploy => [ :db_migrate_if_necessary, :thinking_sphinx_restart, :bounce_passenger ]
+    end
+</code>
+
+
+#### When working with the shell ####
+
+Installing the whiskey\_disk gem also installs another binary, called wd_role.  It's job is really simple,
+given a role, determine if we're currently in a deployment that matches that role.  If so, exit with a success
+exit status, otherwise, exit with an error exit status.  This allows programs running in the shell to conditionally
+execute code based on domain roles.  This is particularly applicable to post\_setup\_script and post\_deploy\_script
+code.
+
+Here's an off-the-cuff example of how one might use wd\_role.  We have the rockhands gem installed (obviously), and
+are in an environment where the 'app' role is active but the 'web' role is not:
+
+
+    $ wd_role web && rock || shocker
+         .-.     
+       .-.U|     
+       |U| | .-. 
+       | | |_|U| 
+       | | | | | 
+      /|     ` |
+     | |       | 
+     |         | 
+      \        / 
+      |       |  
+      |       |  
+                 
+    $ wd_role app && rock || shocker
+       .-.       
+       |U|       
+       | |   .-. 
+       | |-._|U| 
+       | | | | | 
+      /|     ` | 
+     | |       | 
+     |         | 
+              / 
+      |       |  
+      |       |  
+    
+
+
+
+### Running whiskey\_disk from the command-line ###
   
     % wd setup --to=<target>
     % wd setup --to=<project>:<target>
