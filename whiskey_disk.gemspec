@@ -5,19 +5,19 @@
 
 Gem::Specification.new do |s|
   s.name = %q{whiskey_disk}
-  s.version = "0.6.0"
+  s.version = "0.6.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Rick Bradley"]
-  s.date = %q{2010-12-22}
-  s.default_executable = %q{wd}
+  s.date = %q{2010-12-23}
   s.description = %q{Opinionated gem for doing fast git-based server deployments.}
   s.email = %q{rick@rickbradley.com}
-  s.executables = ["wd"]
+  s.executables = ["wd_role", "wd"]
   s.extra_rdoc_files = [
     "README.markdown"
   ]
   s.files = [
+    "CHANGELOG",
     "MIT-LICENSE",
     "README.markdown",
     "Rakefile",
@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
     "VERSION",
     "WHY.txt",
     "bin/wd",
+    "bin/wd_role",
     "examples/deploy-local.yml",
     "examples/deploy-multiple-remotes.yml",
     "examples/deploy-staging.yml",
@@ -34,13 +35,16 @@ Gem::Specification.new do |s|
     "install.rb",
     "lib/whiskey_disk.rb",
     "lib/whiskey_disk/config.rb",
+    "lib/whiskey_disk/helpers.rb",
     "lib/whiskey_disk/rake.rb",
     "spec/.bacon",
     "spec/init_spec.rb",
     "spec/install_spec.rb",
     "spec/spec_helper.rb",
     "spec/wd_command_spec.rb",
+    "spec/wd_role_command_spec.rb",
     "spec/whiskey_disk/config_spec.rb",
+    "spec/whiskey_disk/helpers_spec.rb",
     "spec/whiskey_disk/rake_spec.rb",
     "spec/whiskey_disk_spec.rb",
     "tasks/deploy.rake",
@@ -55,7 +59,9 @@ Gem::Specification.new do |s|
     "spec/install_spec.rb",
     "spec/spec_helper.rb",
     "spec/wd_command_spec.rb",
+    "spec/wd_role_command_spec.rb",
     "spec/whiskey_disk/config_spec.rb",
+    "spec/whiskey_disk/helpers_spec.rb",
     "spec/whiskey_disk/rake_spec.rb",
     "spec/whiskey_disk_spec.rb"
   ]

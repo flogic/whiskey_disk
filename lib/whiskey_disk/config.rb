@@ -103,20 +103,37 @@ class WhiskeyDisk
         override_project_name!(data)
         { project_name => data }
       end
+
+      def compact_list(list)
+        [ list ].flatten.delete_if { |d| d.nil? or d == '' }
+      end
       
       def normalize_domain(data)
+        compacted = compact_list(data)
+        return nil if compacted.empty?
+        
+        compacted.collect do |d|
+          if d.respond_to?(:keys)
+            row = { :name => (d['name'] || d[:name]) }
+            roles = compact_list(d['roles'] || d[:roles])
+            row[:roles] = roles unless roles.empty?
+            row
+          else
+            { :name => d }
+          end
+        end
+      end
+      
+      def normalize_domains(data)
         data.each_pair do |project, project_data|
           project_data.each_pair do |target, target_data|
-            if target_data['domain']
-              cleaned = [ target_data['domain'] ].flatten.delete_if { |m| m.nil? or m == '' }
-              target_data['domain'] = (cleaned.empty? ? nil : cleaned)
-            end
+            target_data['domain'] = normalize_domain(target_data['domain']) if target_data['domain']
           end
         end
       end
 
       def normalize_data(data)
-        normalize_domain(add_project_scoping(add_environment_scoping(data.clone)))
+        normalize_domains(add_project_scoping(add_environment_scoping(data.clone)))
       end
 
       def load_data

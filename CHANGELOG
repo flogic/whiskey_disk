@@ -1,3 +1,24 @@
+0.6.2 / 2010-12-23 
+==================
+
+  * bumping version to 0.6.2
+  * Merge branch 'feature/support-domain-roles' into develop
+  * updating README to document new roles functionality
+  * even more README tweaks
+  * more README tweaks
+  * adding lib/tasks/deploy.rake example to README
+  * refreshing gemspec
+  * update multiple deployment example to use roles
+  * new wd_role command for checking membership in a role from shell scripts
+  * adding #role? method in whiskey_disk/helpers for role-based rake tasks
+  * pass domain roles along as env variables when running ssh commands
+  * domain data now includes role information when available
+  * internal representation of 'domain' is now a list of hashes
+  * refactoring of config domain normalization code
+  * adding domain examples for config specs
+  * removing unnecessary describe blocks from config spec
+  * reordering domain config spec setup data structure for readability
+
 
 0.6.0 / 2010-12-22 
 ==================
@@ -17,6 +38,10 @@
   * normalize 'domain' values pulled from config files
   * refactor config file writing in config spec
   * WD.remote? now understands arrays of 'domain' entries in the config
+
+0.5.4
+==================
+
   * Merge branch 'release/0.5.4' into develop
   * bump gemspec for 0.5.4 release
   * Version bump to 0.5.4
@@ -37,6 +62,10 @@
   * And removing unneeded spec helper
   * removing whiskey_disk config stubbing
   * introducing use_config() spec helper
+
+0.5.3
+==================
+
   * Merge branch 'release/0.5.3' into develop
   * updating gemspec for 0.5.3
   * updating Contributors section of README
@@ -47,6 +76,10 @@
   * Reworking the config to append project name overrides to the env, since everything else is dependent thereupon
   * tidying up the spec
   * Allowing a manually specified project name in the bare config hash to be used as the parent project in the absence of one specified from the 'to' env setting
+
+0.5.2
+==================
+
   * Merge branch 'release/0.5.2' into develop
   * updating gemspec for version 0.5.2
   * Bumping version to 0.5.2
@@ -61,6 +94,10 @@
   * Updating TODO list
   * Adding lightning talk info to README
   * Making shallow clones on initial setup
+
+0.5.0
+==================
+
   * Merge branch 'release/0.5.0' into develop
   * updating gemspec for 0.5.0
   * Version bump to 0.5.0
@@ -72,6 +109,10 @@
   * Reordering specs for post-setup/deployment tasks
   * Updating README for post_*_script functionality
   * TODO file updates
+
+0.4.5
+==================
+
   * Merge branch 'release/0.4.5' into develop
   * new gemspec for 0.4.5 release
   * Version bump to 0.4.5
@@ -82,25 +123,45 @@
   * refactoring update checkout methods
   * renaming conditional_clone
   * Refactoring rake task code
+
+0.4.4
+==================
+
   * Merge branch 'release/0.4.4' into develop
   * 0.4.4 gemspec
   * Version bump to 0.4.4
   * Merge branch 'feature/readme-updates' into develop
   * TODO list tweakage
   * README updates
+
+0.4.3
+==================
+
   * Merge branch 'release/0.4.3' into develop
   * updating gemspec
   * Version bump to 0.4.3
   * Updating TODO
   * Smarter setups
   * TODO updates
+
+0.4.2
+==================
+
   * Version bump to 0.4.2
   * Taking a different approach to rake task detection
+
+0.4.1
+==================
+
   * bumping gemspec
   * Version bump to 0.4.1
   * Fixing post_* hook edge case
   * More README updates
   * updating README
+
+0.4.0
+==================
+
   * updated gemspec
   * adding staleness check docs to README
   * Version bump to 0.4.0
@@ -112,6 +173,10 @@
   * Adding first pass at conditional staleness checks
   * updating TODO list
   * README note about post_* rake task dependencies
+
+0.3.1
+==================
+
   * updated gemspec
   * Version bump to 0.3.1
   * No longer require a Rakefile when --path isn't used

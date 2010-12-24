@@ -5,6 +5,18 @@ multi:
   deploy_to: "/tmp/test-deployment/"
   repository: "git@git.ogtastic.com:whiskey_disk.git"
   branch: "develop"
+roles:
+  domain:
+  - name: "ogc@hoenir.websages.com"
+    roles:
+    - web
+    - app
+  - name: "ogc@nerthus.websages.com"
+    roles: db 
+  deploy_to: "/tmp/test-deployment/"
+  repository: "git@git.ogtastic.com:whiskey_disk.git"
+  branch: "feature/support-domain-roles"
+  post_deploy_script: "/tmp/role-checker.sh"
 badmulti:
   domain:
   - "ogc@hoenir.websages.com"

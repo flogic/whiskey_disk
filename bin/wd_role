@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby 
+require 'whiskey_disk/helpers'
+
+# simple command-line script to detect whether this deployment target
+# is in a specified whiskey_disk role.  sets exit status appropriately
+#
+# useful for conditionalizing shell scripting based on roles.
+
+role = ARGV.shift
+exit(1) unless role?(role)
+
+__END__
+
+( this example session presumes you `gem install rockhands` first... )
+
+$ export WD_ROLES='app:db'
+$ wd_role web && rock || shocker
+     .-.     
+   .-.U|     
+   |U| | .-. 
+   | | |_|U| 
+   | | | | | 
+  /|     ` |
+ | |       | 
+ |         | 
+  \        / 
+  |       |  
+  |       |  
+             
+$ wd_role app && rock || shocker
+   .-.       
+   |U|       
+   | |   .-. 
+   | |-._|U| 
+   | | | | | 
+  /|     ` | 
+ | |       | 
+ |         | 
+          / 
+  |       |  
+  |       |  
+
