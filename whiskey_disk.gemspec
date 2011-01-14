@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
     "WHY.txt",
     "bin/wd",
     "bin/wd_role",
+    "examples/deploy-configs.yml",
     "examples/deploy-local.yml",
     "examples/deploy-multiple-remotes.yml",
     "examples/deploy-staging.yml",
