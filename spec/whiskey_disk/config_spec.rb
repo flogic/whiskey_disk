@@ -159,6 +159,18 @@ describe WhiskeyDisk::Config do
       write_config_file('production' => { 'repository' => 'b'}, 'staging' => staging)
       WhiskeyDisk::Config.fetch['project'].should == 'diskey_whisk'
     end
+    
+    it 'should include the environment name as the config_target setting when no config_target is specified' do
+      staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
+      write_config_file('production' => { 'repository' => 'b'}, 'staging' => staging)
+      WhiskeyDisk::Config.fetch['config_target'].should == 'staging'
+    end
+    
+    it 'should include the config_target setting when a config_target is specified' do
+      staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk', 'config_target' => 'testing' }
+      write_config_file('production' => { 'repository' => 'b'}, 'staging' => staging)
+      WhiskeyDisk::Config.fetch['config_target'].should == 'testing'
+    end
   end
 
   describe 'returning configuration data from a configuration file' do

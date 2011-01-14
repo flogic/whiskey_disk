@@ -39,7 +39,8 @@ current local checkout.
   - You can separate per-deployment application configuration information (e.g., passwords, 
     database configs, hoptoad/AWS/email config data, etc.) in separate repositories from 
     the application, and whiskey\_disk will merge the correct data onto the deployed 
-    application at deployment time.
+    application at deployment time.  You can even share sets of configuration files among
+    deployment targets that behave alike.
 
   - You can have per-developer configurations for targets (especially
     useful for "local" or "development" targets).  Use .gitignore, or
@@ -116,6 +117,7 @@ Known config file settings (if you're familiar with capistrano and vlad these sh
     deploy_config_to:    where to deploy the configuration repository
     config_repository:   git repository for configuration files
     config_branch:       git branch to deploy from configuration git repo (default: master)
+    config_target:       configuration repository target path to use
     project:             project name (used to compute path in configuration checkout)
     post_deploy_script:  path to a shell script to run after deployment
     post_setup_script:   path to a shell script to run after setup
@@ -532,11 +534,62 @@ overlaid on top of the most recent checkout of the project.  Snap.
                         |
                         ....
 
- 
+
+#### Sharing a set of configuration files among multiple targets ####
+
+Developers on applications with many deployment targets can find that configuration repositories can become a burden to maintain, especially when a number of environments share essentially the same configurations.  For example, for an application where deployments for user acceptance testing, QA, staging, and feature branch demoing are all essentially the same (though differing from production configurations and developer configurations), it's probably easiest to store a configuration for development, a configuration for production, a configuration for staging and then use the staging configuration for all the other environments: user acceptance testing, QA, staging, demo1, demo2, etc.  Using the config\_target setting, a deploy.yml might look like this:
+
+
+    production:
+      domain: "www.ogtastic.com"
+      deploy_to: "/var/www/www.ogtastic.com"
+      repository: "git@ogtastic.com:www.ogtastic.com.git"
+      branch: "production"
+      config_repository: "git@ogtastic.com:ogc-production-config.git"
+    development:
+      deploy_to: '/var/www/devel.ogtastic.com'
+      repository: "git@ogtastic.com:www.ogtastic.com.git"
+      branch: "develop"
+      config_repository: "git@ogtastic.com:ogc-config.git"
+    staging:
+      [...]
+      config_repository: "git@ogtastic.com:ogc-config.git"
+    uat:
+      [....]
+      config_repository: "git@ogtastic.com:ogc-config.git"
+      config_target: "staging"
+    qa:
+      [....]
+      config_repository: "git@ogtastic.com:ogc-config.git"
+      config_target: "staging"
+
+
+So here we have the 'staging', 'uat', and 'qa' deployment targets all sharing the 'staging' configuration repo information.  The non-production configuration repo can then look like:
+
+
+    project-config/
+      |
+      +---ogtastic/
+            |
+            +---staging/
+            |     |
+            |     |
+            |     +---config/
+            |           |
+            |           ....
+            |
+            +---development/
+                  |
+                  +---config/
+                        |
+                        ....
+
+
+Notice that there are no separate trees for 'uat' and 'qa' targets.
 
 ### More Examples: ###
 
- - We are using this to manage larry.  See [https://github.com/flogic/larry/blob/master/config/deploy-local.yml.example](https://github.com/flogic/larry/blob/master/config/deploy-local.yml.example) and [http://github.com/flogic/larry/blob/master/lib/tasks/deploy.rake](http://github.com/flogic/larry/blob/master/lib/tasks/deploy.rake)
+ - We are using whiskey\_disk to manage larry.  See [https://github.com/flogic/larry/blob/master/config/deploy-local.yml.example](https://github.com/flogic/larry/blob/master/config/deploy-local.yml.example) and [http://github.com/flogic/larry/blob/master/lib/tasks/deploy.rake](http://github.com/flogic/larry/blob/master/lib/tasks/deploy.rake)
 
  - Here is a sample of a lib/tasks/deploy.rake from a Rails application we deployed once upon a time:
 

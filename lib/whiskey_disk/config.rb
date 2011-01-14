@@ -143,11 +143,16 @@ class WhiskeyDisk
       end
 
       def filter_data(data)
-        raise "No configuration file defined data for environment [#{environment_name}]" unless data[project_name][environment_name]
-        data[project_name][environment_name].merge({
+        current = data[project_name][environment_name]
+        raise "No configuration file defined data for environment [#{environment_name}]" unless current
+
+        current.merge!({
           'environment' => environment_name,
-          'project' => project_name
+          'project' => project_name,
         })
+        
+        current['config_target'] ||= environment_name
+        current
       end
 
       def fetch
