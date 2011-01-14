@@ -305,6 +305,7 @@ describe 'WhiskeyDisk' do
                       'environment' => 'production',
                       'config_repository' => 'git@git://foo.bar.git',
                       'config_branch' => 'master',
+                      'config_target' => 'staging',
                       'project' => 'whiskey_disk' }
       WhiskeyDisk.configuration = @parameters
     end
@@ -313,23 +314,23 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.configuration = @parameters.merge('deploy_to' => nil)
       lambda { WhiskeyDisk.refresh_configuration }.should.raise
     end
-    
+  
     it 'should fail if the configuration deployment path is not specified' do
       WhiskeyDisk.configuration = @parameters.merge('deploy_config_to' => nil)
       lambda { WhiskeyDisk.refresh_configuration }.should.raise
     end
-    
+  
     it 'should fail if no project name was specified' do
       WhiskeyDisk.configuration = @parameters.merge('project' => 'unnamed_project')
       lambda { WhiskeyDisk.refresh_configuration }.should.raise      
     end
-    
-    it 'should use rsync to overlay the configuration checkout for the project in the configured environment onto the main checkout' do
+  
+    it 'should use rsync to overlay the configuration checkout for the project in the config target onto the main checkout' do
       WhiskeyDisk.refresh_configuration
-      WhiskeyDisk.buffer.last.should.match(%r{rsync.* /path/to/config/repo/whiskey_disk/production/ /path/to/main/repo/})
+      WhiskeyDisk.buffer.last.should.match(%r{rsync.* /path/to/config/repo/whiskey_disk/staging/ /path/to/main/repo/})
     end
   end
-  
+
   describe 'running post setup hooks' do
     before do
       WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo' }
