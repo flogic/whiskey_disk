@@ -19,6 +19,17 @@ def write_config_file(data)
   File.open(@config_file, 'w') { |f| f.puts YAML.dump(data) }
 end
 
+# class for testing .open calls -- for use with URL config paths
+class TestURLConfig < WhiskeyDisk::Config
+  def self.open
+    raise
+  end
+end
+
+def set_config_url_response(data)
+  TestURLConfig.stub!(:open).and_return(YAML.dump(data))
+end
+
 describe WhiskeyDisk::Config do
   describe 'when computing the environment name' do
     it 'should return false when there is no ENV["to"] setting' do
@@ -80,96 +91,183 @@ describe WhiskeyDisk::Config do
   end
 
   describe 'when fetching configuration' do
-    before do
-      ENV['to'] = @env = 'foo:staging'
-      @path = build_temp_dir
-      ENV['path'] = @config_file = File.join(@path, 'deploy.yml')
-    end
+    describe 'and path specified is an URL' do
+      before do
+        ENV['to'] = @env = 'foo:staging'
+        ENV['path'] = 'https://www.example.com/foo/bar/deploy.yml'
+      end
+      
+      it 'should fail if the current environment cannot be determined' do
+        ENV['to'] = nil
+        lambda { TestURLConfig.fetch }.should.raise
+      end
 
-    after do
-      FileUtils.rm_rf(@path)
-    end
+      it 'should fail if the configuration data cannot be retrieved' do
+        TestURLConfig.stub!(:open).and_raise(RuntimeError)
+        lambda { TestURLConfig.fetch }.should.raise
+      end
 
-    it 'should fail if the current environment cannot be determined' do
-      ENV['to'] = nil
-      lambda { WhiskeyDisk::Config.fetch }.should.raise
-    end
+      it 'should fail if the retrieved configuration data is invalid' do
+        TestURLConfig.stub!(:open).and_return("}")
+        lambda { TestURLConfig.fetch }.should.raise
+      end
 
-    it 'should fail if the configuration file does not exist' do
-      lambda { WhiskeyDisk::Config.fetch }.should.raise
-    end
+      it 'should fail if the retrieved configuration data does not define data for this environment' do
+        set_config_url_response('foo' => { 'production' => { 'a' => 'b'} })
+        lambda { TestURLConfig.fetch }.should.raise
+      end
 
-    it 'should fail if the configuration file cannot be read' do
-      Dir.mkdir(File.join(@path, 'tmp'))
-      lambda { WhiskeyDisk::Config.fetch }.should.raise
-    end
+      it 'should return the retrieved configuration yaml data for this environment as a hash' do
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
+        set_config_url_response('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
+        result = TestURLConfig.fetch
+        staging.each_pair do |k,v|
+          result[k].should == v
+        end
+      end
+    
+      it 'should not include configuration information for other environments in the returned hash' do
+        staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
+        set_config_url_response('production' => { 'repository' => 'c', 'a' => 'b'}, 'staging' => staging)
+        TestURLConfig.fetch['a'].should.be.nil
+      end
 
-    it 'should fail if the configuration file is invalid' do
-      File.open(@config_file, 'w') {|f| f.puts "}" }
-      lambda { WhiskeyDisk::Config.fetch }.should.raise
-    end
+      it 'should include the environment in the hash' do
+        staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
+        set_config_url_response('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
+        TestURLConfig.fetch['environment'].should == 'staging'
+      end
 
-    it 'should fail if the configuration file does not define data for this environment' do
-      write_config_file('foo' => { 'production' => { 'a' => 'b'} })
-      lambda { WhiskeyDisk::Config.fetch }.should.raise
-    end
+      it 'should not allow overriding the environment in the configuration file' do
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'environment' => 'production' }
+        set_config_url_response('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
+        TestURLConfig.fetch['environment'].should == 'staging'
+      end
 
-    it 'should return the configuration yaml file data for this environment as a hash' do
-      staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
-      write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
-      result = WhiskeyDisk::Config.fetch
-      staging.each_pair do |k,v|
-        result[k].should == v
+      it 'should include the project handle in the hash' do
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
+        set_config_url_response('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
+        TestURLConfig.fetch['project'].should == 'foo'
+      end
+
+      it 'should not allow overriding the project handle in the configuration file when a project root is specified' do
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
+        set_config_url_response('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
+        TestURLConfig.fetch['project'].should == 'foo'
+      end
+
+      it 'should allow overriding the project handle in the configuration file when a project root is not specified' do
+        ENV['to'] = @env = 'staging'
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
+        set_config_url_response('production' => { 'repository' => 'b'}, 'staging' => staging)
+        TestURLConfig.fetch['project'].should == 'diskey_whisk'
+      end
+    
+      it 'should include the environment name as the config_target setting when no config_target is specified' do
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
+        set_config_url_response('production' => { 'repository' => 'b'}, 'staging' => staging)
+        TestURLConfig.fetch['config_target'].should == 'staging'
+      end
+    
+      it 'should include the config_target setting when a config_target is specified' do
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk', 'config_target' => 'testing' }
+        set_config_url_response('production' => { 'repository' => 'b'}, 'staging' => staging)
+        TestURLConfig.fetch['config_target'].should == 'testing'
       end
     end
     
-    it 'should not include configuration information for other environments in the returned hash' do
-      staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
-      write_config_file('production' => { 'repository' => 'c', 'a' => 'b'}, 'staging' => staging)
-      WhiskeyDisk::Config.fetch['a'].should.be.nil
-    end
+    describe 'and path specified is not an URL' do
+      before do
+        ENV['to'] = @env = 'foo:staging'
+        @path = build_temp_dir
+        ENV['path'] = @config_file = File.join(@path, 'deploy.yml')
+      end
 
-    it 'should include the environment in the hash' do
-      staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
-      write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
-      WhiskeyDisk::Config.fetch['environment'].should == 'staging'
-    end
+      after do
+        FileUtils.rm_rf(@path)
+      end
 
-    it 'should not allow overriding the environment in the configuration file' do
-      staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'environment' => 'production' }
-      write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
-      WhiskeyDisk::Config.fetch['environment'].should == 'staging'
-    end
+      it 'should fail if the current environment cannot be determined' do
+        ENV['to'] = nil
+        lambda { WhiskeyDisk::Config.fetch }.should.raise
+      end
 
-    it 'should include the project handle in the hash' do
-      staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
-      write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
-      WhiskeyDisk::Config.fetch['project'].should == 'foo'
-    end
+      it 'should fail if the configuration file does not exist' do
+        lambda { WhiskeyDisk::Config.fetch }.should.raise
+      end
 
-    it 'should not allow overriding the project handle in the configuration file when a project root is specified' do
-      staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
-      write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
-      WhiskeyDisk::Config.fetch['project'].should == 'foo'
-    end
+      it 'should fail if the configuration file cannot be read' do
+        Dir.mkdir(File.join(@path, 'tmp'))
+        lambda { WhiskeyDisk::Config.fetch }.should.raise
+      end
 
-    it 'should allow overriding the project handle in the configuration file when a project root is not specified' do
-      ENV['to'] = @env = 'staging'
-      staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
-      write_config_file('production' => { 'repository' => 'b'}, 'staging' => staging)
-      WhiskeyDisk::Config.fetch['project'].should == 'diskey_whisk'
-    end
+      it 'should fail if the configuration file is invalid' do
+        File.open(@config_file, 'w') {|f| f.puts "}" }
+        lambda { WhiskeyDisk::Config.fetch }.should.raise
+      end
+
+      it 'should fail if the configuration file does not define data for this environment' do
+        write_config_file('foo' => { 'production' => { 'a' => 'b'} })
+        lambda { WhiskeyDisk::Config.fetch }.should.raise
+      end
+
+      it 'should return the configuration yaml file data for this environment as a hash' do
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
+        write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
+        result = WhiskeyDisk::Config.fetch
+        staging.each_pair do |k,v|
+          result[k].should == v
+        end
+      end
     
-    it 'should include the environment name as the config_target setting when no config_target is specified' do
-      staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
-      write_config_file('production' => { 'repository' => 'b'}, 'staging' => staging)
-      WhiskeyDisk::Config.fetch['config_target'].should == 'staging'
-    end
+      it 'should not include configuration information for other environments in the returned hash' do
+        staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
+        write_config_file('production' => { 'repository' => 'c', 'a' => 'b'}, 'staging' => staging)
+        WhiskeyDisk::Config.fetch['a'].should.be.nil
+      end
+
+      it 'should include the environment in the hash' do
+        staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
+        write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
+        WhiskeyDisk::Config.fetch['environment'].should == 'staging'
+      end
+
+      it 'should not allow overriding the environment in the configuration file' do
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'environment' => 'production' }
+        write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
+        WhiskeyDisk::Config.fetch['environment'].should == 'staging'
+      end
+
+      it 'should include the project handle in the hash' do
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
+        write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
+        WhiskeyDisk::Config.fetch['project'].should == 'foo'
+      end
+
+      it 'should not allow overriding the project handle in the configuration file when a project root is specified' do
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
+        write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
+        WhiskeyDisk::Config.fetch['project'].should == 'foo'
+      end
+
+      it 'should allow overriding the project handle in the configuration file when a project root is not specified' do
+        ENV['to'] = @env = 'staging'
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
+        write_config_file('production' => { 'repository' => 'b'}, 'staging' => staging)
+        WhiskeyDisk::Config.fetch['project'].should == 'diskey_whisk'
+      end
     
-    it 'should include the config_target setting when a config_target is specified' do
-      staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk', 'config_target' => 'testing' }
-      write_config_file('production' => { 'repository' => 'b'}, 'staging' => staging)
-      WhiskeyDisk::Config.fetch['config_target'].should == 'testing'
+      it 'should include the environment name as the config_target setting when no config_target is specified' do
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
+        write_config_file('production' => { 'repository' => 'b'}, 'staging' => staging)
+        WhiskeyDisk::Config.fetch['config_target'].should == 'staging'
+      end
+    
+      it 'should include the config_target setting when a config_target is specified' do
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk', 'config_target' => 'testing' }
+        write_config_file('production' => { 'repository' => 'b'}, 'staging' => staging)
+        WhiskeyDisk::Config.fetch['config_target'].should == 'testing'
+      end
     end
   end
 

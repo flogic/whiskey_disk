@@ -1,4 +1,6 @@
 require 'yaml'
+require 'uri'
+require 'open-uri'
 
 class WhiskeyDisk
   class Config
@@ -47,9 +49,19 @@ class WhiskeyDisk
         find_rakefile_from_current_path
       end
 
-      def configuration_file
-        return path if path and File.file?(path)
+      def valid_path?(path)
+        if path
+          uri = URI.parse(path)
+          return path if uri.scheme
+          return path if File.file?(path)
+        end
+        
+        false
+      end
 
+      def configuration_file
+        return path if valid_path?(path)
+        
         files = []
 
         files += [
@@ -69,8 +81,7 @@ class WhiskeyDisk
       end
 
       def configuration_data
-        raise "Configuration file [#{configuration_file}] not found!" unless File.exists?(configuration_file)
-        File.read(configuration_file)
+        open(configuration_file) {|f| f.read }
       end
 
       def project_name
