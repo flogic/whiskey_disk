@@ -637,7 +637,7 @@ Notice that there are no separate trees for 'uat' and 'qa' targets.
 
 ### Future Directions ###
 
-Check out the [TODO.txt](http://github.com/flogic/whiskey_disk/raw/master/TODO.txt) file 
+Check out the [Pivotal Tracker project](https://www.pivotaltracker.com/projects/202125)
 to see what we have in mind for the near future.
 
 ### Resources ###
