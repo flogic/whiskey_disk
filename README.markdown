@@ -168,12 +168,45 @@ of deploy:setup
    lib/tasks/ or in your project's Rakefile) will cause that task to be run
 at the end of deploy:now
 
+It's easy to specify a local deployment.  The simplest way is to just not specify a "domain":
+
+    local:
+      deploy_to: "/var/www/www.ogtastic.com"
+      repository: "git@ogtastic.com:www.ogtastic.com.git"
+      branch: "stable"
+      rake_env:
+        RAILS_ENV: 'production'
+
+
+Or, just specify the string 'local' as the domain:
+
+    local:
+      domain: "local"
+      deploy_to: "/var/www/www.ogtastic.com"
+      repository: "git@ogtastic.com:www.ogtastic.com.git"
+      branch: "stable"
+      rake_env:
+        RAILS_ENV: 'production'
+
 
 For deploying to multiple hosts, the config/deploy.yml might look like:
 
     qa:
       domain:
       - "ogc@qa1.ogtastic.com"
+      - "ogc@qa2.ogtastic.com""
+      deploy_to: "/var/www/www.ogtastic.com"
+      repository: "git@ogtastic.com:www.ogtastic.com.git"
+      branch: "stable"
+      rake_env:
+        RAILS_ENV: 'production'
+
+
+You can even include a local deployment along with remote deployments, simply use the 'local' name:
+
+    qa:
+      domain:
+      - "local"
       - "ogc@qa2.ogtastic.com""
       deploy_to: "/var/www/www.ogtastic.com"
       repository: "git@ogtastic.com:www.ogtastic.com.git"
@@ -213,7 +246,6 @@ otherwise it's optional and superfluous):
       domain:
       - name: "build@ci.example.com"
 
-
 It's also possible to assign various "roles" to the domains to which you deploy.  Some common usages would be
 "www", which might need a post\_deploy task which notifies some web server software (apache, nginx, passenger, 
 unicorn, etc.) that it should refresh the contents being served; or perhaps "db", which might need some set of
@@ -251,6 +283,17 @@ But domains with roles can be specified alongside simple domains as well:
       - name: "bar@demo.example.com"
       - "user@otherhost.domain.com"
       - name: "foo@appserver1.example.com"
+        roles: 
+        - "web"
+        - "app"
+        - "db"
+
+
+And, if you need to assign roles for a local deployment, you can do that as well:
+
+    local:
+      domain:
+      - name: "local"
         roles: 
         - "web"
         - "app"
