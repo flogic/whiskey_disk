@@ -364,16 +364,20 @@ are in an environment where the 'app' role is active but the 'web' role is not:
     % wd setup --to=<target>
     % wd setup --to=<project>:<target>
     % wd setup --to=foo:qa --path=/etc/whiskey_disk/deploy.yml
+    % wd setup --to=foo:qa --path=https://github.com/username/project/raw/master/path/to/configs/deploy.yml
     
     % wd deploy --to=<target>
     % wd deploy --to=<project>:<target>
     % wd deploy --to=foo:qa --path=/etc/whiskey_disk/deploy.yml
+    % wd deploy --to=foo:qa --path=https://github.com/username/project/raw/master/path/to/configs/deploy.yml
 
 
 Note that the wd command (unlike rake, which requires a Rakefile in the current directory) can be run from anywhere, so you can deploy any project, working from any path, and can even specify where to find the deployment YAML configuration file.
   
 The --path argument can take either a file or a directory.  When given a file it will use that file as the configuration file.  When given a directory it will look in that directory for deploy/&lt;project&gt;/&lt;target&gt;.yml, then deploy/&lt;project&gt;.yml, then deploy/&lt;target&gt;.yml, then &lt;target&gt;.yml, and finally, deploy.yml.
-  
+
+To make things even better, you can provide an URL as the --path argument and have a central location from which to pull deployment YAML data.  This means that you can centrally administer the definitive deployment information for the various projects and targets you manage.  This could be as simple as keeping them in a text file hosted on a web server, checking them into git and using github or gitweb to serve up the file contents on HEAD, or it could be a programmatically managed configuration management system returning dynamically-generated results.
+
 All this means you can manage a large number of project deployments (local or remote) and have a single scripted deployment manager that keeps them up to date.  Configurations can live in a centralized location, and developers don't have to be actively involved in ensuring code gets shipped up to a server.  Win.
 
 
@@ -402,6 +406,21 @@ In your Rakefile:
 
     % rake deploy:setup to=<project>:<target>   (e.g., "foo:qa", "bar:production", etc.)
     % rake deploy:now   to=<project>:<target>
+
+  enabling staleness checking (see below):
+
+  % rake deploy:setup to=<project>:<target> check=yes
+  % rake deploy:now   to=<project>:<target> check=yes
+
+  maybe even specifying the path to the configuration file:
+
+  % rake deploy:setup to=<project>:<target> path=/etc/deploy.yml
+  % rake deploy:now   to=<project>:<target> path=/etc/deploy.yml
+
+  how about specifying the configuration file via URL:
+
+  % rake deploy:setup to=<project>:<target> path=https://github.com/username/project/raw/master/path/to/configs/deploy.yml
+  % rake deploy:now   to=<project>:<target> path=https://github.com/username/project/raw/master/path/to/configs/deploy.yml
 
 
 ### Staleness checks ###
