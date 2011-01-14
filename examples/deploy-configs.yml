@@ -1,0 +1,13 @@
+production:
+  domain: "ogc@hoenir.websages.com"
+  deploy_to: "/tmp/test-deployment"
+  deploy_config_to: "/tmp/test-config"
+  repository: "git@git.ogtastic.com:whiskey_disk.git"
+  config_repository: "git@git.ogtastic.com:ogc-config.git"
+staging:
+  domain: "ogc@hoenir.websages.com"
+  deploy_to: "/tmp/test-deployment"
+  deploy_config_to: "/tmp/test-config"
+  repository: "git@git.ogtastic.com:whiskey_disk.git"
+  config_repository: "git@git.ogtastic.com:ogc-config.git"
+  config_target: "local"
