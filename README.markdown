@@ -8,6 +8,32 @@ Right-arrow through a short whiskey_disk presentation at [http://wd2010.rickbrad
 You can also right-arrow through a shorter but more up-to-date whiskey_disk "lightning talk" presentation 
 (from the 2010 Ruby Hoedown) at [http://wdlightning.rickbradley.com/](http://wdlightning.rickbradley.com) (slide source available [here](http://github.com/rick/whiskey_disk_presentation/tree/lightning).), covering the 0.4.*-era functionality.
 
+### tl;dr ###
+
+First:
+
+    % gem install whiskey_disk
+
+
+Then make a deploy.yml file (in config/ if you're doing a Rails project):
+
+    staging:
+      domain: "deployment_user@staging.mydomain.com"
+      deploy_to: "/path/to/where/i/deploy/staging.mydomain.com"
+      repository: "https://github.com/username/project.git"
+      branch: "staging"
+      rake_env:
+        RAILS_ENV: 'production'	    
+
+then:
+
+    % wd setup --to=staging
+
+then:
+
+    % wd deploy --to=staging
+
+
 ### Selling points ###
 
   - If you share the same opinions as we do there's almost no code involved, almost no
