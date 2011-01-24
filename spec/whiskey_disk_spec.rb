@@ -45,27 +45,24 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.configuration = @parameters
     end
     
-    it 'should work without arguments' do
-      lambda { WhiskeyDisk.remote? }.should.not.raise(ArgumentError)
+    it 'should allow a domain argument' do
+      lambda { WhiskeyDisk.remote?('domain') }.should.not.raise(ArgumentError)
     end
     
-    it 'should not allow arguments' do
-      lambda { WhiskeyDisk.remote?(:foo) }.should.raise(ArgumentError)
+    it 'should require a domain argument' do
+      lambda { WhiskeyDisk.remote? }.should.raise(ArgumentError)
     end
     
-    it 'should return false if the configuration includes a nil domain setting' do
-      @parameters['domain'] = nil
-      WhiskeyDisk.remote?.should == false
+    it 'should return false if the provided domain is nil' do
+      WhiskeyDisk.remote?(nil).should == false
+    end
+    
+    it 'should return false if the provided domain is the string "local"' do
+      WhiskeyDisk.remote?('local').should == false
     end
 
-    it 'should return true if the configuration includes a non-empty domain setting' do
-      @parameters['domain'] = [ { :name => 'smeghost' } ]
-      WhiskeyDisk.remote?.should == true
-    end
-    
-    it 'should return true if the configuration includes a multiple domain settings' do
-      @parameters['domain'] = [ { :name => 'smeghost' }, { :name => 'faphost' } ]
-      WhiskeyDisk.remote?.should == true
+    it 'should return true if the provided domain is non-empty' do
+      WhiskeyDisk.remote?('smeghost').should == true
     end
   end
   

@@ -34,17 +34,6 @@ describe 'rake tasks' do
       WhiskeyDisk.stub!(:success?).and_return(true)
     end
     
-    it 'should make changes on the specified domain when a domain is specified' do
-      WhiskeyDisk.configuration = { 'domain' => [ 'some domain' ] }
-      @rake["deploy:setup"].invoke
-      WhiskeyDisk.should.be.remote
-    end
-    
-    it 'should make changes on the local system when no domain is specified' do
-      WhiskeyDisk.configuration = { 'domain' => nil }
-      WhiskeyDisk.should.not.be.remote
-    end
-    
     it 'should ensure that the parent path for the main repository checkout is present' do
       WhiskeyDisk.should.receive(:ensure_main_parent_path_is_present)
       @rake["deploy:setup"].invoke
@@ -161,16 +150,6 @@ describe 'rake tasks' do
       end
       
       WhiskeyDisk.stub!(:success?).and_return(true)
-    end
-    
-    it 'should make changes on the specified domain when a domain is specified' do
-      WhiskeyDisk.configuration = { 'domain' => [ 'some domain' ]}
-      @rake["deploy:now"].invoke
-      WhiskeyDisk.should.be.remote
-    end
-    
-    it 'should make changes on the local system when no domain is specified' do
-      WhiskeyDisk.should.not.be.remote
     end
     
     it 'should enable staleness checks' do

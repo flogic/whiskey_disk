@@ -40,8 +40,8 @@ class WhiskeyDisk
       buffer << command
     end
     
-    def remote?
-      !! self[:domain]
+    def remote?(domain)
+      !! (domain && domain != 'local')
     end
     
     def has_config_repo?
@@ -123,7 +123,7 @@ class WhiskeyDisk
     end
     
     def flush
-      return run(bundle) if remote?
+      return run(bundle) if remote?(self[:domain])
       record_result('local', system(bundle))
     end
     
