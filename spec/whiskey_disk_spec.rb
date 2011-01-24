@@ -524,61 +524,6 @@ describe 'WhiskeyDisk' do
     end
   end
   
-  describe 'flushing changes' do
-    describe 'when running remotely' do
-      before do
-        WhiskeyDisk.configuration = { 'domain' => [ { :name => 'www.domain.com' } ], 'deploy_to' => '/path/to/main/repo' }
-        WhiskeyDisk.stub!(:bundle).and_return('command string')
-        WhiskeyDisk.stub!(:run)
-      end
-      
-      it 'should bundle the buffer of commands' do
-        WhiskeyDisk.enqueue('x')
-        WhiskeyDisk.enqueue('y')
-        WhiskeyDisk.should.receive(:bundle)
-        WhiskeyDisk.flush
-      end
-      
-      it 'should use "run" to run all the bundled commands at once' do
-        WhiskeyDisk.should.receive(:run).with('command string')
-        WhiskeyDisk.flush
-      end
-    end
-    
-    describe 'when running locally' do
-      before do
-        WhiskeyDisk.reset
-        WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo' }
-        WhiskeyDisk.stub!(:bundle).and_return('command string')
-        WhiskeyDisk.stub!(:system)
-      end
-      
-      it 'should bundle the buffer of commands' do
-        WhiskeyDisk.enqueue('x')
-        WhiskeyDisk.enqueue('y')
-        WhiskeyDisk.should.receive(:bundle).and_return('command string')
-        WhiskeyDisk.flush
-      end
-      
-      it 'should use "system" to run all the bundled commands at once' do
-        WhiskeyDisk.should.receive(:system).with('command string')
-        WhiskeyDisk.flush
-      end
-      
-      it 'should record a failure result when the system command fails' do
-        WhiskeyDisk.stub!(:system).and_return(false)
-        WhiskeyDisk.flush
-        WhiskeyDisk.results.should == [ { :domain => 'local', :status => false } ]
-      end
-      
-      it 'should record a success result when the system command succeeds' do
-        WhiskeyDisk.stub!(:system).and_return(true)
-        WhiskeyDisk.flush
-        WhiskeyDisk.results.should == [ { :domain => 'local', :status => true } ]
-      end
-    end
-  end
-  
   describe 'bundling up buffered commands for execution' do
     before do
       WhiskeyDisk.reset
@@ -775,6 +720,61 @@ describe 'WhiskeyDisk' do
             WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cr=\`git ls-remote #{@config_repository} refs/heads/production\`;")))
           end
         end
+      end
+    end
+  end
+  
+  describe 'flushing changes' do
+    describe 'when running remotely' do
+      before do
+        WhiskeyDisk.configuration = { 'domain' => [ { :name => 'www.domain.com' } ], 'deploy_to' => '/path/to/main/repo' }
+        WhiskeyDisk.stub!(:bundle).and_return('command string')
+        WhiskeyDisk.stub!(:run)
+      end
+      
+      it 'should bundle the buffer of commands' do
+        WhiskeyDisk.enqueue('x')
+        WhiskeyDisk.enqueue('y')
+        WhiskeyDisk.should.receive(:bundle)
+        WhiskeyDisk.flush
+      end
+      
+      it 'should use "run" to run all the bundled commands at once' do
+        WhiskeyDisk.should.receive(:run).with('command string')
+        WhiskeyDisk.flush
+      end
+    end
+    
+    describe 'when running locally' do
+      before do
+        WhiskeyDisk.reset
+        WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo' }
+        WhiskeyDisk.stub!(:bundle).and_return('command string')
+        WhiskeyDisk.stub!(:system)
+      end
+      
+      it 'should bundle the buffer of commands' do
+        WhiskeyDisk.enqueue('x')
+        WhiskeyDisk.enqueue('y')
+        WhiskeyDisk.should.receive(:bundle).and_return('command string')
+        WhiskeyDisk.flush
+      end
+      
+      it 'should use "system" to run all the bundled commands at once' do
+        WhiskeyDisk.should.receive(:system).with('command string')
+        WhiskeyDisk.flush
+      end
+      
+      it 'should record a failure result when the system command fails' do
+        WhiskeyDisk.stub!(:system).and_return(false)
+        WhiskeyDisk.flush
+        WhiskeyDisk.results.should == [ { :domain => 'local', :status => false } ]
+      end
+      
+      it 'should record a success result when the system command succeeds' do
+        WhiskeyDisk.stub!(:system).and_return(true)
+        WhiskeyDisk.flush
+        WhiskeyDisk.results.should == [ { :domain => 'local', :status => true } ]
       end
     end
   end
