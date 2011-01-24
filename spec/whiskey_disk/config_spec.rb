@@ -324,7 +324,8 @@ describe WhiskeyDisk::Config do
             'eee' => { 'repository' => 'x', 'domain' => '' },
             'abc' => { 'repository' => 'x', 'domain' => 'what@example.com' },
             'baz' => { 'repository' => 'x', 'domain' => [ 'bar@example.com', 'baz@domain.com' ]},
-            'bar' => { 'repository' => 'x', 'domain' => [ 'user@example.com', nil, 'foo@domain.com', '' ]},
+            'bar' => { 'repository' => 'x', 'domain' => [ 'user@example.com', nil, 'foo@domain.com' ]},
+            'bat' => { 'repository' => 'x', 'domain' => [ 'user@example.com', 'foo@domain.com', '' ]},
             'hsh' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, { 'name' => 'baz@domain.com' } ]},
             'mix' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, 'baz@domain.com' ]},            
             'erl' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => nil }, 
@@ -335,7 +336,7 @@ describe WhiskeyDisk::Config do
                                                           { 'name' => 'aok@domain.com', 'roles' => 'app' } ]},            
             'wow' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => [ 'web', 'db' ] }, 
                                                           { 'name' => 'baz@domain.com', 'roles' => [ 'db' ] },   
-                                                          nil, '', 'foo@bar.example.com',      
+                                                            '', 'foo@bar.example.com',      
                                                           { 'name' => 'aok@domain.com', 'roles' => 'app' } ]},            
           },
 
@@ -344,7 +345,8 @@ describe WhiskeyDisk::Config do
             'eee' => { 'repository' => 'x', 'domain' => '' },
             'abc' => { 'repository' => 'x', 'domain' => 'what@example.com' },
             'hij' => { 'repository' => 'x', 'domain' => [ 'bar@example.com', 'baz@domain.com' ]},
-            'def' => { 'repository' => 'x', 'domain' => [ 'user@example.com', nil, 'foo@domain.com', '' ]},
+            'def' => { 'repository' => 'x', 'domain' => [ 'user@example.com', nil, 'foo@domain.com' ]},
+            'dex' => { 'repository' => 'x', 'domain' => [ 'user@example.com', 'foo@domain.com', '' ]},
             'hsh' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, { 'name' => 'baz@domain.com' } ]},
             'mix' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, 'baz@domain.com' ]},
             'erl' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => nil }, 
@@ -355,7 +357,7 @@ describe WhiskeyDisk::Config do
                                                           { 'name' => 'aok@domain.com', 'roles' => 'app' } ]},            
             'wow' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => [ 'web', 'db' ] }, 
                                                           { 'name' => 'baz@domain.com', 'roles' => [ 'db' ] },   
-                                                          nil, '', 'foo@bar.example.com',      
+                                                             '', 'foo@bar.example.com',      
                                                           { 'name' => 'aok@domain.com', 'roles' => 'app' } ]},            
           }
         )
@@ -397,15 +399,27 @@ describe WhiskeyDisk::Config do
          ]
       end
       
-      it 'should replace any blank or nil domains with "local" domains in a domain list' do
+      it 'should replace any nil domains with "local" domains in a domain list' do
         WhiskeyDisk::Config.load_data['foo']['bar']['domain'].should == [
-          { :name => 'user@example.com' }, { :name => 'local' }, { :name => 'foo@domain.com' }, { :name => 'local' }
+          { :name => 'user@example.com' }, { :name => 'local' }, { :name => 'foo@domain.com' }
          ]
       end
   
-      it 'should handle localizing blanks and nils across all projects and targets' do
+      it 'should handle localizing nils across all projects and targets' do
         WhiskeyDisk::Config.load_data['zyx']['def']['domain'].should == [
-          { :name => 'user@example.com' }, { :name => 'local' }, { :name => 'foo@domain.com' }, { :name => 'local' }
+          { :name => 'user@example.com' }, { :name => 'local' }, { :name => 'foo@domain.com' }
+         ]
+      end
+      
+      it 'should replace any blank domains with "local" domains in a domain list' do
+        WhiskeyDisk::Config.load_data['foo']['bat']['domain'].should == [
+          { :name => 'user@example.com' }, { :name => 'foo@domain.com' }, { :name => 'local' }
+         ]
+      end
+  
+      it 'should handle localizing blanks across all projects and targets' do
+        WhiskeyDisk::Config.load_data['zyx']['dex']['domain'].should == [
+          { :name => 'user@example.com' }, { :name => 'foo@domain.com' }, { :name => 'local' }
          ]
       end
       
@@ -442,7 +456,6 @@ describe WhiskeyDisk::Config do
           { :name => 'bar@example.com', :roles => [ 'web', 'db' ] }, 
           { :name => 'baz@domain.com',  :roles => [ 'db' ] }, 
           { :name => 'local' },
-          { :name => 'local' },
           { :name => 'foo@bar.example.com' },
           { :name => 'aok@domain.com',  :roles => [ 'app' ] }
          ]                
@@ -453,10 +466,22 @@ describe WhiskeyDisk::Config do
           { :name => 'bar@example.com', :roles => [ 'web', 'db' ] }, 
           { :name => 'baz@domain.com',  :roles => [ 'db' ] }, 
           { :name => 'local' },
-          { :name => 'local' },
           { :name => 'foo@bar.example.com' },
           { :name => 'aok@domain.com',  :roles => [ 'app' ] }
          ]        
+      end
+      
+      it 'should raise an exception if a domain appears more than once in a target' do
+        write_config_file(
+          'foo' => { 
+            'erl' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => nil }, 
+                                                          { 'name' => 'baz@domain.com', 'roles' => '' },
+                                                          { 'name' => 'bar@example.com', 'roles' => [] } ]},
+          }
+        )
+        
+        lambda { WhiskeyDisk::Config.load_data }.should.raise
+        
       end
     end
   end
