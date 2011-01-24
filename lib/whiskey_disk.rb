@@ -113,18 +113,25 @@ class WhiskeyDisk
       return '' unless roles and !roles.empty?
       "export WD_ROLES='#{roles.join(':')}'; "
     end
+
+    def build_command(domain, cmd)
+      "set -x; " + encode_roles(domain[:roles]) + cmd
+    end
     
-    def run(cmd)
-      needs(:domain)
-      self[:domain].each do |domain|
-        status = system('ssh', '-v', domain[:name], "set -x; " + encode_roles(domain[:roles]) + cmd)
-        record_result(domain[:name], status)
-      end
+    def run(domain, cmd)
+      system('ssh', '-v', domain[:name], build_command(domain, cmd))
+    end
+    
+    def shell(domain, cmd)
+      system(build_command(domain, cmd))
     end
     
     def flush
-      return run(bundle) if remote?(self[:domain])
-      record_result('local', system(bundle))
+      needs(:domain)
+      self[:domain].each do |domain|
+        status = remote?(domain[:name]) ? run(domain, bundle) : shell(domain, bundle)
+        record_result(domain[:name], status)
+      end
     end
     
     def record_result(domain, status)

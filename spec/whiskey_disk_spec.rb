@@ -725,147 +725,88 @@ describe 'WhiskeyDisk' do
   end
   
   describe 'flushing changes' do
-    describe 'when running remotely' do
-      before do
-        WhiskeyDisk.configuration = { 'domain' => [ { :name => 'www.domain.com' } ], 'deploy_to' => '/path/to/main/repo' }
-        WhiskeyDisk.stub!(:bundle).and_return('command string')
-        WhiskeyDisk.stub!(:run)
-      end
-      
-      it 'should bundle the buffer of commands' do
-        WhiskeyDisk.enqueue('x')
-        WhiskeyDisk.enqueue('y')
-        WhiskeyDisk.should.receive(:bundle)
-        WhiskeyDisk.flush
-      end
-      
-      it 'should use "run" to run all the bundled commands at once' do
-        WhiskeyDisk.should.receive(:run).with('command string')
-        WhiskeyDisk.flush
-      end
+    before do
+      @cmd = 'ls'
+      @domains = [ { :name => 'ogc@ogtastic.com' }, { :name => 'foo@example.com' }, { :name => 'local' } ]
+      WhiskeyDisk.configuration = { 'domain' => @domains }
+      WhiskeyDisk.stub!(:bundle).and_return(@cmd)
+      WhiskeyDisk.stub!(:system)
+    end
+          
+    it 'should fail if the domain path is not specified' do
+      WhiskeyDisk.configuration = {}
+      lambda { WhiskeyDisk.flush}.should.raise
+    end
+
+    it 'should use "run" to issue commands for all remote domains' do
+      WhiskeyDisk.should.receive(:run).with({ :name => 'ogc@ogtastic.com' }, @cmd)
+      WhiskeyDisk.should.receive(:run).with({ :name => 'foo@example.com' }, @cmd)
+      WhiskeyDisk.flush
     end
     
-    describe 'when running locally' do
-      before do
-        WhiskeyDisk.reset
-        WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo' }
-        WhiskeyDisk.stub!(:bundle).and_return('command string')
-        WhiskeyDisk.stub!(:system)
-      end
-      
-      it 'should bundle the buffer of commands' do
-        WhiskeyDisk.enqueue('x')
-        WhiskeyDisk.enqueue('y')
-        WhiskeyDisk.should.receive(:bundle).and_return('command string')
-        WhiskeyDisk.flush
-      end
-      
-      it 'should use "system" to run all the bundled commands at once' do
-        WhiskeyDisk.should.receive(:system).with('command string')
-        WhiskeyDisk.flush
-      end
-      
-      it 'should record a failure result when the system command fails' do
-        WhiskeyDisk.stub!(:system).and_return(false)
-        WhiskeyDisk.flush
-        WhiskeyDisk.results.should == [ { :domain => 'local', :status => false } ]
-      end
-      
-      it 'should record a success result when the system command succeeds' do
-        WhiskeyDisk.stub!(:system).and_return(true)
-        WhiskeyDisk.flush
-        WhiskeyDisk.results.should == [ { :domain => 'local', :status => true } ]
-      end
-    end
+    it 'should use "shell" to issue commands for any local domains' do
+      WhiskeyDisk.should.receive(:shell).with({ :name => 'local' }, @cmd)
+      WhiskeyDisk.flush      
+    end    
   end
   
+  describe 'when running a command string locally' do
+    before do
+      WhiskeyDisk.reset
+      @domain_name = 'local'
+      @domain = { :name => @domain_name }
+      WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
+      WhiskeyDisk.stub!(:system)
+    end
+    
+    it 'should accept a domain and a command string' do
+      lambda { WhiskeyDisk.shell(@domain, 'ls') }.should.not.raise(ArgumentError)
+    end
+    
+    it 'should require a domain and a command string' do
+      lambda { WhiskeyDisk.shell(@domain) }.should.raise(ArgumentError)
+    end
+
+    it 'should pass the string to the shell with verbosity enabled' do
+      WhiskeyDisk.should.receive(:system).with("set -x; ls")
+      WhiskeyDisk.shell(@domain, 'ls')
+    end
+      
+    it 'should include domain role settings when the domain has roles' do
+      @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
+      WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
+      WhiskeyDisk.should.receive(:system).with("set -x; export WD_ROLES='web:db'; ls")
+      WhiskeyDisk.shell(@domain, 'ls')        
+    end
+  end
+
   describe 'when running a command string remotely' do
     before do
       WhiskeyDisk.reset
-      @domain = 'ogc@ogtastic.com'
-      WhiskeyDisk.configuration = { 'domain' => [ { :name => @domain } ] }
-      WhiskeyDisk.stub!(:system)      
+      @domain_name = 'ogc@ogtastic.com'
+      @domain = { :name => @domain_name }
+      WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
+      WhiskeyDisk.stub!(:system)
     end
     
-    it 'should accept a command string' do
-      lambda { WhiskeyDisk.run('ls') }.should.not.raise(ArgumentError)
+    it 'should accept a domain and a command string' do
+      lambda { WhiskeyDisk.run(@domain, 'ls') }.should.not.raise(ArgumentError)
     end
     
-    it 'should require a command string' do
-      lambda { WhiskeyDisk.run }.should.raise(ArgumentError)
-    end
-    
-    it 'should fail if the domain path is not specified' do
-      WhiskeyDisk.configuration = {}
-      lambda { WhiskeyDisk.run('ls') }.should.raise
+    it 'should require a domain and a command string' do
+      lambda { WhiskeyDisk.run(@domain) }.should.raise(ArgumentError)
     end
 
-    describe 'and a single domain is specified' do
-      before do
-        @domain = 'ogc@ogtastic.com'
-        WhiskeyDisk.configuration = { 'domain' => [ { :name => @domain } ] }
-      end
-      
-      it 'should pass the string to ssh with verbosity enabled' do
-        WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain, "set -x; ls")
-        WhiskeyDisk.run('ls')
-      end
-      
-      it 'should include domain role settings when the domain has roles' do
-        WhiskeyDisk.configuration = { 'domain' => [ { :name => @domain, :roles => [ 'web', 'db' ] } ] }
-        WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain, "set -x; export WD_ROLES='web:db'; ls")
-        WhiskeyDisk.run('ls')        
-      end
+    it 'should pass the string to ssh for the domain, with verbosity enabled' do
+      WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain_name, "set -x; ls")
+      WhiskeyDisk.run(@domain, 'ls')
     end
-    
-    describe 'and multiple domains are specified' do
-      before do
-        @domains = [ { :name => 'ogc@ogtastic.com' }, { :name => 'foo@example.com' } ]
-      end
-            
-      it 'should run the command via ssh on each domain in the order specified in the configuration file' do
-        TestOrderedExecution.configuration = { 'domain' => @domains }
-        TestOrderedExecution.run('ls')
-        TestOrderedExecution.commands.should == [
-          "ssh -v ogc@ogtastic.com set -x; ls", 
-          "ssh -v foo@example.com set -x; ls"
-        ]
-      end
       
-      it 'should include role settings for each domain when available' do
-        @domains = [ 
-          { :name => 'ogc@ogtastic.com', :roles => [ 'db', 'web' ] }, 
-          { :name => 'foo@example.com', :roles => [ 'app' ] } 
-        ]
-        TestOrderedExecution.configuration = { 'domain' => @domains }
-        TestOrderedExecution.run('ls')
-        TestOrderedExecution.commands.should == [
-          "ssh -v ogc@ogtastic.com set -x; export WD_ROLES='db:web'; ls", 
-          "ssh -v foo@example.com set -x; export WD_ROLES='app'; ls"
-        ]
-      end
-      
-      it 'should not fail if an ssh command fails' do
-        WhiskeyDisk.configuration = { 'domain' => @domains }
-        WhiskeyDisk.stub!(:system).with('ssh', '-v', 'ogc@ogtastic.com', 'set -x; ls').and_return(false)
-        lambda { WhiskeyDisk.run('ls') }.should.not.raise(RuntimeError)
-      end
-      
-      it 'should continue to run the remaining ssh commands when an ssh fails' do
-        WhiskeyDisk.configuration = { 'domain' => @domains }
-        WhiskeyDisk.stub!(:system).with('ssh', '-v', 'ogc@ogtastic.com', 'set -x; ls').and_return(false)
-        WhiskeyDisk.should.receive(:system).with('ssh', '-v', 'foo@example.com', 'set -x; ls')
-        WhiskeyDisk.run('ls')   
-      end
-      
-      it 'should record failure and success status for issued ssh commands' do
-        WhiskeyDisk.configuration = { 'domain' => @domains }
-        WhiskeyDisk.stub!(:system).with('ssh', '-v', 'ogc@ogtastic.com', 'set -x; ls').and_return(false)
-        WhiskeyDisk.stub!(:system).with('ssh', '-v', 'foo@example.com', 'set -x; ls').and_return(true)
-        WhiskeyDisk.run('ls')   
-        WhiskeyDisk.results.should == [ { :domain => 'ogc@ogtastic.com', :status => false }, 
-                                        { :domain => 'foo@example.com', :status => true} ]
-      end
+    it 'should include domain role settings when the domain has roles' do
+      @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
+      WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
+      WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain_name, "set -x; export WD_ROLES='web:db'; ls")
+      WhiskeyDisk.run(@domain, 'ls')        
     end
   end
   
