@@ -724,11 +724,41 @@ describe 'WhiskeyDisk' do
     end
   end
   
+  describe 'determining if a domain is of interest to us' do
+    before do
+      WhiskeyDisk::Config.stub!(:domain_limit).and_return(false)
+    end
+    
+    it 'should allow specifying a domain' do
+      lambda { WhiskeyDisk.domain_of_interest?(:domain) }.should.not.raise(ArgumentError)
+    end
+    
+    it 'should require a domain' do
+      lambda { WhiskeyDisk.domain_of_interest? }.should.raise(ArgumentError)      
+    end
+    
+    it 'should return true when our configuration does not specify a domain limit' do
+      WhiskeyDisk::Config.stub!(:domain_limit).and_return(false)
+      WhiskeyDisk.domain_of_interest?('somedomain').should == true
+    end
+    
+    it 'should return true when the specified domain matches the configuration domain limit' do
+      WhiskeyDisk::Config.stub!(:domain_limit).and_return('somedomain')
+      WhiskeyDisk.domain_of_interest?('somedomain').should == true      
+    end
+    
+    it 'should return false when the specified domain does not match the configuration domain limit' do
+      WhiskeyDisk::Config.stub!(:domain_limit).and_return('otherdomain')
+      WhiskeyDisk.domain_of_interest?('somedomain').should == false  
+    end
+  end
+
   describe 'flushing changes' do
     before do
       @cmd = 'ls'
       @domains = [ { :name => 'ogc@ogtastic.com' }, { :name => 'foo@example.com' }, { :name => 'local' } ]
       WhiskeyDisk.configuration = { 'domain' => @domains }
+      WhiskeyDisk.stub!(:domain_of_interest?).and_return(true)
       WhiskeyDisk.stub!(:bundle).and_return(@cmd)
       WhiskeyDisk.stub!(:system)
     end
@@ -748,6 +778,18 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.should.receive(:shell).with({ :name => 'local' }, @cmd)
       WhiskeyDisk.flush      
     end    
+
+    it 'should not issue a command via run for a remote domain which is not of interest' do
+      WhiskeyDisk.stub!(:domain_of_interest?).with('ogc@ogtastic.com').and_return(false)
+      WhiskeyDisk.should.not.receive(:run).with({ :name => 'ogc@ogtastic.com' }, @cmd)
+      WhiskeyDisk.flush
+    end
+
+    it 'should not issue a command via shell for a local domain which is not of interest' do
+      WhiskeyDisk.stub!(:domain_of_interest?).with('local').and_return(false)
+      WhiskeyDisk.should.not.receive(:shell).with({ :name => 'local' }, @cmd)
+      WhiskeyDisk.flush
+    end
   end
   
   describe 'when running a command string locally' do

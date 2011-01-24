@@ -28,6 +28,11 @@ class WhiskeyDisk
       def check_staleness?
         !!(ENV['check'] && ENV['check'] =~ /^(?:t(?:rue)?|y(?:es)?|1)$/)
       end
+      
+      def domain_limit
+        return false unless ENV['only'] and ENV['only'] != ''
+        ENV['only']
+      end
 
       def contains_rakefile?(path)
         File.exists?(File.expand_path(File.join(path, 'Rakefile')))

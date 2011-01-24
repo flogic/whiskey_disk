@@ -109,6 +109,11 @@ class WhiskeyDisk
       (staleness_checks_enabled? and check_staleness?) ? apply_staleness_check(join_commands) : join_commands
     end
     
+    def domain_of_interest?(domain)
+      return true unless limit = WhiskeyDisk::Config.domain_limit
+      limit == domain
+    end
+    
     def encode_roles(roles)
       return '' unless roles and !roles.empty?
       "export WD_ROLES='#{roles.join(':')}'; "
@@ -129,6 +134,7 @@ class WhiskeyDisk
     def flush
       needs(:domain)
       self[:domain].each do |domain|
+        next unless domain_of_interest?(domain[:name])
         status = remote?(domain[:name]) ? run(domain, bundle) : shell(domain, bundle)
         record_result(domain[:name], status)
       end

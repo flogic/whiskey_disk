@@ -89,6 +89,23 @@ describe WhiskeyDisk::Config do
       WhiskeyDisk::Config.check_staleness?.should == true
     end
   end
+  
+  describe 'when determining whether there is a domain limit set' do
+    it 'should return false when ENV["only"] is nil' do
+      ENV['only'] = nil
+      WhiskeyDisk::Config.domain_limit.should == false
+    end
+    
+    it 'should return false when ENV["only"] is empty' do
+      ENV['only'] = ''
+      WhiskeyDisk::Config.domain_limit.should == false
+    end
+    
+    it 'should return the value in ENV["only"] when it is non-empty' do
+      ENV['only'] = 'somedomain'
+      WhiskeyDisk::Config.domain_limit.should == 'somedomain'      
+    end
+  end
 
   describe 'when fetching configuration' do
     describe 'and path specified is an URL' do
