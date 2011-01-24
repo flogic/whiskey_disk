@@ -115,13 +115,17 @@ class WhiskeyDisk
         { project_name => data }
       end
 
+      def localize_domain_list(list)
+        [ list ].flatten.collect { |d| (d.nil? or d == '') ? 'local' : d }
+      end
+      
       def compact_list(list)
         [ list ].flatten.delete_if { |d| d.nil? or d == '' }
       end
       
       def normalize_domain(data)
-        compacted = compact_list(data)
-        return nil if compacted.empty?
+        compacted = localize_domain_list(data)
+        compacted = [ 'local' ] if compacted.empty?
         
         compacted.collect do |d|
           if d.respond_to?(:keys)
@@ -138,7 +142,7 @@ class WhiskeyDisk
       def normalize_domains(data)
         data.each_pair do |project, project_data|
           project_data.each_pair do |target, target_data|
-            target_data['domain'] = normalize_domain(target_data['domain']) if target_data['domain']
+            target_data['domain'] = normalize_domain(target_data['domain'])
           end
         end
       end
