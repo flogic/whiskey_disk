@@ -41,7 +41,11 @@ class WhiskeyDisk
     end
     
     def remote?(domain)
-      !! (domain && domain != 'local')
+      return false unless domain
+      return false if domain == 'local'
+      limit = WhiskeyDisk::Config.domain_limit
+      return false if limit and domain == limit
+      true
     end
     
     def has_config_repo?

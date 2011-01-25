@@ -52,17 +52,46 @@ describe 'WhiskeyDisk' do
     it 'should require a domain argument' do
       lambda { WhiskeyDisk.remote? }.should.raise(ArgumentError)
     end
-    
-    it 'should return false if the provided domain is nil' do
-      WhiskeyDisk.remote?(nil).should == false
-    end
-    
-    it 'should return false if the provided domain is the string "local"' do
-      WhiskeyDisk.remote?('local').should == false
-    end
 
-    it 'should return true if the provided domain is non-empty' do
-      WhiskeyDisk.remote?('smeghost').should == true
+    describe 'when a domain limit is specified in the configuration' do
+      before do
+        @domain = 'myhost'
+        WhiskeyDisk::Config.stub!(:domain_limit).and_return(@domain)
+      end
+      
+      it 'should return false if the provided domain is nil' do
+        WhiskeyDisk.remote?(nil).should == false
+      end
+
+      it 'should return false if the provided domain is the string "local"' do
+        WhiskeyDisk.remote?('local').should == false
+      end
+
+      it 'should return false if the provided domain matches the limit domain from the configuration' do
+        WhiskeyDisk.remote?(@domain).should == false
+      end
+
+      it 'should return true if the provided domain does not match the limit domain from the configuration' do
+        WhiskeyDisk.remote?('smeghost').should == true
+      end
+    end
+    
+    describe 'when no domain limit is specified in the configuration' do
+      before do
+        WhiskeyDisk::Config.stub!(:domain_limit).and_return(nil)
+      end
+
+      it 'should return false if the provided domain is nil' do
+        WhiskeyDisk.remote?(nil).should == false
+      end
+    
+      it 'should return false if the provided domain is the string "local"' do
+        WhiskeyDisk.remote?('local').should == false
+      end
+
+      it 'should return true if the provided domain is non-empty' do
+        WhiskeyDisk.remote?('smeghost').should == true
+      end
     end
   end
   
