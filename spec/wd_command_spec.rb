@@ -122,6 +122,68 @@ describe 'wd command' do
           lambda { run_command }.should.not.raise
         end
       end
+
+      describe 'and a --only argument is specified' do
+        before do
+          @domain = 'smeghost'
+          ARGV.push "--only=#{@domain}"
+        end
+
+        it 'should make the specified domain available as an "only" argument to the rake task' do
+          run_command
+          ENV['only'].should == @domain
+        end
+
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+
+      describe 'and a -o argument is specified' do
+        before do
+          @domain = 'smeghost'
+          ARGV.push '-o'
+          ARGV.push @domain
+        end
+
+        it 'should make the specified domain available as an "only" argument to the rake task' do
+          run_command
+          ENV['only'].should == @domain
+        end
+
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+
+      describe 'and no --only or -o argument is specified' do
+        it 'should not make an "only" argument available to the rake task' do
+          run_command
+          ENV['only'].should.be.nil
+        end
+
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
     end
 
     describe 'and a -t argument is specified' do
@@ -204,16 +266,78 @@ describe 'wd command' do
           lambda { run_command }.should.not.raise
         end
       end
+
+      describe 'and a --only argument is specified' do
+        before do
+          @domain = 'smeghost'
+          ARGV.push "--only=#{@domain}"
+        end
+
+        it 'should make the specified domain available as an "only" argument to the rake task' do
+          run_command
+          ENV['only'].should == @domain
+        end
+
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+
+      describe 'and a -o argument is specified' do
+        before do
+          @domain = 'smeghost'
+          ARGV.push '-o'
+          ARGV.push @domain
+        end
+
+        it 'should make the specified domain available as an "only" argument to the rake task' do
+          run_command
+          ENV['only'].should == @domain
+        end
+
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+
+      describe 'and no --only or -o argument is specified' do
+        it 'should not make an "only" argument available to the rake task' do
+          run_command
+          ENV['only'].should.be.nil
+        end
+
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
     end
   end
   
   describe "when the 'deploy' command is specified" do
-    describe 'but no target is specified' do
-      before do
-        Object.send(:remove_const, :ARGV)
-        ARGV = ['deploy']
-      end  
+    before do
+      Object.send(:remove_const, :ARGV)
+      ARGV = ['deploy']
+    end  
 
+    describe 'but no target is specified' do
       it 'should not run rake tasks' do
         Rake::Application.should.receive(:new).never
         lambda { run_command }
@@ -289,6 +413,23 @@ describe 'wd command' do
         end
       end
 
+      describe 'and no --check or -c argument is specified' do        
+        it 'should not make a "check" argument available to the rake task' do          
+          run_command
+          ENV['check'].should.be.nil
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+
       describe 'and a --path argument is specified' do
         before do
           ARGV.push '--path=/path/to/foo'
@@ -332,9 +473,72 @@ describe 'wd command' do
         end
       end
       
-      describe 'and no --path or -p argument is specified' do
+      describe 'and no --path or -p argument is specified' do        
         it 'should not make a "path" argument available to the rake task' do
+          run_command
           ENV['path'].should.be.nil
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+
+      describe 'and a --only argument is specified' do
+        before do
+          @domain = 'smeghost'
+          ARGV.push "--only=#{@domain}"
+        end
+        
+        it 'should make the specified domain available as an "only" argument to the rake task' do
+          run_command
+          ENV['only'].should == @domain
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+      
+      describe 'and a -o argument is specified' do
+        before do
+          @domain = 'smeghost'
+          ARGV.push '-o'
+          ARGV.push @domain
+        end
+        
+        it 'should make the specified domain available as an "only" argument to the rake task' do
+          run_command
+          ENV['only'].should == @domain
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+      
+      describe 'and no --only or -o argument is specified' do
+        it 'should not make an "only" argument available to the rake task' do
+          run_command
+          ENV['only'].should.be.nil
         end
       
         it 'should fail if the rake task fails' do
@@ -415,6 +619,23 @@ describe 'wd command' do
         end
       end
 
+      describe 'and no --check or -c argument is specified' do        
+        it 'should not make a "check" argument available to the rake task' do          
+          run_command
+          ENV['check'].should.be.nil
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+
       describe 'and a --path argument is specified' do
         before do
           ARGV.push '--path=/path/to/foo'
@@ -461,6 +682,68 @@ describe 'wd command' do
       describe 'and no --path or -p argument is specified' do
         it 'should not make a "path" argument available to the rake task' do
           ENV['path'].should.be.nil
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+          
+      describe 'and a --only argument is specified' do
+        before do
+          @domain = 'smeghost'
+          ARGV.push "--only=#{@domain}"
+        end
+        
+        it 'should make the specified domain available as an "only" argument to the rake task' do
+          run_command
+          ENV['only'].should == @domain
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+      
+      describe 'and a -o argument is specified' do
+        before do
+          @domain = 'smeghost'
+          ARGV.push '-o'
+          ARGV.push @domain
+        end
+        
+        it 'should make the specified domain available as an "only" argument to the rake task' do
+          run_command
+          ENV['only'].should == @domain
+        end
+      
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+      
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+      
+      describe 'and no --only or -o argument is specified' do
+        it 'should not make an "only" argument available to the rake task' do
+          run_command
+          ENV['only'].should.be.nil
         end
       
         it 'should fail if the rake task fails' do

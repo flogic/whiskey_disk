@@ -15,6 +15,10 @@ op = OptionParser.new do |opts|
     options[:path] = path
   end
     
+  opts.on('-o=DOMAIN', '--only=DOMAIN', "limit deployment to this domain") do |domain|
+    options[:only] = domain
+  end
+    
   opts.on('-c', '--check', "do a staleness check before deploying") do |path|
     options[:check] = 'true'
   end
@@ -32,6 +36,7 @@ raise op.to_s unless ['deploy', 'setup'].include?(command)
 
 ENV['to'] = options[:target]
 ENV['path'] = options[:path]
+ENV['only'] = options[:only]
 ENV['check'] = options[:check]
 
 if command == 'deploy'
