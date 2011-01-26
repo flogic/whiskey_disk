@@ -1,4 +1,11 @@
 
+0.6.4 / 2011-01-26 
+==================
+
+  * bugfix: cd to deploy_to path before running post_{setup,deploy}_script
+  * update gemspec
+  * Version bump to 0.6.4
+
 0.6.3 / 2011-01-13 
 ==================
 
