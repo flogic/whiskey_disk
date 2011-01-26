@@ -21,7 +21,6 @@ Gem::Specification.new do |s|
     "MIT-LICENSE",
     "README.markdown",
     "Rakefile",
-    "TODO.txt",
     "VERSION",
     "WHY.txt",
     "bin/wd",
