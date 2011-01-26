@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{whiskey_disk}
-  s.version = "0.6.3"
+  s.version = "0.6.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Rick Bradley"]
-  s.date = %q{2011-01-13}
+  s.date = %q{2011-01-26}
   s.description = %q{Opinionated gem for doing fast git-based server deployments.}
   s.email = %q{rick@rickbradley.com}
   s.executables = ["wd_role", "wd"]
@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
     "WHY.txt",
     "bin/wd",
     "bin/wd_role",
+    "examples/deploy-configs.yml",
     "examples/deploy-local.yml",
     "examples/deploy-multiple-remotes.yml",
     "examples/deploy-staging.yml",
