@@ -26,7 +26,7 @@ end
 def run_setup(arguments)
   wd_path  = File.join(File.dirname(__FILE__), '..', 'bin', 'wd')
   lib_path = File.join(File.dirname(__FILE__), '..', 'lib')
-  system("/usr/bin/env ruby -I #{lib_path} -rubygems #{wd_path} setup #{arguments} > #{integration_log} 2> #{integration_log}")
+  system("/usr/bin/env ruby -I #{lib_path} -r whiskey_disk -rubygems #{wd_path} setup #{arguments} > #{integration_log} 2> #{integration_log}")
 end
 
 def integration_log
@@ -37,7 +37,8 @@ end
 def run_deploy(arguments)
   wd_path  = File.join(File.dirname(__FILE__), '..', 'bin', 'wd')
   lib_path = File.join(File.dirname(__FILE__), '..', 'lib')
-  system("/usr/bin/env ruby -I #{lib_path} -rubygems #{wd_path} deploy #{arguments} > #{integration_log} 2> #{integration_log}")
+  status = system("/usr/bin/env ruby -I #{lib_path} -r whiskey_disk -rubygems #{wd_path} deploy #{arguments} > #{integration_log} 2> #{integration_log}")
+  status
 end
 
 # build the correct local path to the deployment configuration for a given scenario
