@@ -71,6 +71,10 @@ describe 'WhiskeyDisk' do
         WhiskeyDisk.remote?(@domain).should == false
       end
 
+      it 'should return false if the provided domain, ignoring any user@, matches the limit domain from the configuration' do
+        WhiskeyDisk.remote?("user@" + @domain).should == false
+      end
+
       it 'should return true if the provided domain does not match the limit domain from the configuration' do
         WhiskeyDisk.remote?('smeghost').should == true
       end
@@ -795,6 +799,11 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk::Config.stub!(:domain_limit).and_return('somedomain')
       WhiskeyDisk.domain_of_interest?('somedomain').should == true      
     end
+    
+    it 'should return true when the specified domain matches the configuration domain limit, with a prepended "user@"' do
+      WhiskeyDisk::Config.stub!(:domain_limit).and_return('somedomain')
+      WhiskeyDisk.domain_of_interest?('user@somedomain').should == true      
+    end    
     
     it 'should return false when the specified domain does not match the configuration domain limit' do
       WhiskeyDisk::Config.stub!(:domain_limit).and_return('otherdomain')

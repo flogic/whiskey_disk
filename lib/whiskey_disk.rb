@@ -43,8 +43,9 @@ class WhiskeyDisk
     def remote?(domain)
       return false unless domain
       return false if domain == 'local'
-      limit = WhiskeyDisk::Config.domain_limit
-      return false if limit and domain == limit
+      limit = WhiskeyDisk::Config.domain_limit 
+      return false if limit and domain_limit_match?(domain, limit)
+
       true
     end
     
@@ -112,10 +113,14 @@ class WhiskeyDisk
       return '' if buffer.empty?
       (staleness_checks_enabled? and check_staleness?) ? apply_staleness_check(join_commands) : join_commands
     end
+
+    def domain_limit_match?(domain, limit)
+      domain.sub(%r{^.*@}, '') == limit
+    end
     
     def domain_of_interest?(domain)
       return true unless limit = WhiskeyDisk::Config.domain_limit
-      limit == domain
+      domain_limit_match?(domain, limit)
     end
     
     def encode_roles(roles)
