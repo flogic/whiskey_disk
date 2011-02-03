@@ -217,5 +217,49 @@ integration_spec do
         end
       end
     end
+    
+    describe 'with a single domain which does not match the --only domain' do
+      before do
+        @config = scenario_config('local-valid/deploy.yml')
+        @args = "--path=#{@config} --to=project:local-domain --only=wd-app2.example.com"
+      end
+
+      describe 'performing a setup' do
+        it 'should not perform a checkout of the repository to the target path' do
+          run_setup(@args)
+          File.exists?(deployed_file('project/README')).should == false
+        end
+            
+        it 'should report that there were no deployments' do
+          run_setup(@args)
+          File.read(integration_log).should =~ /No deployments/
+        end
+
+        it 'should exit with a true status' do
+          run_setup(@args).should == true
+        end
+      end
+    
+      describe 'performing a deployment' do
+        before do
+          checkout_repo('project')
+          File.unlink(deployed_file('project/README'))  # modify the deployed checkout
+        end
+        
+        it 'should not update the checkout of the repository on the target path' do
+          run_deploy(@args)
+          File.exists?(deployed_file('project/README')).should == false
+        end    
+
+        it 'should report that there were no deployments' do
+          run_deploy(@args)
+          File.read(integration_log).should =~ /No deployments/
+        end
+
+        it 'should exit with a true status' do
+          run_deploy(@args).should == true
+        end
+      end
+    end
   end
 end
