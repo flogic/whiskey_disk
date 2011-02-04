@@ -7,7 +7,7 @@ $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib')))
 
 # local target directory, integration spec workspace
 def deployment_root
-  '/tmp/wd-integration-target/'
+  '/tmp/wd-integration-target/destination/'
 end
 
 # allow defining an integration spec block
@@ -18,8 +18,9 @@ end
 # reset the deployment directory for integration specs
 def setup_deployment_area
   FileUtils.rm_rf(deployment_root)
+  File.umask(0)
   Dir.mkdir(deployment_root, 0777)
-  Dir.mkdir(File.join(deployment_root, 'log'), 0777)
+  Dir.mkdir(deployed_file('log'), 0777)
 end
 
 # run a wd setup using the provided arguments string
@@ -48,7 +49,7 @@ end
 
 # clone a git repository locally (as if a "wd setup" had been deployed)
 def checkout_repo(repo_name, name = '')
-  repo_path = File.join(File.dirname(__FILE__), '..', 'scenarios', 'git_repositories', "#{repo_name}.git")
+  repo_path = File.expand_path(File.join(File.dirname(__FILE__), '..', 'scenarios', 'git_repositories', "#{repo_name}.git"))
   system("cd #{deployment_root} && git clone #{repo_path} #{name} >/dev/null 2>/dev/null")
 end
 
