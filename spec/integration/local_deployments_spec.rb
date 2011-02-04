@@ -1,50 +1,15 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper.rb'))
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'lib', 'whiskey_disk'))
 
-integration_spec do
-  describe 'when an invalid configuration file is specified' do
-    before do
-      setup_deployment_area
-      @config = scenario_config('local-invalid/deploy.yml')
-      @args = "--path=#{@config} --to=project:production"
-    end
-    
-    describe 'performing a local setup' do
-      it 'should exit with a false status' do
-        run_setup(@args).should == false
-      end
-      
-      it 'should not create a repo checkout' do
-        run_setup(@args)
-        File.exists?(deployed_file('project')).should == false
-      end
-    end
-  
-    describe 'performing a local deployment' do
-      before do
-        checkout_repo('project')
-        File.unlink(deployed_file('project/README'))  # modify the deployed checkout
-      end
-
-      it 'should exit with a false status' do
-        run_deploy(@args).should == false
-      end      
-    
-      it 'should not update a repo checkout' do
-        run_deploy(@args)
-        File.exists?(deployed_file('project/README')).should == false
-      end
-    end
-  end
-  
-  describe 'when a valid configuration is specified' do
+integration_spec do  
+  describe 'when configured for a local deployment' do
     before do
       setup_deployment_area
     end
     
-    describe 'without a domain' do
+    describe 'when the configuration specifies no domain' do
       before do
-        @config = scenario_config('local-valid/deploy.yml')
+        @config = scenario_config('local/deploy.yml')
         @args = "--path=#{@config} --to=project:local-default"
       end
 
@@ -86,9 +51,9 @@ integration_spec do
       end
     end
   
-    describe 'with a single domain specified via the local keyword' do
+    describe 'when the configuration specifies a single domain via the "local" keyword' do
       before do
-        @config = scenario_config('local-valid/deploy.yml')
+        @config = scenario_config('local/deploy.yml')
         @args = "--path=#{@config} --to=project:local-keyword"
       end
 
@@ -130,9 +95,9 @@ integration_spec do
       end
     end
     
-    describe 'with a single domain specified as user@domain, using --only=domain' do
+    describe 'when the configuration specifies a single domain specified as user@domain, using --only=domain' do
       before do
-        @config = scenario_config('local-valid/deploy.yml')
+        @config = scenario_config('local/deploy.yml')
         @args = "--path=#{@config} --to=project:local-user-domain --only=wd-app1.example.com"
       end
 
@@ -174,9 +139,9 @@ integration_spec do
       end
     end
 
-    describe 'with a single domain specified without username, using --only=domain' do
+    describe 'when the configuration specifies a single domain without username, using --only=domain' do
       before do
-        @config = scenario_config('local-valid/deploy.yml')
+        @config = scenario_config('local/deploy.yml')
         @args = "--path=#{@config} --to=project:local-domain --only=wd-app1.example.com"
       end
 
@@ -218,9 +183,9 @@ integration_spec do
       end
     end
     
-    describe 'with a single domain which does not match the --only domain' do
+    describe 'when the configuration specifies a single domain which does not match the --only domain' do
       before do
-        @config = scenario_config('local-valid/deploy.yml')
+        @config = scenario_config('local/deploy.yml')
         @args = "--path=#{@config} --to=project:local-domain --only=wd-app2.example.com"
       end
 

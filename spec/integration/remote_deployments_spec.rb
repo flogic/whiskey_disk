@@ -2,7 +2,7 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', 'spec_helper.rb
 require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'lib', 'whiskey_disk'))
 
 integration_spec do
-  describe 'when a valid configuration is specified' do
+  describe 'when configured for a remote deployment' do
     before do
       setup_deployment_area
     end
