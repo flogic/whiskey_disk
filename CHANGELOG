@@ -1,4 +1,38 @@
 
+0.6.10 / 2011-02-08 
+==================
+
+  * bump version to 0.6.10
+  * Merge branch 'feature/improved-integration-specs' into develop
+  * reorganizing integration specs
+  * adding a quick README on how to run integration specs
+  * adding a remote deployment integration spec
+  * working around permissioning issues to support "remote" integration specs
+  * integration specs for non-matching --only deployment
+  * make sure the integration test is actually testing the local library
+  * fixing 'unit@' --only local deployment WD.remote? bug
+  * Adding initial integration spec suite
+  * save +x chmod state to bin/wd
+  * Merge branch 'develop' of git.ogtastic.com:whiskey_disk into develop
+  * Merge branch 'hotfix/cd-before-post-scripts' into develop
+  * adding --only support to wd binary
+  * an ENV['only'] domain should deploy locally
+  * adding support for ENV['none'] to WhiskeyDisk, ::Config
+  * updating README to document upcoming --only / ENV['only'] functionality
+  * WD.fetch now iterates over all domains, local or remote
+  * reorganizing specs
+  * make it an error for a domain to appear more than once in a given project/target
+  * changing internal :domain representation
+  * WhiskeyDisk.remote? now takes a domain argument
+  * README updates for specifying local deployments via "local" domain
+  * added tl;dr quickstart section to README
+  * Merge branch 'feature/enable_pulling_deploy.yml_from_url' into develop
+  * updating README to describe using --path URLs
+  * can now specify path to deploy.yml info using an URL
+  * Merge branch 'feature/move_todo_to_pivotal_tracker' into develop
+  * removing TODO.txt
+  * updating README to point to PT project instead of old TODO.txt file
+
 0.6.4 / 2011-01-26 
 ==================
 
