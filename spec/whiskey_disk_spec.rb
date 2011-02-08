@@ -45,27 +45,57 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.configuration = @parameters
     end
     
-    it 'should work without arguments' do
-      lambda { WhiskeyDisk.remote? }.should.not.raise(ArgumentError)
+    it 'should allow a domain argument' do
+      lambda { WhiskeyDisk.remote?('domain') }.should.not.raise(ArgumentError)
     end
     
-    it 'should not allow arguments' do
-      lambda { WhiskeyDisk.remote?(:foo) }.should.raise(ArgumentError)
-    end
-    
-    it 'should return false if the configuration includes a nil domain setting' do
-      @parameters['domain'] = nil
-      WhiskeyDisk.remote?.should == false
+    it 'should require a domain argument' do
+      lambda { WhiskeyDisk.remote? }.should.raise(ArgumentError)
     end
 
-    it 'should return true if the configuration includes a non-empty domain setting' do
-      @parameters['domain'] = [ { :name => 'smeghost' } ]
-      WhiskeyDisk.remote?.should == true
+    describe 'when a domain limit is specified in the configuration' do
+      before do
+        @domain = 'myhost'
+        WhiskeyDisk::Config.stub!(:domain_limit).and_return(@domain)
+      end
+      
+      it 'should return false if the provided domain is nil' do
+        WhiskeyDisk.remote?(nil).should == false
+      end
+
+      it 'should return false if the provided domain is the string "local"' do
+        WhiskeyDisk.remote?('local').should == false
+      end
+
+      it 'should return false if the provided domain matches the limit domain from the configuration' do
+        WhiskeyDisk.remote?(@domain).should == false
+      end
+
+      it 'should return false if the provided domain, ignoring any user@, matches the limit domain from the configuration' do
+        WhiskeyDisk.remote?("user@" + @domain).should == false
+      end
+
+      it 'should return true if the provided domain does not match the limit domain from the configuration' do
+        WhiskeyDisk.remote?('smeghost').should == true
+      end
     end
     
-    it 'should return true if the configuration includes a multiple domain settings' do
-      @parameters['domain'] = [ { :name => 'smeghost' }, { :name => 'faphost' } ]
-      WhiskeyDisk.remote?.should == true
+    describe 'when no domain limit is specified in the configuration' do
+      before do
+        WhiskeyDisk::Config.stub!(:domain_limit).and_return(nil)
+      end
+
+      it 'should return false if the provided domain is nil' do
+        WhiskeyDisk.remote?(nil).should == false
+      end
+    
+      it 'should return false if the provided domain is the string "local"' do
+        WhiskeyDisk.remote?('local').should == false
+      end
+
+      it 'should return true if the provided domain is non-empty' do
+        WhiskeyDisk.remote?('smeghost').should == true
+      end
     end
   end
   
@@ -547,61 +577,6 @@ describe 'WhiskeyDisk' do
     end
   end
   
-  describe 'flushing changes' do
-    describe 'when running remotely' do
-      before do
-        WhiskeyDisk.configuration = { 'domain' => [ { :name => 'www.domain.com' } ], 'deploy_to' => '/path/to/main/repo' }
-        WhiskeyDisk.stub!(:bundle).and_return('command string')
-        WhiskeyDisk.stub!(:run)
-      end
-      
-      it 'should bundle the buffer of commands' do
-        WhiskeyDisk.enqueue('x')
-        WhiskeyDisk.enqueue('y')
-        WhiskeyDisk.should.receive(:bundle)
-        WhiskeyDisk.flush
-      end
-      
-      it 'should use "run" to run all the bundled commands at once' do
-        WhiskeyDisk.should.receive(:run).with('command string')
-        WhiskeyDisk.flush
-      end
-    end
-    
-    describe 'when running locally' do
-      before do
-        WhiskeyDisk.reset
-        WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo' }
-        WhiskeyDisk.stub!(:bundle).and_return('command string')
-        WhiskeyDisk.stub!(:system)
-      end
-      
-      it 'should bundle the buffer of commands' do
-        WhiskeyDisk.enqueue('x')
-        WhiskeyDisk.enqueue('y')
-        WhiskeyDisk.should.receive(:bundle).and_return('command string')
-        WhiskeyDisk.flush
-      end
-      
-      it 'should use "system" to run all the bundled commands at once' do
-        WhiskeyDisk.should.receive(:system).with('command string')
-        WhiskeyDisk.flush
-      end
-      
-      it 'should record a failure result when the system command fails' do
-        WhiskeyDisk.stub!(:system).and_return(false)
-        WhiskeyDisk.flush
-        WhiskeyDisk.results.should == [ { :domain => 'local', :status => false } ]
-      end
-      
-      it 'should record a success result when the system command succeeds' do
-        WhiskeyDisk.stub!(:system).and_return(true)
-        WhiskeyDisk.flush
-        WhiskeyDisk.results.should == [ { :domain => 'local', :status => true } ]
-      end
-    end
-  end
-  
   describe 'bundling up buffered commands for execution' do
     before do
       WhiskeyDisk.reset
@@ -802,93 +777,136 @@ describe 'WhiskeyDisk' do
     end
   end
   
+  describe 'determining if a domain is of interest to us' do
+    before do
+      WhiskeyDisk::Config.stub!(:domain_limit).and_return(false)
+    end
+    
+    it 'should allow specifying a domain' do
+      lambda { WhiskeyDisk.domain_of_interest?(:domain) }.should.not.raise(ArgumentError)
+    end
+    
+    it 'should require a domain' do
+      lambda { WhiskeyDisk.domain_of_interest? }.should.raise(ArgumentError)      
+    end
+    
+    it 'should return true when our configuration does not specify a domain limit' do
+      WhiskeyDisk::Config.stub!(:domain_limit).and_return(false)
+      WhiskeyDisk.domain_of_interest?('somedomain').should == true
+    end
+    
+    it 'should return true when the specified domain matches the configuration domain limit' do
+      WhiskeyDisk::Config.stub!(:domain_limit).and_return('somedomain')
+      WhiskeyDisk.domain_of_interest?('somedomain').should == true      
+    end
+    
+    it 'should return true when the specified domain matches the configuration domain limit, with a prepended "user@"' do
+      WhiskeyDisk::Config.stub!(:domain_limit).and_return('somedomain')
+      WhiskeyDisk.domain_of_interest?('user@somedomain').should == true      
+    end    
+    
+    it 'should return false when the specified domain does not match the configuration domain limit' do
+      WhiskeyDisk::Config.stub!(:domain_limit).and_return('otherdomain')
+      WhiskeyDisk.domain_of_interest?('somedomain').should == false  
+    end
+  end
+
+  describe 'flushing changes' do
+    before do
+      @cmd = 'ls'
+      @domains = [ { :name => 'ogc@ogtastic.com' }, { :name => 'foo@example.com' }, { :name => 'local' } ]
+      WhiskeyDisk.configuration = { 'domain' => @domains }
+      WhiskeyDisk.stub!(:domain_of_interest?).and_return(true)
+      WhiskeyDisk.stub!(:bundle).and_return(@cmd)
+      WhiskeyDisk.stub!(:system)
+    end
+          
+    it 'should fail if the domain path is not specified' do
+      WhiskeyDisk.configuration = {}
+      lambda { WhiskeyDisk.flush}.should.raise
+    end
+
+    it 'should use "run" to issue commands for all remote domains' do
+      WhiskeyDisk.should.receive(:run).with({ :name => 'ogc@ogtastic.com' }, @cmd)
+      WhiskeyDisk.should.receive(:run).with({ :name => 'foo@example.com' }, @cmd)
+      WhiskeyDisk.flush
+    end
+    
+    it 'should use "shell" to issue commands for any local domains' do
+      WhiskeyDisk.should.receive(:shell).with({ :name => 'local' }, @cmd)
+      WhiskeyDisk.flush      
+    end    
+
+    it 'should not issue a command via run for a remote domain which is not of interest' do
+      WhiskeyDisk.stub!(:domain_of_interest?).with('ogc@ogtastic.com').and_return(false)
+      WhiskeyDisk.should.not.receive(:run).with({ :name => 'ogc@ogtastic.com' }, @cmd)
+      WhiskeyDisk.flush
+    end
+
+    it 'should not issue a command via shell for a local domain which is not of interest' do
+      WhiskeyDisk.stub!(:domain_of_interest?).with('local').and_return(false)
+      WhiskeyDisk.should.not.receive(:shell).with({ :name => 'local' }, @cmd)
+      WhiskeyDisk.flush
+    end
+  end
+  
+  describe 'when running a command string locally' do
+    before do
+      WhiskeyDisk.reset
+      @domain_name = 'local'
+      @domain = { :name => @domain_name }
+      WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
+      WhiskeyDisk.stub!(:system)
+    end
+    
+    it 'should accept a domain and a command string' do
+      lambda { WhiskeyDisk.shell(@domain, 'ls') }.should.not.raise(ArgumentError)
+    end
+    
+    it 'should require a domain and a command string' do
+      lambda { WhiskeyDisk.shell(@domain) }.should.raise(ArgumentError)
+    end
+
+    it 'should pass the string to the shell with verbosity enabled' do
+      WhiskeyDisk.should.receive(:system).with("set -x; ls")
+      WhiskeyDisk.shell(@domain, 'ls')
+    end
+      
+    it 'should include domain role settings when the domain has roles' do
+      @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
+      WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
+      WhiskeyDisk.should.receive(:system).with("set -x; export WD_ROLES='web:db'; ls")
+      WhiskeyDisk.shell(@domain, 'ls')        
+    end
+  end
+
   describe 'when running a command string remotely' do
     before do
       WhiskeyDisk.reset
-      @domain = 'ogc@ogtastic.com'
-      WhiskeyDisk.configuration = { 'domain' => [ { :name => @domain } ] }
-      WhiskeyDisk.stub!(:system)      
+      @domain_name = 'ogc@ogtastic.com'
+      @domain = { :name => @domain_name }
+      WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
+      WhiskeyDisk.stub!(:system)
     end
     
-    it 'should accept a command string' do
-      lambda { WhiskeyDisk.run('ls') }.should.not.raise(ArgumentError)
+    it 'should accept a domain and a command string' do
+      lambda { WhiskeyDisk.run(@domain, 'ls') }.should.not.raise(ArgumentError)
     end
     
-    it 'should require a command string' do
-      lambda { WhiskeyDisk.run }.should.raise(ArgumentError)
-    end
-    
-    it 'should fail if the domain path is not specified' do
-      WhiskeyDisk.configuration = {}
-      lambda { WhiskeyDisk.run('ls') }.should.raise
+    it 'should require a domain and a command string' do
+      lambda { WhiskeyDisk.run(@domain) }.should.raise(ArgumentError)
     end
 
-    describe 'and a single domain is specified' do
-      before do
-        @domain = 'ogc@ogtastic.com'
-        WhiskeyDisk.configuration = { 'domain' => [ { :name => @domain } ] }
-      end
-      
-      it 'should pass the string to ssh with verbosity enabled' do
-        WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain, "set -x; ls")
-        WhiskeyDisk.run('ls')
-      end
-      
-      it 'should include domain role settings when the domain has roles' do
-        WhiskeyDisk.configuration = { 'domain' => [ { :name => @domain, :roles => [ 'web', 'db' ] } ] }
-        WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain, "set -x; export WD_ROLES='web:db'; ls")
-        WhiskeyDisk.run('ls')        
-      end
+    it 'should pass the string to ssh for the domain, with verbosity enabled' do
+      WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain_name, "set -x; ls")
+      WhiskeyDisk.run(@domain, 'ls')
     end
-    
-    describe 'and multiple domains are specified' do
-      before do
-        @domains = [ { :name => 'ogc@ogtastic.com' }, { :name => 'foo@example.com' } ]
-      end
-            
-      it 'should run the command via ssh on each domain in the order specified in the configuration file' do
-        TestOrderedExecution.configuration = { 'domain' => @domains }
-        TestOrderedExecution.run('ls')
-        TestOrderedExecution.commands.should == [
-          "ssh -v ogc@ogtastic.com set -x; ls", 
-          "ssh -v foo@example.com set -x; ls"
-        ]
-      end
       
-      it 'should include role settings for each domain when available' do
-        @domains = [ 
-          { :name => 'ogc@ogtastic.com', :roles => [ 'db', 'web' ] }, 
-          { :name => 'foo@example.com', :roles => [ 'app' ] } 
-        ]
-        TestOrderedExecution.configuration = { 'domain' => @domains }
-        TestOrderedExecution.run('ls')
-        TestOrderedExecution.commands.should == [
-          "ssh -v ogc@ogtastic.com set -x; export WD_ROLES='db:web'; ls", 
-          "ssh -v foo@example.com set -x; export WD_ROLES='app'; ls"
-        ]
-      end
-      
-      it 'should not fail if an ssh command fails' do
-        WhiskeyDisk.configuration = { 'domain' => @domains }
-        WhiskeyDisk.stub!(:system).with('ssh', '-v', 'ogc@ogtastic.com', 'set -x; ls').and_return(false)
-        lambda { WhiskeyDisk.run('ls') }.should.not.raise(RuntimeError)
-      end
-      
-      it 'should continue to run the remaining ssh commands when an ssh fails' do
-        WhiskeyDisk.configuration = { 'domain' => @domains }
-        WhiskeyDisk.stub!(:system).with('ssh', '-v', 'ogc@ogtastic.com', 'set -x; ls').and_return(false)
-        WhiskeyDisk.should.receive(:system).with('ssh', '-v', 'foo@example.com', 'set -x; ls')
-        WhiskeyDisk.run('ls')   
-      end
-      
-      it 'should record failure and success status for issued ssh commands' do
-        WhiskeyDisk.configuration = { 'domain' => @domains }
-        WhiskeyDisk.stub!(:system).with('ssh', '-v', 'ogc@ogtastic.com', 'set -x; ls').and_return(false)
-        WhiskeyDisk.stub!(:system).with('ssh', '-v', 'foo@example.com', 'set -x; ls').and_return(true)
-        WhiskeyDisk.run('ls')   
-        WhiskeyDisk.results.should == [ { :domain => 'ogc@ogtastic.com', :status => false }, 
-                                        { :domain => 'foo@example.com', :status => true} ]
-      end
+    it 'should include domain role settings when the domain has roles' do
+      @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
+      WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
+      WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain_name, "set -x; export WD_ROLES='web:db'; ls")
+      WhiskeyDisk.run(@domain, 'ls')        
     end
   end
   

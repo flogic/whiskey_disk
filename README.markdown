@@ -8,6 +8,32 @@ Right-arrow through a short whiskey_disk presentation at [http://wd2010.rickbrad
 You can also right-arrow through a shorter but more up-to-date whiskey_disk "lightning talk" presentation 
 (from the 2010 Ruby Hoedown) at [http://wdlightning.rickbradley.com/](http://wdlightning.rickbradley.com) (slide source available [here](http://github.com/rick/whiskey_disk_presentation/tree/lightning).), covering the 0.4.*-era functionality.
 
+### tl;dr ###
+
+First:
+
+    % gem install whiskey_disk
+
+
+Then make a deploy.yml file (in config/ if you're doing a Rails project):
+
+    staging:
+      domain: "deployment_user@staging.mydomain.com"
+      deploy_to: "/path/to/where/i/deploy/staging.mydomain.com"
+      repository: "https://github.com/username/project.git"
+      branch: "staging"
+      rake_env:
+        RAILS_ENV: 'production'	    
+
+then:
+
+    % wd setup --to=staging
+
+then:
+
+    % wd deploy --to=staging
+
+
 ### Selling points ###
 
   - If you share the same opinions as we do there's almost no code involved, almost no
@@ -142,12 +168,45 @@ of deploy:setup
    lib/tasks/ or in your project's Rakefile) will cause that task to be run
 at the end of deploy:now
 
+It's easy to specify a local deployment.  The simplest way is to just not specify a "domain":
+
+    local:
+      deploy_to: "/var/www/www.ogtastic.com"
+      repository: "git@ogtastic.com:www.ogtastic.com.git"
+      branch: "stable"
+      rake_env:
+        RAILS_ENV: 'production'
+
+
+Or, just specify the string 'local' as the domain:
+
+    local:
+      domain: "local"
+      deploy_to: "/var/www/www.ogtastic.com"
+      repository: "git@ogtastic.com:www.ogtastic.com.git"
+      branch: "stable"
+      rake_env:
+        RAILS_ENV: 'production'
+
 
 For deploying to multiple hosts, the config/deploy.yml might look like:
 
     qa:
       domain:
       - "ogc@qa1.ogtastic.com"
+      - "ogc@qa2.ogtastic.com""
+      deploy_to: "/var/www/www.ogtastic.com"
+      repository: "git@ogtastic.com:www.ogtastic.com.git"
+      branch: "stable"
+      rake_env:
+        RAILS_ENV: 'production'
+
+
+You can even include a local deployment along with remote deployments, simply use the 'local' name:
+
+    qa:
+      domain:
+      - "local"
       - "ogc@qa2.ogtastic.com""
       deploy_to: "/var/www/www.ogtastic.com"
       repository: "git@ogtastic.com:www.ogtastic.com.git"
@@ -187,7 +246,6 @@ otherwise it's optional and superfluous):
       domain:
       - name: "build@ci.example.com"
 
-
 It's also possible to assign various "roles" to the domains to which you deploy.  Some common usages would be
 "www", which might need a post\_deploy task which notifies some web server software (apache, nginx, passenger, 
 unicorn, etc.) that it should refresh the contents being served; or perhaps "db", which might need some set of
@@ -225,6 +283,17 @@ But domains with roles can be specified alongside simple domains as well:
       - name: "bar@demo.example.com"
       - "user@otherhost.domain.com"
       - name: "foo@appserver1.example.com"
+        roles: 
+        - "web"
+        - "app"
+        - "db"
+
+
+And, if you need to assign roles for a local deployment, you can do that as well:
+
+    local:
+      domain:
+      - name: "local"
         roles: 
         - "web"
         - "app"
@@ -364,17 +433,43 @@ are in an environment where the 'app' role is active but the 'web' role is not:
     % wd setup --to=<target>
     % wd setup --to=<project>:<target>
     % wd setup --to=foo:qa --path=/etc/whiskey_disk/deploy.yml
-    
+    % wd setup --to=foo:qa --path=https://github.com/username/project/raw/master/path/to/configs/deploy.yml
+    % wd setup --to=foo:qa --only=myhost.example.com
+
     % wd deploy --to=<target>
     % wd deploy --to=<project>:<target>
     % wd deploy --to=foo:qa --path=/etc/whiskey_disk/deploy.yml
-
+    % wd deploy --to=foo:qa --path=https://github.com/username/project/raw/master/path/to/configs/deploy.yml
+    % wd deploy --to=foo:qa --only=myhost.example.com
 
 Note that the wd command (unlike rake, which requires a Rakefile in the current directory) can be run from anywhere, so you can deploy any project, working from any path, and can even specify where to find the deployment YAML configuration file.
   
 The --path argument can take either a file or a directory.  When given a file it will use that file as the configuration file.  When given a directory it will look in that directory for deploy/&lt;project&gt;/&lt;target&gt;.yml, then deploy/&lt;project&gt;.yml, then deploy/&lt;target&gt;.yml, then &lt;target&gt;.yml, and finally, deploy.yml.
-  
+
+To make things even better, you can provide an URL as the --path argument and have a central location from which to pull deployment YAML data.  This means that you can centrally administer the definitive deployment information for the various projects and targets you manage.  This could be as simple as keeping them in a text file hosted on a web server, checking them into git and using github or gitweb to serve up the file contents on HEAD, or it could be a programmatically managed configuration management system returning dynamically-generated results.
+
 All this means you can manage a large number of project deployments (local or remote) and have a single scripted deployment manager that keeps them up to date.  Configurations can live in a centralized location, and developers don't have to be actively involved in ensuring code gets shipped up to a server.  Win.
+
+When doing scripted deployments for a group of nodes who appear in the same 'domain' list, it's possible to specify the --only setting so that you can identify which domain entries belong to a specific node.  For example, given this configuration:
+
+
+    production:
+      domain:
+      - foo.example.com
+      - bar.example.com
+      repository: git@github.com:foo.git
+
+
+We would like to be able to set up the following scripted runs on foo.example.com and bar.example.com:
+
+
+    foo% wd deploy --to=app:production --path=http://automation.example.com/wd/deploy.yml
+    bar% wd deploy --to=app:production --path=http://automation.example.com/wd/deploy.yml
+
+
+But without specifying --only we end up with undesired results.  When foo.example.com runs it will see that it needs to make sure deployment happens on 'foo.example.com' and 'bar.example.com'.  So, wd will ssh from foo.example.com to foo.example.com (less than ideal), deploy, and then ... it will ssh from foo.example.com to bar.example.com and do a deployment.  When bar.example.com runs, however, it will also ssh to bar.example.com, and also to foo.example.com.  So each host will be deployed twice.
+
+The --only setting is used to tell a node what its name is, and to tell it not to bother trying to deploy other nodes that it finds in the target's "domain" listing.  In other words, deployment is being managed from afar, and it's best to just manage ourselves and forego managing other nodes.
 
 
 ### A note about post\_{setup,deploy} Rake tasks
@@ -402,6 +497,28 @@ In your Rakefile:
 
     % rake deploy:setup to=<project>:<target>   (e.g., "foo:qa", "bar:production", etc.)
     % rake deploy:now   to=<project>:<target>
+
+  enabling staleness checking (see below):
+
+    % rake deploy:setup to=<project>:<target> check=yes
+    % rake deploy:now   to=<project>:<target> check=yes
+
+  maybe even specifying the path to the configuration file:
+
+    % rake deploy:setup to=<project>:<target> path=/etc/deploy.yml
+    % rake deploy:now   to=<project>:<target> path=/etc/deploy.yml
+
+  how about specifying the configuration file via URL:
+
+    % rake deploy:setup to=<project>:<target> path=https://github.com/username/project/raw/master/path/to/configs/deploy.yml
+    % rake deploy:now   to=<project>:<target> path=https://github.com/username/project/raw/master/path/to/configs/deploy.yml
+
+  Finally, it's also possible to specify the 'only' variable to limit 'domain' entries of interest:
+
+    % rake deploy:setup to=<project>:<target> only=myhost.example.com
+    % rake deploy:now to=<project>:<target> only=myhost.example.com
+
+  (see the discussion of --only above in "Running whiskey\_disk from the command-line" for more information)
 
 
 ### Staleness checks ###
@@ -637,7 +754,7 @@ Notice that there are no separate trees for 'uat' and 'qa' targets.
 
 ### Future Directions ###
 
-Check out the [TODO.txt](http://github.com/flogic/whiskey_disk/raw/master/TODO.txt) file 
+Check out the [Pivotal Tracker project](https://www.pivotaltracker.com/projects/202125)
 to see what we have in mind for the near future.
 
 ### Resources ###

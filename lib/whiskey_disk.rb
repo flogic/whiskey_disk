@@ -40,8 +40,13 @@ class WhiskeyDisk
       buffer << command
     end
     
-    def remote?
-      !! self[:domain]
+    def remote?(domain)
+      return false unless domain
+      return false if domain == 'local'
+      limit = WhiskeyDisk::Config.domain_limit 
+      return false if limit and domain_limit_match?(domain, limit)
+
+      true
     end
     
     def has_config_repo?
@@ -108,23 +113,40 @@ class WhiskeyDisk
       return '' if buffer.empty?
       (staleness_checks_enabled? and check_staleness?) ? apply_staleness_check(join_commands) : join_commands
     end
+
+    def domain_limit_match?(domain, limit)
+      domain.sub(%r{^.*@}, '') == limit
+    end
+    
+    def domain_of_interest?(domain)
+      return true unless limit = WhiskeyDisk::Config.domain_limit
+      domain_limit_match?(domain, limit)
+    end
     
     def encode_roles(roles)
       return '' unless roles and !roles.empty?
       "export WD_ROLES='#{roles.join(':')}'; "
     end
+
+    def build_command(domain, cmd)
+      "set -x; " + encode_roles(domain[:roles]) + cmd
+    end
     
-    def run(cmd)
-      needs(:domain)
-      self[:domain].each do |domain|
-        status = system('ssh', '-v', domain[:name], "set -x; " + encode_roles(domain[:roles]) + cmd)
-        record_result(domain[:name], status)
-      end
+    def run(domain, cmd)
+      system('ssh', '-v', domain[:name], build_command(domain, cmd))
+    end
+    
+    def shell(domain, cmd)
+      system(build_command(domain, cmd))
     end
     
     def flush
-      return run(bundle) if remote?
-      record_result('local', system(bundle))
+      needs(:domain)
+      self[:domain].each do |domain|
+        next unless domain_of_interest?(domain[:name])
+        status = remote?(domain[:name]) ? run(domain, bundle) : shell(domain, bundle)
+        record_result(domain[:name], status)
+      end
     end
     
     def record_result(domain, status)

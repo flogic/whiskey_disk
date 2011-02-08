@@ -1,0 +1,16 @@
+project:
+  "local-default":
+    deploy_to: "/tmp/wd-integration-target/destination/project"
+    repository: "git://wd-git.example.com/project.git"
+  "local-keyword":
+    domain: "local"
+    deploy_to: "/tmp/wd-integration-target/destination/project"
+    repository: "git://wd-git.example.com/project.git"
+  "local-user-domain":
+    domain: "user@wd-app1.example.com"
+    deploy_to: "/tmp/wd-integration-target/destination/project"
+    repository: "git://wd-git.example.com/project.git"
+  "local-domain":
+    domain: "wd-app1.example.com"
+    deploy_to: "/tmp/wd-integration-target/destination/project"
+    repository: "git://wd-git.example.com/project.git"

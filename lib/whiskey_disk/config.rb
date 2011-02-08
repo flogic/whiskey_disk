@@ -1,4 +1,6 @@
 require 'yaml'
+require 'uri'
+require 'open-uri'
 
 class WhiskeyDisk
   class Config
@@ -26,6 +28,11 @@ class WhiskeyDisk
       def check_staleness?
         !!(ENV['check'] && ENV['check'] =~ /^(?:t(?:rue)?|y(?:es)?|1)$/)
       end
+      
+      def domain_limit
+        return false unless ENV['only'] and ENV['only'] != ''
+        ENV['only']
+      end
 
       def contains_rakefile?(path)
         File.exists?(File.expand_path(File.join(path, 'Rakefile')))
@@ -47,9 +54,19 @@ class WhiskeyDisk
         find_rakefile_from_current_path
       end
 
-      def configuration_file
-        return path if path and File.file?(path)
+      def valid_path?(path)
+        if path
+          uri = URI.parse(path)
+          return path if uri.scheme
+          return path if File.file?(path)
+        end
+        
+        false
+      end
 
+      def configuration_file
+        return path if valid_path?(path)
+        
         files = []
 
         files += [
@@ -69,8 +86,7 @@ class WhiskeyDisk
       end
 
       def configuration_data
-        raise "Configuration file [#{configuration_file}] not found!" unless File.exists?(configuration_file)
-        File.read(configuration_file)
+        open(configuration_file) {|f| f.read }
       end
 
       def project_name
@@ -104,13 +120,17 @@ class WhiskeyDisk
         { project_name => data }
       end
 
+      def localize_domain_list(list)
+        [ list ].flatten.collect { |d| (d.nil? or d == '') ? 'local' : d }
+      end
+      
       def compact_list(list)
         [ list ].flatten.delete_if { |d| d.nil? or d == '' }
       end
       
       def normalize_domain(data)
-        compacted = compact_list(data)
-        return nil if compacted.empty?
+        compacted = localize_domain_list(data)
+        compacted = [ 'local' ] if compacted.empty?
         
         compacted.collect do |d|
           if d.respond_to?(:keys)
@@ -124,10 +144,18 @@ class WhiskeyDisk
         end
       end
       
+      def check_duplicates(project, target, domain_list)
+        seen = {}
+        domain_list.each do |domain|
+          raise "duplicate domain [#{domain[:name]}] in configuration file for project [#{project}], target [#{target}]" if seen[domain[:name]]
+          seen[domain[:name]] = true
+        end
+      end
+      
       def normalize_domains(data)
         data.each_pair do |project, project_data|
           project_data.each_pair do |target, target_data|
-            target_data['domain'] = normalize_domain(target_data['domain']) if target_data['domain']
+            target_data['domain'] = check_duplicates(project, target, normalize_domain(target_data['domain']))
           end
         end
       end
