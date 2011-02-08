@@ -5,23 +5,24 @@
 
 Gem::Specification.new do |s|
   s.name = %q{whiskey_disk}
-  s.version = "0.6.4"
+  s.version = "0.6.10"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Rick Bradley"]
-  s.date = %q{2011-01-26}
+  s.date = %q{2011-02-08}
   s.description = %q{Opinionated gem for doing fast git-based server deployments.}
   s.email = %q{rick@rickbradley.com}
   s.executables = ["wd_role", "wd"]
   s.extra_rdoc_files = [
+    "README.integration_specs",
     "README.markdown"
   ]
   s.files = [
     "CHANGELOG",
     "MIT-LICENSE",
+    "README.integration_specs",
     "README.markdown",
     "Rakefile",
-    "TODO.txt",
     "VERSION",
     "WHY.txt",
     "bin/wd",
@@ -38,9 +39,57 @@ Gem::Specification.new do |s|
     "lib/whiskey_disk/config.rb",
     "lib/whiskey_disk/helpers.rb",
     "lib/whiskey_disk/rake.rb",
+    "scenarios/git_repositories/config.git/HEAD",
+    "scenarios/git_repositories/config.git/config",
+    "scenarios/git_repositories/config.git/description",
+    "scenarios/git_repositories/config.git/git-daemon-export-ok",
+    "scenarios/git_repositories/config.git/hooks/applypatch-msg.sample",
+    "scenarios/git_repositories/config.git/hooks/commit-msg.sample",
+    "scenarios/git_repositories/config.git/hooks/post-commit.sample",
+    "scenarios/git_repositories/config.git/hooks/post-receive.sample",
+    "scenarios/git_repositories/config.git/hooks/post-update.sample",
+    "scenarios/git_repositories/config.git/hooks/pre-applypatch.sample",
+    "scenarios/git_repositories/config.git/hooks/pre-commit.sample",
+    "scenarios/git_repositories/config.git/hooks/pre-rebase.sample",
+    "scenarios/git_repositories/config.git/hooks/prepare-commit-msg.sample",
+    "scenarios/git_repositories/config.git/hooks/update.sample",
+    "scenarios/git_repositories/config.git/info/exclude",
+    "scenarios/git_repositories/config.git/objects/17/6bf54cf17d1d1c24556dc059c4144a5df230e8",
+    "scenarios/git_repositories/config.git/objects/20/e9ff3feaa8ede30f707e5f1b4356e3c02bb7ec",
+    "scenarios/git_repositories/config.git/objects/45/117b1c775f0de415478dbf08ed9d667ab17d13",
+    "scenarios/git_repositories/config.git/objects/71/eb5df52676e8e6efba471050b46978173af110",
+    "scenarios/git_repositories/config.git/objects/d1/0bcd51fec41f854001e4d61f99d9e282a695d3",
+    "scenarios/git_repositories/config.git/objects/e6/b02c66ad632e6b8535c4630cb8fe07732a72fc",
+    "scenarios/git_repositories/config.git/objects/f9/49d5d8a4f12c91471e34d4e277239c35ebd10d",
+    "scenarios/git_repositories/config.git/refs/heads/master",
+    "scenarios/git_repositories/project.git/HEAD",
+    "scenarios/git_repositories/project.git/config",
+    "scenarios/git_repositories/project.git/description",
+    "scenarios/git_repositories/project.git/git-daemon-export-ok",
+    "scenarios/git_repositories/project.git/hooks/applypatch-msg.sample",
+    "scenarios/git_repositories/project.git/hooks/commit-msg.sample",
+    "scenarios/git_repositories/project.git/hooks/post-commit.sample",
+    "scenarios/git_repositories/project.git/hooks/post-receive.sample",
+    "scenarios/git_repositories/project.git/hooks/post-update.sample",
+    "scenarios/git_repositories/project.git/hooks/pre-applypatch.sample",
+    "scenarios/git_repositories/project.git/hooks/pre-commit.sample",
+    "scenarios/git_repositories/project.git/hooks/pre-rebase.sample",
+    "scenarios/git_repositories/project.git/hooks/prepare-commit-msg.sample",
+    "scenarios/git_repositories/project.git/hooks/update.sample",
+    "scenarios/git_repositories/project.git/info/exclude",
+    "scenarios/git_repositories/project.git/objects/20/1c7641c2e42b0b904e5c1f793489d8b858e4da",
+    "scenarios/git_repositories/project.git/objects/80/26076649ceccbe96a6292f2432652f08483035",
+    "scenarios/git_repositories/project.git/objects/ef/2a88894d5421920b9dfe67a9a4d8043830e62e",
+    "scenarios/git_repositories/project.git/refs/heads/master",
+    "scenarios/invalid/deploy.yml",
+    "scenarios/local/deploy.yml",
+    "scenarios/remote/deploy.yml",
     "spec/.bacon",
     "spec/init_spec.rb",
     "spec/install_spec.rb",
+    "spec/integration/invalid_configuration_spec.rb",
+    "spec/integration/local_deployments_spec.rb",
+    "spec/integration/remote_deployments_spec.rb",
     "spec/spec_helper.rb",
     "spec/wd_command_spec.rb",
     "spec/wd_role_command_spec.rb",
@@ -58,6 +107,9 @@ Gem::Specification.new do |s|
   s.test_files = [
     "spec/init_spec.rb",
     "spec/install_spec.rb",
+    "spec/integration/invalid_configuration_spec.rb",
+    "spec/integration/local_deployments_spec.rb",
+    "spec/integration/remote_deployments_spec.rb",
     "spec/spec_helper.rb",
     "spec/wd_command_spec.rb",
     "spec/wd_role_command_spec.rb",
