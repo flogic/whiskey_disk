@@ -40,7 +40,7 @@ integration_spec do
           File.exists?(deployed_file('project/README')).should == true
         end    
 
-        it 'should report the remoate deployment as successful' do
+        it 'should report the remote deployment as successful' do
           run_deploy(@args)
           File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
         end
