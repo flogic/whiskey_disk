@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{whiskey_disk}
-  s.version = "0.6.10"
+  s.version = "0.6.11"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Rick Bradley"]
-  s.date = %q{2011-02-08}
+  s.date = %q{2011-02-18}
   s.description = %q{Opinionated gem for doing fast git-based server deployments.}
   s.email = %q{rick@rickbradley.com}
   s.executables = ["wd_role", "wd"]
@@ -87,6 +87,7 @@ Gem::Specification.new do |s|
     "spec/.bacon",
     "spec/init_spec.rb",
     "spec/install_spec.rb",
+    "spec/integration/deployment_failures_spec.rb",
     "spec/integration/invalid_configuration_spec.rb",
     "spec/integration/local_deployments_spec.rb",
     "spec/integration/remote_deployments_spec.rb",
@@ -107,6 +108,7 @@ Gem::Specification.new do |s|
   s.test_files = [
     "spec/init_spec.rb",
     "spec/install_spec.rb",
+    "spec/integration/deployment_failures_spec.rb",
     "spec/integration/invalid_configuration_spec.rb",
     "spec/integration/local_deployments_spec.rb",
     "spec/integration/remote_deployments_spec.rb",
