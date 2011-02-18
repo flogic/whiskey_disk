@@ -171,8 +171,8 @@ class WhiskeyDisk
       end
 
       def filter_data(data)
-        current = data[project_name][environment_name]
-        raise "No configuration file defined data for environment [#{environment_name}]" unless current
+        current = data[project_name][environment_name] rescue nil
+        raise "No configuration file defined data for project `#{project_name}`, environment `#{environment_name}`" unless current
 
         current.merge!({
           'environment' => environment_name,

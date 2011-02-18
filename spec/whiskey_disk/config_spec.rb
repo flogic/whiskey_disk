@@ -191,6 +191,11 @@ describe WhiskeyDisk::Config do
         set_config_url_response('production' => { 'repository' => 'b'}, 'staging' => staging)
         TestURLConfig.fetch['config_target'].should == 'testing'
       end
+      
+      it 'should fail if the named target cannot be found' do
+        ENV['to'] = @env = 'bogus:thing'
+        lambda { TestURLConfig.fetch }.should.raise
+      end
     end
     
     describe 'and path specified is not an URL' do
@@ -203,7 +208,7 @@ describe WhiskeyDisk::Config do
       after do
         FileUtils.rm_rf(@path)
       end
-
+      
       it 'should fail if the current environment cannot be determined' do
         ENV['to'] = nil
         lambda { WhiskeyDisk::Config.fetch }.should.raise
@@ -284,6 +289,11 @@ describe WhiskeyDisk::Config do
         staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk', 'config_target' => 'testing' }
         write_config_file('production' => { 'repository' => 'b'}, 'staging' => staging)
         WhiskeyDisk::Config.fetch['config_target'].should == 'testing'
+      end
+      
+      it 'should fail if the named target cannot be found' do
+        ENV['to'] = @env = 'bogus:thing'
+        lambda { WhiskeyDisk::Config.fetch }.should.raise
       end
     end
   end
