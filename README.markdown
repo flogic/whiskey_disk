@@ -767,7 +767,8 @@ to see what we have in mind for the near future.
 ### Contributors ###
 
  - Rick Bradley (rick@rickbradley.com, github:rick)
- - Alex Sharp (ajsharp@gmail.com) - issues, real-world usage cases, design feedback
  - Jeremy Holland (jeremy@jeremypholland.com, github:therubyneck): feature/bugfix contributions
  - Kevin Barnes (@vinbarnes), Yossef Mendellsohn (cardioid) for design help and proofreading
+ - Alex Sharp (ajsharp@gmail.com) - issues, real-world usage cases, design feedback
+ - Josh Moore (josh@codingforrent.com) - tracking down issues handling bad project Rakefiles
  - Cristi Balan (evilchelu) for feedback and proofreading
