@@ -187,7 +187,7 @@ class WhiskeyDisk
     end
     
     def if_task_defined(task, cmd)
-      %Q{if [[ `#{env_vars} rake -P | grep #{task}` != "" ]]; then #{cmd}; fi}
+      %Q(rakep=`#{env_vars} rake -P` && if [[ `echo "${rakep}" | grep #{task}` != "" ]]; then #{cmd}; fi )
     end
     
     def clone_repository(repo, path)

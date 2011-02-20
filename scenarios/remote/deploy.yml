@@ -3,3 +3,23 @@ project:
     domain: "user@wd-app1.example.com"
     deploy_to: "/tmp/wd-integration-target/destination/project"
     repository: "git://wd-git.example.com/project.git"
+  "no_rakefile":
+    domain: "user@wd-app1.example.com"
+    deploy_to: "/tmp/wd-integration-target/destination/project"
+    repository: "git://wd-git.example.com/project.git"
+  "bad_rakefile":
+    domain: "user@wd-app1.example.com"
+    deploy_to: "/tmp/wd-integration-target/destination/project"
+    repository: "git://wd-git.example.com/project.git"
+    branch: "bad_rakefile"
+  "no_rake_hooks":
+    domain: "user@wd-app1.example.com"
+    deploy_to: "/tmp/wd-integration-target/destination/project"
+    repository: "git://wd-git.example.com/project.git"
+    branch: "no_rake_hooks"
+  "with_rake_hooks":
+    domain: "user@wd-app1.example.com"
+    deploy_to: "/tmp/wd-integration-target/destination/project"
+    repository: "git://wd-git.example.com/project.git"
+    branch: "post_rake_tasks"
+    
