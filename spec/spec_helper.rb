@@ -60,3 +60,7 @@ end
 def deployed_file(path)
   File.join(deployment_root, path)
 end
+
+def dump_log
+  STDERR.puts("\n\n\n" + File.read(integration_log) + "\n\n\n")
+end

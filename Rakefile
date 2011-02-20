@@ -20,6 +20,10 @@ begin
     gemspec.homepage = "http://github.com/flogic/whiskey_disk"
     gemspec.authors = ["Rick Bradley"]
     gemspec.add_dependency('rake')
+    
+    # I've decided that the integration spec shizzle shouldn't go into the gem
+    gemspec.files.exclude 'scenarios', 'spec/integration'
+    gemspec.test_files.exclude 'scenarios', 'spec/integration'
   end
   Jeweler::GemcutterTasks.new  
 rescue LoadError
