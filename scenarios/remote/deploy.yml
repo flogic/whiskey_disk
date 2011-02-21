@@ -22,4 +22,27 @@ project:
     deploy_to: "/tmp/wd-integration-target/destination/project"
     repository: "git://wd-git.example.com/project.git"
     branch: "post_rake_tasks"
+  "no_post_scripts":
+    domain: "user@wd-app1.example.com"
+    deploy_to: "/tmp/wd-integration-target/destination/project"
+    repository: "git://wd-git.example.com/project.git"
+  "missing_post_scripts":
+    domain: "user@wd-app1.example.com"
+    deploy_to: "/tmp/wd-integration-target/destination/project"
+    repository: "git://wd-git.example.com/project.git"
+    post_setup_script: "bin/missing.sh"
+    post_deploy_script: "bin/missing.sh"
+  "with_post_scripts":
+    domain: "user@wd-app1.example.com"
+    deploy_to: "/tmp/wd-integration-target/destination/project"
+    repository: "git://wd-git.example.com/project.git"
+    post_setup_script: "bin/post_setup_script.sh"
+    post_deploy_script: "bin/post_deploy_script.sh"
+  "with_failing_post_scripts":
+    domain: "user@wd-app1.example.com"
+    deploy_to: "/tmp/wd-integration-target/destination/project"
+    repository: "git://wd-git.example.com/project.git"
+    post_setup_script: "bin/failing_post_setup_script.sh"
+    post_deploy_script: "bin/failing_post_deploy_script.sh"
+  
     
