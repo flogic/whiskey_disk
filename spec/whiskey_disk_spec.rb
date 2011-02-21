@@ -389,7 +389,7 @@ describe 'WhiskeyDisk' do
       
         it 'should cd to the deploy_to path prior to running the script' do
           WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo; sh -x /path/to/setup/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*sh -x /path/to/setup/script})
         end
             
         it 'should use an absolute path to run the post setup script when the script path starts with a "/"' do
@@ -410,7 +410,7 @@ describe 'WhiskeyDisk' do
       
         it 'should cd to the deploy_to path prior to running the script' do
           WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo; sh -x /path/to/main/repo/path/to/setup/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*sh -x /path/to/main/repo/path/to/setup/script})
         end
       
         it 'should use a path relative to the setup path to run the post setup script' do
@@ -487,7 +487,7 @@ describe 'WhiskeyDisk' do
         
         it 'should cd to the deploy_to path prior to running the script' do
           WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo; sh -x /path/to/deployment/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*sh -x /path/to/deployment/script})
         end
         
         it 'should use an absolute path to run the post deployment script when the script path starts with a "/"' do
@@ -508,7 +508,7 @@ describe 'WhiskeyDisk' do
       
         it 'should cd to the deploy_to path prior to running the script' do
           WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo; sh -x /path/to/main/repo/path/to/deployment/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*sh -x /path/to/main/repo/path/to/deployment/script})
         end
         
         it 'should use a path relative to the deployment path to run the post deployment script' do

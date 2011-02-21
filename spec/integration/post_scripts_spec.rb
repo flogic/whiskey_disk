@@ -21,7 +21,7 @@ integration_spec do
         
         it 'should not run a post_setup script' do
           run_setup(@args)
-          File.read(integration_log).should.not =~ /something something/ # TODO
+          File.read(integration_log).should.not =~ /^Running post script/
         end
             
         it 'should report the remote setup as successful' do
@@ -47,7 +47,7 @@ integration_spec do
 
         it 'should not run a post_deploy script' do
           run_deploy(@args)
-          File.read(integration_log).should.not =~ /something something/ # TODO
+          File.read(integration_log).should.not =~ /^Running post script/
         end
             
         it 'should report the remote deployment as successful' do
@@ -73,9 +73,9 @@ integration_spec do
           File.exists?(deployed_file('project/README')).should == true
         end
         
-        it 'should not run a post_setup script' do
+        it 'should attempt to run a post_setup script' do
           run_setup(@args)
-          File.read(integration_log).should.not =~ /something something/ # TODO
+          File.read(integration_log).should =~ /^Running post script/
         end
             
         it 'should report the remote setup as a failure' do
@@ -99,9 +99,9 @@ integration_spec do
           File.exists?(deployed_file('project/README')).should == true
         end    
 
-        it 'should not run a post_deploy script' do
+        it 'should attempt to run a post_deploy script' do
           run_deploy(@args)
-          File.read(integration_log).should.not =~ /something something/ # TODO
+          File.read(integration_log).should =~ /^Running post script/
         end
             
         it 'should report the remote deployment as a failure' do
