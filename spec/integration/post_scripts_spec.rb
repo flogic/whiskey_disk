@@ -77,6 +77,11 @@ integration_spec do
           run_setup(@args)
           File.read(integration_log).should =~ /^Running post script/
         end
+        
+        it 'should pass environment variable settings to the post_setup script' do
+          run_setup(@args)
+          File.read(integration_log).should =~ /FOO='BAR'/
+        end
             
         it 'should report the remote setup as a failure' do
           run_setup(@args)
@@ -102,6 +107,11 @@ integration_spec do
         it 'should attempt to run a post_deploy script' do
           run_deploy(@args)
           File.read(integration_log).should =~ /^Running post script/
+        end
+            
+        it 'should pass environment variable settings to the post_deploy script' do
+          run_deploy(@args)
+          File.read(integration_log).should =~ /FOO='BAR'/
         end
             
         it 'should report the remote deployment as a failure' do
@@ -133,6 +143,11 @@ integration_spec do
             File.read(integration_log).should =~ /^Running the post_setup script/
           end
 
+          it 'should pass environment variable settings to the post_setup script' do
+            run_setup(@args)
+            File.read(integration_log).should =~ /FOO='BAR'/
+          end
+
           it 'should report the remote setup as successful' do
             run_setup(@args)
             File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
@@ -151,6 +166,11 @@ integration_spec do
           it 'should run the post_setup script' do
             run_setup(@args)
             File.read(integration_log).should =~ /^Running the post_setup script/
+          end
+
+          it 'should pass environment variable settings to the post_setup script' do
+            run_setup(@args)
+            File.read(integration_log).should =~ /FOO='BAR'/
           end
 
           it 'should report the remote setup as a failure' do
@@ -181,6 +201,11 @@ integration_spec do
             File.read(integration_log).should =~ /^Running the post_deploy script/
           end
 
+          it 'should pass environment variable settings to the post_deploy script' do
+            run_deploy(@args)
+            File.read(integration_log).should =~ /FOO='BAR'/
+          end
+
           it 'should report the remote deployment as successful' do
             run_deploy(@args)
             File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
@@ -199,6 +224,11 @@ integration_spec do
           it 'should run the post_deploy script' do
             run_deploy(@args)
             File.read(integration_log).should =~ /^Running the post_deploy script/
+          end
+
+          it 'should pass environment variable settings to the post_deploy script' do
+            run_deploy(@args)
+            File.read(integration_log).should =~ /FOO='BAR'/
           end
 
           it 'should report the remote deployment as a failure' do
