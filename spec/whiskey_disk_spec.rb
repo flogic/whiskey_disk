@@ -396,11 +396,6 @@ describe 'WhiskeyDisk' do
           WhiskeyDisk.run_post_setup_hooks
           WhiskeyDisk.buffer.join(' ').should.match(%r{sh -x /path/to/setup/script})         
         end
-        
-        it 'should make the post setup script run conditional on the presence of the script' do
-          WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{if \[ -e /path/to/setup/script \]; then .*; fi})
-        end
       end
       
       describe 'and the script path does not start with a "/"' do
@@ -421,11 +416,6 @@ describe 'WhiskeyDisk' do
         it 'should use a path relative to the setup path to run the post setup script' do
           WhiskeyDisk.run_post_setup_hooks
           WhiskeyDisk.buffer.join(' ').should.match(%r{sh -x /path/to/main/repo/path/to/setup/script})
-        end
-        
-        it 'should make the post setup script run conditional on the presence of the script' do
-          WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{if \[ -e /path/to/main/repo/path/to/setup/script \]; then .*; fi})
         end
       end
     end
@@ -504,11 +494,6 @@ describe 'WhiskeyDisk' do
           WhiskeyDisk.run_post_deploy_hooks
           WhiskeyDisk.buffer.join(' ').should.match(%r{sh -x /path/to/deployment/script})         
         end
-        
-        it 'should make the post deployment script run conditional on the presence of the script' do
-          WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{if \[ -e /path/to/deployment/script \]; then .*; fi})
-        end
       end
       
       describe 'and the script path does not start with a "/"' do
@@ -529,11 +514,6 @@ describe 'WhiskeyDisk' do
         it 'should use a path relative to the deployment path to run the post deployment script' do
           WhiskeyDisk.run_post_deploy_hooks
           WhiskeyDisk.buffer.join(' ').should.match(%r{sh -x /path/to/main/repo/path/to/deployment/script})
-        end
-        
-        it 'should make the post deployment script run conditional on the presence of the script' do
-          WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{if \[ -e /path/to/main/repo/path/to/deployment/script \]; then .*; fi})
         end
       end
     end

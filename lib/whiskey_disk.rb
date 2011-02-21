@@ -215,8 +215,7 @@ class WhiskeyDisk
 
     def run_script(script)
       return unless script
-      path = build_path(script)
-      enqueue("if [ -e #{path} ]; then cd #{self[:deploy_to]}; sh -x #{path}; fi ")
+      enqueue("cd #{self[:deploy_to]}; sh -x #{build_path(script)}")
     end
 
     def ensure_main_parent_path_is_present
