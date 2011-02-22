@@ -86,11 +86,13 @@ current local checkout.
 
   - You can deploy to multiple remote targets at once.  Currently this is limited
     to one-after-the-other synchronous deployments, but we're thinking about 
-    doing them in parallel once we're happy with the stability of this (new)
-    feature.
+    doing them in parallel once we're happy with the stability of this feature.
 
   - Assign hosts to roles (e.g., "web", "db", "app") and vary the shell or rake 
     post-setup/post-deploy actions you run based on those roles.
+
+  - Limit the actions you run after deployment based on whether files of interest
+    *actually changed*.
 
 ### Assumptions ###
 
@@ -486,9 +488,37 @@ You can also define these tasks yourself if you want to eliminate the dependency
 deployment target system.
 
 
+### Doing things when files of interest change ###
+
+Do you want to run database migrations when no migrations have been added?  Why bother compressing front-end assets when none of them have changed?  Why restart your application server if only the project README changed?  Whiskey\_disk provides a `changed?` ruby helper method to allow you to decide whether to run expensive post deployment tasks, based on what files changed in the deployment.  Typically this would happen in your rake tasks, but it could happen from regular ruby code as well.
+
+
+    require 'whiskey_disk/helpers'
+
+    namespace :deploy do
+
+      task :run_migrations do
+        if role?(:db) and changed?('db/migrate')
+          puts "Running database migrations..."
+          Rake::Task['db:migrate'].invoke
+        end
+      end
+
+      task :compress_assets do
+        if changed?('public/stylesheets') or changed?('public/javascripts') 
+          puts "Getting my asset munge on..."
+          # do some expensive asset compression stuff
+        end
+      end
+
+      task :post_deploy => [ :run_migrations, :compress_assets ]
+    end
+
+
+
 ### Running via rake ###
 
-In your Rakefile:
+You can use rake tasks to do everything possible with whiskey\_disk (the `wd` command is just a front-end to the whiskey\_disk rake tasks).  In your Rakefile:
 
     require 'whiskey_disk/rake'
 
