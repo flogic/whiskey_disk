@@ -160,22 +160,24 @@ class WhiskeyDisk
       @results ||= []
       @results << { :domain => domain, :status => status }
     end
+
+    def summarize_results(results)
+      successes = failures = 0
+      results.each do |result|
+        puts "#{result[:domain]} => #{result[:status] ? 'succeeded' : 'failed'}."
+        if result[:status]
+          successes += 1 
+        else
+          failures += 1
+        end
+      end
+      [successes + failures, successes, failures]
+    end
     
     def summarize
-      puts
-      puts "Results:"
+      puts "\nResults:"
       if results and not results.empty?
-        successes = failures = total = 0
-        results.each do |result|
-          total += 1
-          if result[:status]
-            successes += 1 
-          else
-            failures += 1
-          end
-          
-          puts "#{result[:domain]} => #{result[:status] ? 'succeeded' : 'failed'}."
-        end
+        total, successes, failures = summarize_results(results)
         puts "Total: #{total} deployment#{total == 1 ? '' : 's'}, " +
           "#{successes} success#{successes == 1 ? '' : 'es'}, " +
           "#{failures} failure#{failures == 1 ? '' : 's'}."
