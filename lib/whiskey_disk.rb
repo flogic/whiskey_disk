@@ -133,11 +133,11 @@ class WhiskeyDisk
     end
     
     def run(domain, cmd)
-      system('ssh', '-v', domain[:name], build_command(domain, cmd))
+      system('ssh', '-v', domain[:name], 'bash', '-c', build_command(domain, cmd))
     end
     
     def shell(domain, cmd)
-      system(build_command(domain, cmd))
+      system('bash', '-c', build_command(domain, cmd))
     end
     
     def flush
@@ -215,7 +215,7 @@ class WhiskeyDisk
 
     def run_script(script)
       return unless script
-      enqueue(%Q<cd #{self[:deploy_to]}; echo "Running post script..."; #{env_vars} sh -x #{build_path(script)}>)
+      enqueue(%Q<cd #{self[:deploy_to]}; echo "Running post script..."; #{env_vars} bash -x #{build_path(script)}>)
     end
 
     def ensure_main_parent_path_is_present
