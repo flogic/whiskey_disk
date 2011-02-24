@@ -384,22 +384,22 @@ describe 'WhiskeyDisk' do
       
         it 'should attempt to run the post setup script' do        
           WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{sh -x .*/path/to/setup/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x .*/path/to/setup/script})
         end
       
         it 'should pass any environment variables when running the post setup script' do
           WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{FOO='BAR'  sh -x .*/path/to/setup/script})      
+          WhiskeyDisk.buffer.join(' ').should.match(%r{FOO='BAR'  bash -x .*/path/to/setup/script})      
         end
 
         it 'should cd to the deploy_to path prior to running the script' do
           WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*sh -x /path/to/setup/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*bash -x /path/to/setup/script})
         end
             
         it 'should use an absolute path to run the post setup script when the script path starts with a "/"' do
           WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{sh -x /path/to/setup/script})         
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x /path/to/setup/script})         
         end
       end
       
@@ -410,22 +410,22 @@ describe 'WhiskeyDisk' do
 
         it 'should attempt to run the post setup script' do        
           WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{sh -x .*/path/to/setup/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x .*/path/to/setup/script})
         end
       
         it 'should pass any environment variables when running the post setup script' do
           WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{FOO='BAR'  sh -x .*/path/to/setup/script})      
+          WhiskeyDisk.buffer.join(' ').should.match(%r{FOO='BAR'  bash -x .*/path/to/setup/script})      
         end
 
         it 'should cd to the deploy_to path prior to running the script' do
           WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*sh -x /path/to/main/repo/path/to/setup/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*bash -x /path/to/main/repo/path/to/setup/script})
         end
       
         it 'should use a path relative to the setup path to run the post setup script' do
           WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{sh -x /path/to/main/repo/path/to/setup/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x /path/to/main/repo/path/to/setup/script})
         end
       end
     end
@@ -492,22 +492,22 @@ describe 'WhiskeyDisk' do
       
         it 'should attempt to run the post deployment script' do        
           WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{sh -x .*/path/to/deployment/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x .*/path/to/deployment/script})
         end
         
         it 'should pass any environment variables when running the post deploy script' do
           WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{FOO='BAR'  sh -x .*/path/to/deployment/script})      
+          WhiskeyDisk.buffer.join(' ').should.match(%r{FOO='BAR'  bash -x .*/path/to/deployment/script})      
         end
 
         it 'should cd to the deploy_to path prior to running the script' do
           WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*sh -x /path/to/deployment/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*bash -x /path/to/deployment/script})
         end
         
         it 'should use an absolute path to run the post deployment script when the script path starts with a "/"' do
           WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{sh -x /path/to/deployment/script})         
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x /path/to/deployment/script})         
         end
       end
       
@@ -518,22 +518,22 @@ describe 'WhiskeyDisk' do
 
         it 'should attempt to run the post deployment script' do        
           WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{sh -x .*/path/to/deployment/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x .*/path/to/deployment/script})
         end
       
         it 'should pass any environment variables when running the post deploy script' do
           WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{FOO='BAR'  sh -x .*/path/to/deployment/script})      
+          WhiskeyDisk.buffer.join(' ').should.match(%r{FOO='BAR'  bash -x .*/path/to/deployment/script})      
         end
 
         it 'should cd to the deploy_to path prior to running the script' do
           WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*sh -x /path/to/main/repo/path/to/deployment/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*bash -x /path/to/main/repo/path/to/deployment/script})
         end
         
         it 'should use a path relative to the deployment path to run the post deployment script' do
           WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{sh -x /path/to/main/repo/path/to/deployment/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x /path/to/main/repo/path/to/deployment/script})
         end
       end
     end
@@ -868,14 +868,14 @@ describe 'WhiskeyDisk' do
     end
 
     it 'should pass the string to the shell with verbosity enabled' do
-      WhiskeyDisk.should.receive(:system).with("set -x; ls")
+      WhiskeyDisk.should.receive(:system).with('bash', '-c', "set -x; ls")
       WhiskeyDisk.shell(@domain, 'ls')
     end
       
     it 'should include domain role settings when the domain has roles' do
       @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
       WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
-      WhiskeyDisk.should.receive(:system).with("set -x; export WD_ROLES='web:db'; ls")
+      WhiskeyDisk.should.receive(:system).with('bash', '-c', "set -x; export WD_ROLES='web:db'; ls")
       WhiskeyDisk.shell(@domain, 'ls')        
     end
   end
@@ -898,14 +898,14 @@ describe 'WhiskeyDisk' do
     end
 
     it 'should pass the string to ssh for the domain, with verbosity enabled' do
-      WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain_name, "set -x; ls")
+      WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain_name, 'bash', '-c', "set -x; ls")
       WhiskeyDisk.run(@domain, 'ls')
     end
       
     it 'should include domain role settings when the domain has roles' do
       @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
       WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
-      WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain_name, "set -x; export WD_ROLES='web:db'; ls")
+      WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain_name, 'bash', '-c', "set -x; export WD_ROLES='web:db'; ls")
       WhiskeyDisk.run(@domain, 'ls')        
     end
   end
