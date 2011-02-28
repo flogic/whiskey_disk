@@ -55,6 +55,10 @@ def checkout_repo(repo_name, name = '')
   system("cd #{deployment_root} && git clone #{repo_path} #{name} >/dev/null 2>/dev/null")
 end
 
+def jump_to_initial_commit(path)
+  system(%Q(cd #{File.join(deployment_root, path)} && git reset --hard `git log --oneline | head -1 | awk '{print $1}'` >/dev/null 2>/dev/null))
+end
+
 def run_log
   File.readlines(integration_log)
 end
