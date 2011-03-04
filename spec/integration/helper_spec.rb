@@ -9,6 +9,32 @@ integration_spec do
       @args = "--path=#{@config} --to=project:hook_with_changed"
     end
     
+    describe 'and performing a setup' do
+      it 'should perform a checkout of the repository to the target path' do
+        run_setup(@args)
+        File.exists?(deployed_file('project/README')).should == true
+      end
+      
+      it 'should do actions guarded by a changed? method when the relevant files have changed' do
+        run_setup(@args)
+        File.read(integration_log).should =~ /changed\? was true/
+      end
+      
+      it 'should do actions guarded by a changed? method when the relevant files have not changed' do
+        run_setup(@args)
+        File.read(integration_log).should.not =~ /changed\? was false/
+      end
+
+      it 'should report the remote setup as successful' do
+        run_setup(@args)
+        File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
+      end
+
+      it 'should exit with a true status' do
+        run_setup(@args).should == true
+      end
+    end
+    
     describe 'and performing a deployment' do
       before do
         checkout_repo('project')
