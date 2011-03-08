@@ -190,11 +190,14 @@ class WhiskeyDisk
       %Q(rakep=`#{env_vars} rake -P` && if [[ `echo "${rakep}" | grep #{task}` != "" ]]; then #{cmd}; fi )
     end
     
+    def safe_branch_checkout(path, my_branch)
+      %Q(cd #{path} && git checkout -b #{my_branch} origin/#{my_branch} || git checkout #{my_branch})
+    end
+    
     def clone_repository(repo, path, my_branch)
       enqueue "cd #{parent_path(path)}"
       enqueue("if [ -e #{path} ]; then echo 'Repository already cloned to [#{path}].  Skipping.'; " +
-              "else git clone --depth 1 #{repo} #{tail_path(path)} && " +
-              "cd #{path} && git checkout -b #{my_branch} origin/#{my_branch} || git checkout #{my_branch}; fi")
+              "else git clone --depth 1 #{repo} #{tail_path(path)} && #{safe_branch_checkout(path, my_branch)}; fi")
     end
    
     def refresh_checkout(path, repo_branch)
