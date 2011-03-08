@@ -1,4 +1,12 @@
 
+0.6.15 / 2011-03-07 
+==================
+
+  * integration specs for "git checkout #{branch}" functionality
+  * adding scenario to test git checkout on non-master branches
+  * Adding current_branch integration spec helper method
+  * Ensure specified branch is checked out before applying the refresh
+
 0.6.14 / 2011-02-23 
 ==================
 
