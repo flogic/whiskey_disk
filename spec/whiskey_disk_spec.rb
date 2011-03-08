@@ -202,8 +202,7 @@ describe 'WhiskeyDisk' do
     
     it 'should work from the main repository checkout parent path' do
       WhiskeyDisk.checkout_main_repository
-      WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main})
-      WhiskeyDisk.buffer.join(' ').should.not.match(%r{cd /path/to/main/repo})
+      WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main[^/]})
     end
       
     it 'should attempt to shallow clone the main repository to the repository checkout path' do
@@ -235,8 +234,7 @@ describe 'WhiskeyDisk' do
 
     it 'should work from the configuration repository checkout parent path' do
       WhiskeyDisk.checkout_configuration_repository
-      WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/config})
-      WhiskeyDisk.buffer.join(' ').should.not.match(%r{cd /path/to/config/repo})
+      WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/config[^/]})
     end
 
     it 'should attempt to shallow clone the configuration repository to the repository checkout path' do
