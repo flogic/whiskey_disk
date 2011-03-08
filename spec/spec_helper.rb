@@ -64,3 +64,7 @@ end
 def dump_log
   STDERR.puts("\n\n\n" + File.read(integration_log) + "\n\n\n")
 end
+
+def current_branch(path)
+  `cd #{deployed_file(path)} && git branch`.split("\n").grep(/^\*/).first.sub(/^\* /, '')
+end
