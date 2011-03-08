@@ -1,4 +1,13 @@
 
+0.6.16 / 2011-03-08 
+==================
+
+  * Turning off shallow clones for 'wd setup'
+  * minor refactoring of new checkout functionality
+  * check out the specified branch on setup
+  * adding integration specs to test setup + deploy at once
+  * tweaking a couple of old path specs
+
 0.6.15 / 2011-03-07 
 ==================
 
