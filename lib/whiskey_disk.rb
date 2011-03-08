@@ -190,10 +190,14 @@ class WhiskeyDisk
       %Q(rakep=`#{env_vars} rake -P` && if [[ `echo "${rakep}" | grep #{task}` != "" ]]; then #{cmd}; fi )
     end
     
-    def clone_repository(repo, path)
+    def safe_branch_checkout(path, my_branch)
+      %Q(cd #{path} && git checkout -b #{my_branch} origin/#{my_branch} || git checkout #{my_branch})
+    end
+    
+    def clone_repository(repo, path, my_branch)
       enqueue "cd #{parent_path(path)}"
       enqueue("if [ -e #{path} ]; then echo 'Repository already cloned to [#{path}].  Skipping.'; " +
-              "else git clone --depth 1 #{repo} #{tail_path(path)} ; fi")
+              "else git clone --depth 1 #{repo} #{tail_path(path)} && #{safe_branch_checkout(path, my_branch)}; fi")
     end
    
     def refresh_checkout(path, repo_branch)
@@ -231,12 +235,12 @@ class WhiskeyDisk
 
     def checkout_main_repository
       needs(:deploy_to, :repository)
-      clone_repository(self[:repository], self[:deploy_to])
+      clone_repository(self[:repository], self[:deploy_to], branch)
     end
     
     def checkout_configuration_repository
       needs(:deploy_config_to, :config_repository)
-      clone_repository(self[:config_repository], self[:deploy_config_to])
+      clone_repository(self[:config_repository], self[:deploy_config_to], config_branch)
     end
     
     def update_main_repository_checkout

@@ -202,8 +202,7 @@ describe 'WhiskeyDisk' do
     
     it 'should work from the main repository checkout parent path' do
       WhiskeyDisk.checkout_main_repository
-      WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main})
-      WhiskeyDisk.buffer.join(' ').should.not.match(%r{cd /path/to/main/repo})
+      WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main[^/]})
     end
       
     it 'should attempt to shallow clone the main repository to the repository checkout path' do
@@ -214,6 +213,33 @@ describe 'WhiskeyDisk' do
     it 'should make the main repository clone conditional on the lack of a main repository checkout' do
       WhiskeyDisk.checkout_main_repository
       WhiskeyDisk.buffer.join(' ').should.match(%r{if \[ -e #{@parameters['deploy_to']} \]; then .*; fi})
+    end
+    
+    it 'should do a branch creation checkout of the master branch when no branch is specified' do
+      WhiskeyDisk.checkout_main_repository
+      WhiskeyDisk.buffer.join(' ').should.match(%r{git checkout -b master origin/master})
+    end
+    
+    it 'should fall back to a regular checkout of the master branch when no branch is specified' do
+      WhiskeyDisk.checkout_main_repository
+      WhiskeyDisk.buffer.join(' ').should.match(%r{\|\| git checkout master})
+    end
+    
+    it 'should do a branch creation checkout of the specified branch when a branch is specified' do
+      WhiskeyDisk.configuration = @parameters.merge({'branch' => 'production'})
+      WhiskeyDisk.checkout_main_repository
+      WhiskeyDisk.buffer.join(' ').should.match(%r{git checkout -b production origin/production})
+    end
+
+    it 'should fall back to a regular checkout of the specified branch when a branch is specified' do
+      WhiskeyDisk.configuration = @parameters.merge({'branch' => 'production'})
+      WhiskeyDisk.checkout_main_repository
+      WhiskeyDisk.buffer.join(' ').should.match(%r{\|\| git checkout production})
+    end
+
+    it 'should do branch checkouts from the repository path' do
+      WhiskeyDisk.checkout_main_repository
+      WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo && git checkout})      
     end
   end
   
@@ -235,8 +261,7 @@ describe 'WhiskeyDisk' do
 
     it 'should work from the configuration repository checkout parent path' do
       WhiskeyDisk.checkout_configuration_repository
-      WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/config})
-      WhiskeyDisk.buffer.join(' ').should.not.match(%r{cd /path/to/config/repo})
+      WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/config[^/]})
     end
 
     it 'should attempt to shallow clone the configuration repository to the repository checkout path' do
@@ -247,6 +272,17 @@ describe 'WhiskeyDisk' do
     it 'should make the configuration repository clone conditional on the lack of a main repository checkout' do
       WhiskeyDisk.checkout_configuration_repository
       WhiskeyDisk.buffer.join(' ').should.match(%r{if \[ -e #{@parameters['deploy_config_to']} \]; then .*; fi})
+    end
+
+    it 'should do a branch creation checkout of the master branch when no branch is specified' do
+      WhiskeyDisk.checkout_configuration_repository
+      WhiskeyDisk.buffer.join(' ').should.match(%r{git checkout -b master origin/master})
+    end
+    
+    it 'should do a branch creation checkout of the specified branch when a branch is specified' do
+      WhiskeyDisk.configuration = @parameters.merge({'config_branch' => 'production'})
+      WhiskeyDisk.checkout_configuration_repository
+      WhiskeyDisk.buffer.join(' ').should.match(%r{git checkout -b production origin/production})
     end
   end
   
