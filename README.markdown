@@ -345,8 +345,6 @@ Whiskey\_disk includes a helper library for use in rake tasks and other ruby scr
 find a ruby function 'role?' which returns true if you're currently being deployed to a domain with the given
 role.  For example:
 
-<code>
-    
     require 'whiskey_disk/helpers'
 
     namespace :deploy do
@@ -384,7 +382,6 @@ role.  For example:
       task :post_setup  => [ :create_rails_directories ]
       task :post_deploy => [ :db_migrate_if_necessary, :thinking_sphinx_restart, :bounce_passenger ]
     end
-</code>
 
 
 #### When working with the shell ####
@@ -710,8 +707,6 @@ Notice that there are no separate trees for 'uat' and 'qa' targets.
 
  - Here is a sample of a lib/tasks/deploy.rake from a Rails application we deployed once upon a time:
 
-<code>
-
     RAILS_ENV=ENV['RAILS_ENV'] if ENV['RAILS_ENV'] and '' != ENV['RAILS_ENV']
     Rake::Task['environment'].invoke
     
@@ -750,7 +745,6 @@ Notice that there are no separate trees for 'uat' and 'qa' targets.
       task :post_setup => [ :create_rails_directories, :setup_postgres_for_thinking_sphinx ]
       task :post_deploy => [ 'db:migrate', 'ts:config', :thinking_sphinx_restart, :bounce_passenger, :clear_asset_cache ]
     end
-</code>
 
 ### Future Directions ###
 
@@ -768,7 +762,7 @@ to see what we have in mind for the near future.
 
  - Rick Bradley (rick@rickbradley.com, github:rick)
  - Jeremy Holland (jeremy@jeremypholland.com, github:therubyneck): feature/bugfix contributions
- - Kevin Barnes (@vinbarnes), Yossef Mendellsohn (cardioid) for design help and proofreading
+ - Kevin Barnes (@vinbarnes), Yossef Mendelssohn (cardioid) for design help and proofreading
  - Alex Sharp (ajsharp@gmail.com) - issues, real-world usage cases, design feedback
  - Josh Moore (josh@codingforrent.com) - tracking down issues handling bad project Rakefiles
  - Cristi Balan (evilchelu) for feedback and proofreading
