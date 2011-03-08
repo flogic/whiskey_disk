@@ -205,9 +205,9 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main[^/]})
     end
       
-    it 'should attempt to shallow clone the main repository to the repository checkout path' do
+    it 'should attempt to clone the main repository to the repository checkout path' do
       WhiskeyDisk.checkout_main_repository
-      WhiskeyDisk.buffer.join(' ').should.match(%r{clone --depth 1 #{@parameters['repository']} repo})
+      WhiskeyDisk.buffer.join(' ').should.match(%r{clone #{@parameters['repository']} repo})
     end
     
     it 'should make the main repository clone conditional on the lack of a main repository checkout' do
@@ -264,9 +264,9 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/config[^/]})
     end
 
-    it 'should attempt to shallow clone the configuration repository to the repository checkout path' do
+    it 'should attempt to clone the configuration repository to the repository checkout path' do
       WhiskeyDisk.checkout_configuration_repository
-      WhiskeyDisk.buffer.join(' ').should.match(%r{clone --depth 1 #{@parameters['config_repository']} repo})
+      WhiskeyDisk.buffer.join(' ').should.match(%r{clone #{@parameters['config_repository']} repo})
     end
     
     it 'should make the configuration repository clone conditional on the lack of a main repository checkout' do
