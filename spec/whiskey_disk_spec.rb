@@ -956,7 +956,7 @@ describe 'WhiskeyDisk' do
       before { ENV['debug'] = 'true' }
 
       it 'should pass the string to ssh for the domain, with verbosity enabled' do
-        WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain_name, 'bash', '-c', "set -x; ls")
+        WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain_name, "set -x; ls")
         WhiskeyDisk.run(@domain, 'ls')
       end
     end
@@ -965,7 +965,7 @@ describe 'WhiskeyDisk' do
       before { ENV['debug'] = 'false' }
 
       it 'should pass the string to ssh for the domain, with verbosity disabled' do
-        WhiskeyDisk.should.receive(:system).with('ssh', @domain_name, 'bash', '-c', "set -x; ls")
+        WhiskeyDisk.should.receive(:system).with('ssh', @domain_name, "ls")
         WhiskeyDisk.run(@domain, 'ls')
       end
     end

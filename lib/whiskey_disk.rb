@@ -129,7 +129,7 @@ class WhiskeyDisk
     end
 
     def build_command(domain, cmd)
-      "set -x; " + encode_roles(domain[:roles]) + cmd
+      "#{'set -x; ' if Config.debug?}" + encode_roles(domain[:roles]) + cmd
     end
     
     def run(domain, cmd)
@@ -137,7 +137,7 @@ class WhiskeyDisk
     end
 
     def ssh(domain, cmd)
-      args = [domain[:name], 'bash', '-c', build_command(domain, cmd)]
+      args = [domain[:name], build_command(domain, cmd)]
       args.unshift '-v' if Config.debug?
       system('ssh', *args)
     end
