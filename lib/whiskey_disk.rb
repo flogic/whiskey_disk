@@ -133,7 +133,13 @@ class WhiskeyDisk
     end
     
     def run(domain, cmd)
-      system('ssh', '-v', domain[:name], 'bash', '-c', build_command(domain, cmd))
+      ssh(domain, cmd)
+    end
+
+    def ssh(domain, cmd)
+      args = [domain[:name], 'bash', '-c', build_command(domain, cmd)]
+      args.unshift '-v'
+      system('ssh', *args)
     end
     
     def shell(domain, cmd)
