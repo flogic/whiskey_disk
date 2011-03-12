@@ -107,7 +107,7 @@ describe WhiskeyDisk::Config do
     end
   end
 
-  describe 'when determining whether to do a staleness debug before updating' do
+  describe 'when determining whether to turn debug mode on' do
     it 'should return false when there is no ENV["debug"] setting' do
       ENV['debug'] = nil
       WhiskeyDisk::Config.debug?.should == false
