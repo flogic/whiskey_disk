@@ -209,9 +209,9 @@ class WhiskeyDisk
    
     def refresh_checkout(path, repo_branch)
       enqueue "cd #{path}"
-      enqueue "git fetch origin +refs/heads/#{repo_branch}:refs/remotes/origin/#{repo_branch}"
-      enqueue "git checkout #{repo_branch}"
-      enqueue "git reset --hard origin/#{repo_branch}"
+      enqueue "git fetch origin +refs/heads/#{repo_branch}:refs/remotes/origin/#{repo_branch} #{'&>/dev/null' unless Config.debug?}"
+      enqueue "git checkout #{repo_branch} #{'&>/dev/null' unless Config.debug?}"
+      enqueue "git reset --hard origin/#{repo_branch} #{'&>/dev/null' unless Config.debug?}"
     end
 
     def run_rake_task(path, task_name)
