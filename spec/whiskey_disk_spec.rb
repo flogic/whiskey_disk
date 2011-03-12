@@ -944,18 +944,19 @@ describe 'WhiskeyDisk' do
       lambda { WhiskeyDisk.run(@domain) }.should.raise(ArgumentError)
     end
 
+    describe "building a command" do
+      it 'should include domain role settings when the domain has roles' do
+        @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
+        WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
+        WhiskeyDisk.build_command(@domain, 'ls').should == "set -x; export WD_ROLES='web:db'; ls"
+      end
+    end
+
     describe 'when WhiskeyDisk::Config.debug? is true' do
       before { ENV['debug'] = 'true' }
 
       it 'should pass the string to ssh for the domain, with verbosity enabled' do
         WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain_name, 'bash', '-c', "set -x; ls")
-        WhiskeyDisk.run(@domain, 'ls')
-      end
-
-      it 'should include domain role settings when the domain has roles' do
-        @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
-        WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
-        WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain_name, 'bash', '-c', "set -x; export WD_ROLES='web:db'; ls")
         WhiskeyDisk.run(@domain, 'ls')
       end
     end
@@ -965,13 +966,6 @@ describe 'WhiskeyDisk' do
 
       it 'should pass the string to ssh for the domain, with verbosity disabled' do
         WhiskeyDisk.should.receive(:system).with('ssh', @domain_name, 'bash', '-c', "set -x; ls")
-        WhiskeyDisk.run(@domain, 'ls')
-      end
-
-      it 'should include domain role settings when the domain has roles' do
-        @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
-        WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
-        WhiskeyDisk.should.receive(:system).with('ssh', @domain_name, 'bash', '-c', "set -x; export WD_ROLES='web:db'; ls")
         WhiskeyDisk.run(@domain, 'ls')
       end
     end
