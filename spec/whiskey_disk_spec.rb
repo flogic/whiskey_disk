@@ -944,19 +944,39 @@ describe 'WhiskeyDisk' do
       lambda { WhiskeyDisk.run(@domain) }.should.raise(ArgumentError)
     end
 
-    it 'should pass the string to ssh for the domain, with verbosity enabled' do
-      WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain_name, 'bash', '-c', "set -x; ls")
-      WhiskeyDisk.run(@domain, 'ls')
+    describe 'when WhiskeyDisk::Config.debug? is true' do
+      before { ENV['debug'] = 'true' }
+
+      it 'should pass the string to ssh for the domain, with verbosity enabled' do
+        WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain_name, 'bash', '-c', "set -x; ls")
+        WhiskeyDisk.run(@domain, 'ls')
+      end
+
+      it 'should include domain role settings when the domain has roles' do
+        @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
+        WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
+        WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain_name, 'bash', '-c', "set -x; export WD_ROLES='web:db'; ls")
+        WhiskeyDisk.run(@domain, 'ls')
+      end
     end
-      
-    it 'should include domain role settings when the domain has roles' do
-      @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
-      WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
-      WhiskeyDisk.should.receive(:system).with('ssh', '-v', @domain_name, 'bash', '-c', "set -x; export WD_ROLES='web:db'; ls")
-      WhiskeyDisk.run(@domain, 'ls')        
+
+    describe 'when WhiskeyDisk::Config.debug? is false' do
+      before { ENV['debug'] = 'false' }
+
+      it 'should pass the string to ssh for the domain, with verbosity disabled' do
+        WhiskeyDisk.should.receive(:system).with('ssh', @domain_name, 'bash', '-c', "set -x; ls")
+        WhiskeyDisk.run(@domain, 'ls')
+      end
+
+      it 'should include domain role settings when the domain has roles' do
+        @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
+        WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
+        WhiskeyDisk.should.receive(:system).with('ssh', @domain_name, 'bash', '-c', "set -x; export WD_ROLES='web:db'; ls")
+        WhiskeyDisk.run(@domain, 'ls')
+      end
     end
   end
-  
+
   describe 'determining if all the deployments succeeded' do
     before do
       WhiskeyDisk.reset
