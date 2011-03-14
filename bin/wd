@@ -23,6 +23,11 @@ op = OptionParser.new do |opts|
     options[:check] = 'true'
   end
     
+  opts.on('--version', 'show current version') do
+    puts File.read(File.expand_path(File.join(File.dirname(__FILE__), '..', 'VERSION')))
+    exit 0
+  end
+  
   opts.on_tail('-h', '--help', 'show this message') do
     raise opts.to_s
   end
