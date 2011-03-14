@@ -757,6 +757,14 @@ to see what we have in mind for the near future.
  - [http://github.com/mislav/git-deploy](http://github.com/mislav/git-deploy)
  - [http://toroid.org/ams/git-website-howto](http://toroid.org/ams/git-website-howto)
 
+### Support ###
+
+The [bug tracker](https://github.com/flogic/whiskey_disk/issues)
+is available here:
+
+  -  [https://github.com/flogic/whiskey_disk/issues](https://github.com/flogic/whiskey_disk/issues)
+
+The IRC channel is #whiskey_disk on freenode.
 
 ### Contributors ###
 
