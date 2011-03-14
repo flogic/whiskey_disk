@@ -24,7 +24,7 @@ op = OptionParser.new do |opts|
   end
     
   opts.on_tail('-h', '--help', 'show this message') do
-    raise opts.to_s
+    abort opts.to_s
   end
 end
 
