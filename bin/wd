@@ -33,7 +33,12 @@ op = OptionParser.new do |opts|
   end
 end
 
-rest = op.parse(ARGV)
+begin
+  rest = op.parse(ARGV) 
+rescue 
+  abort op.to_s 
+end
+
 raise op.to_s unless options[:target]
 raise op.to_s unless rest and rest.size == 1
 command = rest.first

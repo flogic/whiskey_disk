@@ -25,6 +25,20 @@ describe 'wd command' do
       lambda { run_command }.should.raise
     end
   end
+
+  it 'should output usage without a backtrace when --help is specified' do
+    Object.send(:remove_const, :ARGV)
+    ARGV = ['--help']
+    self.stub!(:abort).and_raise(SystemExit)  # primarily to drop extraneous output
+    lambda { run_command }.should.raise(SystemExit)
+  end
+  
+  it 'should output usage without a backtrace when garbage options are specified' do
+    Object.send(:remove_const, :ARGV)
+    ARGV = ['--slkjfsdflkj']
+    self.stub!(:abort).and_raise(SystemExit)  # primarily to drop extraneous output
+    lambda { run_command }.should.raise(SystemExit)
+  end
   
   describe "when the 'setup' command is specified" do
     before do
