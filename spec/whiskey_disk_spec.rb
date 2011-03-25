@@ -863,6 +863,7 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.stub!(:domain_of_interest?).and_return(true)
       WhiskeyDisk.stub!(:bundle).and_return(@cmd)
       WhiskeyDisk.stub!(:system)
+      WhiskeyDisk.stub!(:puts)
     end
           
     it 'should fail if the domain path is not specified' do
