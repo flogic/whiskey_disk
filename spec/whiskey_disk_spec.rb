@@ -412,6 +412,7 @@ describe 'WhiskeyDisk' do
   describe 'running post setup hooks' do
     before do
       WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo' }
+      ENV['debug'] = nil
     end
     
     it 'should fail if the deployment path is not specified' do
@@ -427,53 +428,67 @@ describe 'WhiskeyDisk' do
     describe 'when a post setup script is specified' do
       describe 'and the script path does not start with a "/"' do      
         before do
-          WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo', 'post_setup_script' => '/path/to/setup/script', 'rake_env' => { 'FOO' => 'BAR' }  }
+          WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo', 'post_setup_script' => 'path/to/setup/script', 'rake_env' => { 'FOO' => 'BAR' }  }
         end
       
-        it 'should attempt to run the post setup script' do        
+        it 'should cd to the deploy_to path prior to running the script' do
           WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x .*/path/to/setup/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*bash  /path/to/main/repo/path/to/setup/script})
+        end
+
+        it 'should attempt to run the post setup script with the deployment path prepended' do        
+          WhiskeyDisk.run_post_setup_hooks
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash  /path/to/main/repo/path/to/setup/script})
         end
       
         it 'should pass any environment variables when running the post setup script' do
           WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{FOO='BAR'  bash -x .*/path/to/setup/script})      
+          WhiskeyDisk.buffer.join(' ').should.match(%r{FOO='BAR'  bash  /path/to/main/repo/path/to/setup/script})      
         end
 
-        it 'should cd to the deploy_to path prior to running the script' do
+        it 'should enable shell verbosity when debugging is enabled' do
+          ENV['debug'] = 'true'
           WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*bash -x /path/to/setup/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x /path/to/main/repo/path/to/setup/script})      
         end
-            
-        it 'should use an absolute path to run the post setup script when the script path starts with a "/"' do
+
+        it 'should disable shell verbosity when debugging is not enabled' do
+          ENV['debug'] = 'false'
           WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x /path/to/setup/script})         
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash  /path/to/main/repo/path/to/setup/script})      
         end
       end
       
-      describe 'and the script path does not start with a "/"' do
+      describe 'and the script path starts with a "/"' do
         before do
-          WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo', 'post_setup_script' => 'path/to/setup/script', 'rake_env' => { 'FOO' => 'BAR' } }
-        end
-
-        it 'should attempt to run the post setup script' do        
-          WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x .*/path/to/setup/script})
-        end
-      
-        it 'should pass any environment variables when running the post setup script' do
-          WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{FOO='BAR'  bash -x .*/path/to/setup/script})      
+          WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo', 'post_setup_script' => '/path/to/setup/script', 'rake_env' => { 'FOO' => 'BAR' } }
         end
 
         it 'should cd to the deploy_to path prior to running the script' do
           WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*bash -x /path/to/main/repo/path/to/setup/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*bash  /path/to/setup/script})
         end
       
-        it 'should use a path relative to the setup path to run the post setup script' do
+        it 'should run the post setup script using its absolute path' do
           WhiskeyDisk.run_post_setup_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x /path/to/main/repo/path/to/setup/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash  /path/to/setup/script})
+        end
+
+        it 'should pass any environment variables when running the post setup script' do
+          WhiskeyDisk.run_post_setup_hooks
+          WhiskeyDisk.buffer.join(' ').should.match(%r{FOO='BAR'  bash  /path/to/setup/script})      
+        end
+
+        it 'should enable shell verbosity when debugging is enabled' do
+          ENV['debug'] = 'true'
+          WhiskeyDisk.run_post_setup_hooks
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x /path/to/setup/script})      
+        end
+
+        it 'should disable shell verbosity when debugging is not enabled' do
+          ENV['debug'] = 'false'
+          WhiskeyDisk.run_post_setup_hooks
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash  /path/to/setup/script})      
         end
       end
     end
@@ -520,6 +535,7 @@ describe 'WhiskeyDisk' do
   describe 'running post deployment hooks' do
     before do
       WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo' }
+      ENV['debug'] = nil
     end
     
     it 'should fail if the deployment path is not specified' do
@@ -535,53 +551,67 @@ describe 'WhiskeyDisk' do
     describe 'when a post deployment script is specified' do
       describe 'and the script path does not start with a "/"' do      
         before do
-          WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo', 'post_deploy_script' => '/path/to/deployment/script', 'rake_env' => { 'FOO' => 'BAR' }  }
+          WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo', 'post_deploy_script' => 'path/to/deployment/script', 'rake_env' => { 'FOO' => 'BAR' }  }
         end
       
-        it 'should attempt to run the post deployment script' do        
+        it 'should cd to the deploy_to path prior to running the script' do
           WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x .*/path/to/deployment/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*bash  /path/to/main/repo/path/to/deployment/script})
+        end
+
+        it 'should attempt to run the post deployment script with the deployment path prepended' do        
+          WhiskeyDisk.run_post_deploy_hooks
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash  /path/to/main/repo/path/to/deployment/script})
         end
         
         it 'should pass any environment variables when running the post deploy script' do
           WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{FOO='BAR'  bash -x .*/path/to/deployment/script})      
+          WhiskeyDisk.buffer.join(' ').should.match(%r{FOO='BAR'  bash  /path/to/main/repo/path/to/deployment/script})      
         end
 
-        it 'should cd to the deploy_to path prior to running the script' do
+        it 'should enable shell verbosity when debugging is enabled' do
+          ENV['debug'] = 'true'
           WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*bash -x /path/to/deployment/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x /path/to/main/repo/path/to/deployment/script})
         end
-        
-        it 'should use an absolute path to run the post deployment script when the script path starts with a "/"' do
+
+        it 'should disable shell verbosity when debugging is not enabled' do
+          ENV['debug'] = 'false'
           WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x /path/to/deployment/script})         
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash  /path/to/main/repo/path/to/deployment/script})
         end
       end
       
-      describe 'and the script path does not start with a "/"' do
+      describe 'and the script path starts with a "/"' do
         before do
-          WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo', 'post_deploy_script' => 'path/to/deployment/script', 'rake_env' => { 'FOO' => 'BAR' }  }
-        end
-
-        it 'should attempt to run the post deployment script' do        
-          WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x .*/path/to/deployment/script})
-        end
-      
-        it 'should pass any environment variables when running the post deploy script' do
-          WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{FOO='BAR'  bash -x .*/path/to/deployment/script})      
+          WhiskeyDisk.configuration = { 'deploy_to' => '/path/to/main/repo', 'post_deploy_script' => '/path/to/deployment/script', 'rake_env' => { 'FOO' => 'BAR' }  }
         end
 
         it 'should cd to the deploy_to path prior to running the script' do
           WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*bash -x /path/to/main/repo/path/to/deployment/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo;.*bash  /path/to/deployment/script})
         end
-        
-        it 'should use a path relative to the deployment path to run the post deployment script' do
+
+        it 'should attempt to run the post deployment script using its absolute path' do        
           WhiskeyDisk.run_post_deploy_hooks
-          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x /path/to/main/repo/path/to/deployment/script})
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash  /path/to/deployment/script})
+        end
+      
+        it 'should pass any environment variables when running the post deploy script' do
+          WhiskeyDisk.run_post_deploy_hooks
+          WhiskeyDisk.buffer.join(' ').should.match(%r{FOO='BAR'  bash  /path/to/deployment/script})      
+        end
+
+        it 'should enable shell verbosity when debugging is enabled' do
+          ENV['debug'] = 'true'
+          WhiskeyDisk.run_post_deploy_hooks
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash -x /path/to/deployment/script})      
+        end
+
+        it 'should disable shell verbosity when debugging is not enabled' do
+          ENV['debug'] = 'false'
+          WhiskeyDisk.run_post_deploy_hooks
+          WhiskeyDisk.buffer.join(' ').should.match(%r{bash  /path/to/deployment/script})      
         end
       end
     end
@@ -910,17 +940,37 @@ describe 'WhiskeyDisk' do
     it 'should require a domain and a command string' do
       lambda { WhiskeyDisk.shell(@domain) }.should.raise(ArgumentError)
     end
+    
+    describe 'when debugging is enabled' do
+      before { ENV['debug'] = 'true' }
 
-    it 'should pass the string to the shell with verbosity enabled' do
-      WhiskeyDisk.should.receive(:system).with('bash', '-c', "set -x; ls")
-      WhiskeyDisk.shell(@domain, 'ls')
-    end
+      it 'should pass the string to the shell with verbosity enabled' do
+        WhiskeyDisk.should.receive(:system).with('bash', '-c', "set -x; ls")
+        WhiskeyDisk.shell(@domain, 'ls')
+      end
       
-    it 'should include domain role settings when the domain has roles' do
-      @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
-      WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
-      WhiskeyDisk.should.receive(:system).with('bash', '-c', "set -x; export WD_ROLES='web:db'; ls")
-      WhiskeyDisk.shell(@domain, 'ls')        
+      it 'should include domain role settings when the domain has roles' do
+        @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
+        WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
+        WhiskeyDisk.should.receive(:system).with('bash', '-c', "set -x; export WD_ROLES='web:db'; ls")
+        WhiskeyDisk.shell(@domain, 'ls')        
+      end
+    end
+    
+    describe 'when debugging is not enabled' do
+      before { ENV['debug'] = 'false' }
+
+      it 'should pass the string to the shell without verbosity enabled' do
+        WhiskeyDisk.should.receive(:system).with('bash', '-c', "ls")
+        WhiskeyDisk.shell(@domain, 'ls')
+      end
+      
+      it 'should include domain role settings when the domain has roles' do
+        @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
+        WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
+        WhiskeyDisk.should.receive(:system).with('bash', '-c', "export WD_ROLES='web:db'; ls")
+        WhiskeyDisk.shell(@domain, 'ls')        
+      end
     end
   end
 
@@ -944,11 +994,11 @@ describe 'WhiskeyDisk' do
       it 'should include domain role settings when the domain has roles' do
         @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
         WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
-        WhiskeyDisk.build_command(@domain, 'ls').should == "set -x; export WD_ROLES='web:db'; ls"
+        WhiskeyDisk.build_command(@domain, 'ls').should.match /export WD_ROLES='web:db'; ls/
       end
     end
 
-    describe 'when WhiskeyDisk::Config.debug? is true' do
+    describe 'when debugging is enabled' do
       before { ENV['debug'] = 'true' }
 
       it 'should pass the string to ssh for the domain, with verbosity enabled' do
@@ -957,7 +1007,7 @@ describe 'WhiskeyDisk' do
       end
     end
 
-    describe 'when WhiskeyDisk::Config.debug? is false' do
+    describe 'when debugging is not enabled' do
       before { ENV['debug'] = 'false' }
 
       it 'should pass the string to ssh for the domain, with verbosity disabled' do
