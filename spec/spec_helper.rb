@@ -24,10 +24,11 @@ def setup_deployment_area
 end
 
 # run a wd setup using the provided arguments string
-def run_setup(arguments)
+def run_setup(arguments, debugging = true)
   wd_path  = File.join(File.dirname(__FILE__), '..', 'bin', 'wd')
   lib_path = File.join(File.dirname(__FILE__), '..', 'lib')
-  system("/usr/bin/env ruby -I #{lib_path} -r whiskey_disk -rubygems #{wd_path} setup #{arguments} > #{integration_log} 2> #{integration_log}")
+  debug = debugging ? '--debug' : ''
+  system("/usr/bin/env ruby -I #{lib_path} -r whiskey_disk -rubygems #{wd_path} setup #{debug} #{arguments} > #{integration_log} 2> #{integration_log}")
 end
 
 def integration_log
@@ -35,10 +36,11 @@ def integration_log
 end
 
 # run a wd setup using the provided arguments string
-def run_deploy(arguments)
+def run_deploy(arguments, debugging = true)
   wd_path  = File.join(File.dirname(__FILE__), '..', 'bin', 'wd')
   lib_path = File.join(File.dirname(__FILE__), '..', 'lib')
-  status = system("/usr/bin/env ruby -I #{lib_path} -r whiskey_disk -rubygems #{wd_path} deploy #{arguments} > #{integration_log} 2> #{integration_log}")
+  debug = debugging ? '--debug' : ''
+  status = system("/usr/bin/env ruby -I #{lib_path} -r whiskey_disk -rubygems #{wd_path} deploy #{debug} #{arguments} > #{integration_log} 2> #{integration_log}")
   status
 end
 
