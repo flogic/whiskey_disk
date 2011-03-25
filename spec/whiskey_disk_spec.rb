@@ -39,6 +39,10 @@ describe 'requiring the main library' do
 end
 
 describe 'WhiskeyDisk' do
+  before do
+    WhiskeyDisk.reset
+  end
+  
   describe 'determining if the deployment is remote' do
     before do
       @parameters = { 'deploy_to' => '/path/to/main/repo' }
@@ -131,7 +135,6 @@ describe 'WhiskeyDisk' do
   
   describe 'enabling staleness checks' do
     it 'should ensure that staleness checks are activated' do
-      WhiskeyDisk.reset
       WhiskeyDisk.enable_staleness_checks
       WhiskeyDisk.staleness_checks_enabled?.should == true      
     end
@@ -139,12 +142,10 @@ describe 'WhiskeyDisk' do
   
   describe 'when checking staleness checks' do
     it 'should return false if staleness checks have not been enabled' do
-      WhiskeyDisk.reset
       WhiskeyDisk.staleness_checks_enabled?.should == false
     end
     
     it 'should return true if staleness checks have been enabled' do
-      WhiskeyDisk.reset
       WhiskeyDisk.enable_staleness_checks
       WhiskeyDisk.staleness_checks_enabled?.should == true
     end
@@ -625,10 +626,6 @@ describe 'WhiskeyDisk' do
   end
   
   describe 'bundling up buffered commands for execution' do
-    before do
-      WhiskeyDisk.reset
-    end
-    
     describe 'when staleness checks are disabled' do
       it 'should return an empty string if there are no commands' do
         WhiskeyDisk.bundle.should == ''
@@ -899,7 +896,6 @@ describe 'WhiskeyDisk' do
   
   describe 'when running a command string locally' do
     before do
-      WhiskeyDisk.reset
       @domain_name = 'local'
       @domain = { :name => @domain_name }
       WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
@@ -929,7 +925,6 @@ describe 'WhiskeyDisk' do
 
   describe 'when running a command string remotely' do
     before do
-      WhiskeyDisk.reset
       @domain_name = 'ogc@ogtastic.com'
       @domain = { :name => @domain_name }
       WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
@@ -972,10 +967,6 @@ describe 'WhiskeyDisk' do
   end
 
   describe 'determining if all the deployments succeeded' do
-    before do
-      WhiskeyDisk.reset
-    end
-    
     it 'should work without arguments' do
       lambda { WhiskeyDisk.success? }.should.not.raise(ArgumentError)
     end
@@ -1005,7 +996,6 @@ describe 'WhiskeyDisk' do
   
   describe 'summarizing the results of a run' do
     before do
-      WhiskeyDisk.reset
       WhiskeyDisk.stub!(:puts)
     end
     
