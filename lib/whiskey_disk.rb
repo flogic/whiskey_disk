@@ -150,7 +150,7 @@ class WhiskeyDisk
       needs(:domain)
       self[:domain].each do |domain|
         next unless domain_of_interest?(domain[:name])
-        puts domain[:name] + '...'
+        puts "Deploying #{domain[:name]}..."
         status = remote?(domain[:name]) ? run(domain, bundle) : shell(domain, bundle)
         record_result(domain[:name], status)
       end
