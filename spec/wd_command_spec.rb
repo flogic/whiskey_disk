@@ -46,6 +46,25 @@ describe 'wd command' do
     lambda { run_command }.should.raise(SystemExit)
   end
   
+  describe 'when --version argument is specified' do
+    before do
+      Object.send(:remove_const, :ARGV)
+      ARGV = ['--version']
+    end
+
+    it 'should fail with SystemExit' do
+      lambda { run_command }.should.raise(SystemExit)
+    end
+
+    it 'should exit successfully' do
+      begin
+        run_command
+      rescue SystemExit => e
+        e.success?.should == true
+      end
+    end
+  end
+
   describe "when the 'setup' command is specified" do
     before do
       Object.send(:remove_const, :ARGV)
