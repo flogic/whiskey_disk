@@ -129,11 +129,17 @@ class WhiskeyDisk
     end
 
     def build_command(domain, cmd)
-      "set -x; " + encode_roles(domain[:roles]) + cmd
+      "#{'set -x; ' if Config.debug?}" + encode_roles(domain[:roles]) + cmd
     end
     
     def run(domain, cmd)
-      system('ssh', '-v', domain[:name], 'bash', '-c', build_command(domain, cmd))
+      ssh(domain, cmd)
+    end
+
+    def ssh(domain, cmd)
+      args = [domain[:name], build_command(domain, cmd)]
+      args.unshift '-v' if Config.debug?
+      system('ssh', *args)
     end
     
     def shell(domain, cmd)
@@ -144,6 +150,7 @@ class WhiskeyDisk
       needs(:domain)
       self[:domain].each do |domain|
         next unless domain_of_interest?(domain[:name])
+        puts "Deploying #{domain[:name]}..."
         status = remote?(domain[:name]) ? run(domain, bundle) : shell(domain, bundle)
         record_result(domain[:name], status)
       end
@@ -202,15 +209,16 @@ class WhiskeyDisk
    
     def refresh_checkout(path, repo_branch)
       enqueue "cd #{path}"
-      enqueue "git fetch origin +refs/heads/#{repo_branch}:refs/remotes/origin/#{repo_branch}"
-      enqueue "git checkout #{repo_branch}"
-      enqueue "git reset --hard origin/#{repo_branch}"
+      enqueue "git fetch origin +refs/heads/#{repo_branch}:refs/remotes/origin/#{repo_branch} #{'&>/dev/null' unless Config.debug?}"
+      enqueue "git checkout #{repo_branch} #{'&>/dev/null' unless Config.debug?}"
+      enqueue "git reset --hard origin/#{repo_branch} #{'&>/dev/null' unless Config.debug?}"
     end
 
     def run_rake_task(path, task_name)
+      enqueue "echo Running rake #{task_name}..."
       enqueue "cd #{path}"
       enqueue(if_file_present("#{self[:deploy_to]}/Rakefile", 
-        if_task_defined(task_name, "#{env_vars} rake --trace #{task_name} to=#{self[:environment]}")))
+        if_task_defined(task_name, "#{env_vars} rake #{'--trace' if Config.debug?} #{task_name} to=#{self[:environment]}")))
     end
     
     def build_path(path)
@@ -220,7 +228,7 @@ class WhiskeyDisk
 
     def run_script(script)
       return unless script
-      enqueue(%Q<cd #{self[:deploy_to]}; echo "Running post script..."; #{env_vars} bash -x #{build_path(script)}>)
+      enqueue(%Q<cd #{self[:deploy_to]}; echo "Running post script..."; #{env_vars} bash #{'-x' if Config.debug?} #{build_path(script)}>)
     end
 
     def ensure_main_parent_path_is_present
@@ -256,7 +264,8 @@ class WhiskeyDisk
     def refresh_configuration
       needs(:deploy_to, :deploy_config_to)
       raise "Must specify project name when using a configuration repository." unless project_name_specified?
-      enqueue("rsync -av --progress #{self[:deploy_config_to]}/#{self[:project]}/#{self[:config_target]}/ #{self[:deploy_to]}/")
+      enqueue "echo Rsyncing configuration..."
+      enqueue("rsync -a#{'v --progress' if Config.debug?} #{self[:deploy_config_to]}/#{self[:project]}/#{self[:config_target]}/ #{self[:deploy_to]}/")
     end
     
     def run_post_setup_hooks

@@ -439,6 +439,13 @@ are in an environment where the 'app' role is active but the 'web' role is not:
     % wd deploy --to=foo:qa --path=https://github.com/username/project/raw/master/path/to/configs/deploy.yml
     % wd deploy --to=foo:qa --only=myhost.example.com
 
+    % wd --help
+    % wd --version
+
+
+
+Also, `--debug` can be used to enable verbose output when running `wd setup` or `wd deploy`.
+
 Note that the wd command (unlike rake, which requires a Rakefile in the current directory) can be run from anywhere, so you can deploy any project, working from any path, and can even specify where to find the deployment YAML configuration file.
   
 The --path argument can take either a file or a directory.  When given a file it will use that file as the configuration file.  When given a directory it will look in that directory for deploy/&lt;project&gt;/&lt;target&gt;.yml, then deploy/&lt;project&gt;.yml, then deploy/&lt;target&gt;.yml, then &lt;target&gt;.yml, and finally, deploy.yml.
@@ -757,12 +764,22 @@ to see what we have in mind for the near future.
  - [http://github.com/mislav/git-deploy](http://github.com/mislav/git-deploy)
  - [http://toroid.org/ams/git-website-howto](http://toroid.org/ams/git-website-howto)
 
+### Support ###
+
+The [bug tracker](https://github.com/flogic/whiskey_disk/issues)
+is available here:
+
+  -  [https://github.com/flogic/whiskey_disk/issues](https://github.com/flogic/whiskey_disk/issues)
+
+The IRC channel is #whiskey_disk on freenode.
 
 ### Contributors ###
 
- - Rick Bradley (rick@rickbradley.com, github:rick)
- - Jeremy Holland (jeremy@jeremypholland.com, github:therubyneck): feature/bugfix contributions
- - Kevin Barnes (@vinbarnes), Yossef Mendelssohn (cardioid) for design help and proofreading
- - Alex Sharp (ajsharp@gmail.com) - issues, real-world usage cases, design feedback
- - Josh Moore (josh@codingforrent.com) - tracking down issues handling bad project Rakefiles
- - Cristi Balan (evilchelu) for feedback and proofreading
+ - [Rick Bradley](https://github.com/rick): author
+ - [Rein Henrichs](https://github.com/reinh): design help, code
+ - [Jeremy Holland](https://github.com/awebneck): code
+ - [Kevin Barnes](https://github.com/vinbarnes): design help, code
+ - [Alex Sharp](https://github.com/ajsharp): issues, real-world usage cases, design help
+ - [Yossef Mendelssohn](https://github.com/ymendel): design help, proofreading
+ - [Josh Moore](https://github.com/joshsmoore): bug-hunting
+ - [Cristi Balan](https://github.com/evilchelu): feedback, proofreading

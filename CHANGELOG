@@ -1,4 +1,32 @@
 
+0.6.17 / 2011-03-25 
+==================
+
+  * updating contributor info in README
+  * updating specs to pass under new --debug regime
+  * deployment status message shouldn't appear in spec run output
+  * Refactoring WhiskeyDisk.reset in whiskey_disk_spec.rb
+  * spec helper should keep debugging on for test runs
+  * Make deployment status message more readable
+  * Only run post deploy|setup script with -x in debug mode
+  * Only rake --trace in debug mode
+  * Suppressing git output unless debug mode
+  * Adding log mesage for rsync configuration
+  * Only show rsync verbose and progress if debug enabled
+  * Print out a log message to indicate which host is currently being deployed
+  * Only run set -x in debug mode, also don't use bash -c
+  * Refactor a spec to use build_command directly
+  * Fix spec description for ENV['debug']
+  * Only run ssh with -v if in debug mode
+  * Refactor run to use a #ssh command
+  * Add WhiskeyDisk::Config.debug?
+  * Add -d, --debug to bin/wd
+  * change raise to abort for cleaner help output when doing `wd -h`
+  * change raise to abort for cleaner help output
+  * add --version option to wd
+  * Add support section to README
+
+
 0.6.16 / 2011-03-08 
 ==================
 

@@ -22,13 +22,27 @@ op = OptionParser.new do |opts|
   opts.on('-c', '--check', "do a staleness check before deploying") do |path|
     options[:check] = 'true'
   end
+
+  opts.on('-d', '--debug', "turn on debug mode (ssh -v and rake --trace)") do
+    options[:debug] = 'true'
+  end
     
+  opts.on('--version', 'show current version') do
+    puts File.read(File.expand_path(File.join(File.dirname(__FILE__), '..', 'VERSION')))
+    exit 0
+  end
+  
   opts.on_tail('-h', '--help', 'show this message') do
-    raise opts.to_s
+    abort opts.to_s
   end
 end
 
-rest = op.parse(ARGV)
+begin
+  rest = op.parse(ARGV) 
+rescue 
+  abort op.to_s 
+end
+
 raise op.to_s unless options[:target]
 raise op.to_s unless rest and rest.size == 1
 command = rest.first
@@ -38,6 +52,7 @@ ENV['to'] = options[:target]
 ENV['path'] = options[:path]
 ENV['only'] = options[:only]
 ENV['check'] = options[:check]
+ENV['debug'] = options[:debug]
 
 if command == 'deploy'
   Rake::Task['deploy:now'].invoke
