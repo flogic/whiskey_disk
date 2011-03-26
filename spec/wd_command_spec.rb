@@ -2,7 +2,13 @@ require File.dirname(__FILE__) + '/spec_helper.rb'
 require 'rake'
 
 def run_command
-  eval File.read(File.join(File.dirname(__FILE__), *%w[.. bin wd]))
+  cmd_path = File.expand_path(File.join(File.dirname(__FILE__), *%w[.. bin wd]))
+  path = File.expand_path(File.dirname(cmd_path))
+  file = File.read(cmd_path)
+
+  Dir.chdir(path) do |path|
+    eval(file)
+  end
 end
 
 describe 'wd command' do
