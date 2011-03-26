@@ -439,6 +439,13 @@ are in an environment where the 'app' role is active but the 'web' role is not:
     % wd deploy --to=foo:qa --path=https://github.com/username/project/raw/master/path/to/configs/deploy.yml
     % wd deploy --to=foo:qa --only=myhost.example.com
 
+    % wd --help
+    % wd --version
+
+
+
+Also, `--debug` can be used to enable verbose output when running `wd setup` or `wd deploy`.
+
 Note that the wd command (unlike rake, which requires a Rakefile in the current directory) can be run from anywhere, so you can deploy any project, working from any path, and can even specify where to find the deployment YAML configuration file.
   
 The --path argument can take either a file or a directory.  When given a file it will use that file as the configuration file.  When given a directory it will look in that directory for deploy/&lt;project&gt;/&lt;target&gt;.yml, then deploy/&lt;project&gt;.yml, then deploy/&lt;target&gt;.yml, then &lt;target&gt;.yml, and finally, deploy.yml.
