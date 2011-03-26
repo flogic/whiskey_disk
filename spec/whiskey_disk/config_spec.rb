@@ -107,6 +107,43 @@ describe WhiskeyDisk::Config do
     end
   end
 
+  describe 'when determining whether to turn debug mode on' do
+    it 'should return false when there is no ENV["debug"] setting' do
+      ENV['debug'] = nil
+      WhiskeyDisk::Config.debug?.should == false
+    end
+
+    it 'should return false when the ENV["debug"] setting is blank' do
+      ENV['debug'] = ''
+      WhiskeyDisk::Config.debug?.should == false
+    end
+
+    it 'should return true if the ENV["debug"] setting is "t"' do
+      ENV['debug'] = 't'
+      WhiskeyDisk::Config.debug?.should == true
+    end
+
+    it 'should return true if the ENV["debug"] setting is "true"' do
+      ENV['debug'] = 'true'
+      WhiskeyDisk::Config.debug?.should == true
+    end
+
+    it 'should return true if the ENV["debug"] setting is "y"' do
+      ENV['debug'] = 'y'
+      WhiskeyDisk::Config.debug?.should == true
+    end
+
+    it 'should return true if the ENV["debug"] setting is "yes"' do
+      ENV['debug'] = 'yes'
+      WhiskeyDisk::Config.debug?.should == true
+    end
+
+    it 'should return true if the ENV["debug"] setting is "1"' do
+      ENV['debug'] = '1'
+      WhiskeyDisk::Config.debug?.should == true
+    end
+  end
+
   describe 'when fetching configuration' do
     describe 'and path specified is an URL' do
       before do

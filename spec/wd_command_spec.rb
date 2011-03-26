@@ -25,6 +25,20 @@ describe 'wd command' do
       lambda { run_command }.should.raise
     end
   end
+
+  it 'should output usage without a backtrace when --help is specified' do
+    Object.send(:remove_const, :ARGV)
+    ARGV = ['--help']
+    self.stub!(:abort).and_raise(SystemExit)  # primarily to drop extraneous output
+    lambda { run_command }.should.raise(SystemExit)
+  end
+  
+  it 'should output usage without a backtrace when garbage options are specified' do
+    Object.send(:remove_const, :ARGV)
+    ARGV = ['--slkjfsdflkj']
+    self.stub!(:abort).and_raise(SystemExit)  # primarily to drop extraneous output
+    lambda { run_command }.should.raise(SystemExit)
+  end
   
   describe "when the 'setup' command is specified" do
     before do
@@ -42,6 +56,7 @@ describe 'wd command' do
         lambda { run_command }.should.raise
       end
     end
+
     
     describe 'and a --to argument is specified' do
       before do
@@ -172,6 +187,80 @@ describe 'wd command' do
         it 'should not make an "only" argument available to the rake task' do
           run_command
           ENV['only'].should.be.nil
+        end
+
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+
+      describe 'and a --debug argument is specified' do
+        before do
+          ARGV.push '--debug'
+        end
+
+        it 'should run the deploy:now rake task' do
+          @rake.should.receive(:invoke)
+          run_command
+        end
+
+        it 'should make the specified target available as a "debug" argument to the rake task' do
+          run_command
+          ENV['debug'].should == 'true'
+        end
+
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+      
+      describe 'and a -d argument is specified' do
+        before do
+          ARGV.push '-d'
+        end
+
+        it 'should run the deploy:now rake task' do
+          @rake.should.receive(:invoke)
+          run_command
+        end
+
+        it 'should make the specified target available as a "debug" argument to the rake task' do
+          run_command
+          ENV['debug'].should == 'true'
+        end
+
+        it 'should fail if the rake task fails' do
+          @rake.stub!(:invoke).and_raise(RuntimeError)
+          lambda { run_command }.should.raise
+        end
+
+        it 'should not fail if the rake task succeeds' do
+          @rake.stub!(:invoke).and_return(true)
+          lambda { run_command }.should.not.raise
+        end
+      end
+
+      describe 'and no --debug or -d argument is specified' do
+        it 'should not make a "debug" argument available to the rake task' do
+          run_command
+          ENV['debug'].should.be.nil
+        end
+
+        it 'should run the deploy:now rake task' do
+          @rake.should.receive(:invoke)
+          run_command
         end
 
         it 'should fail if the rake task fails' do

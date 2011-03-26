@@ -28,6 +28,10 @@ class WhiskeyDisk
       def check_staleness?
         !!(ENV['check'] && ENV['check'] =~ /^(?:t(?:rue)?|y(?:es)?|1)$/)
       end
+
+      def debug?
+        !!(ENV['debug'] && ENV['debug'] =~ /^(?:t(?:rue)?|y(?:es)?|1)$/)
+      end
       
       def domain_limit
         return false unless ENV['only'] and ENV['only'] != ''
