@@ -2,7 +2,13 @@ require File.dirname(__FILE__) + '/spec_helper.rb'
 require 'rake'
 
 def run_command
-  eval File.read(File.join(File.dirname(__FILE__), *%w[.. bin wd]))
+  cmd_path = File.expand_path(File.join(File.dirname(__FILE__), *%w[.. bin wd]))
+  path = File.expand_path(File.dirname(cmd_path))
+  file = File.read(cmd_path)
+
+  Dir.chdir(path) do |path|
+    eval(file)
+  end
 end
 
 describe 'wd command' do
@@ -40,6 +46,25 @@ describe 'wd command' do
     lambda { run_command }.should.raise(SystemExit)
   end
   
+  describe 'when --version argument is specified' do
+    before do
+      Object.send(:remove_const, :ARGV)
+      ARGV = ['--version']
+    end
+
+    it 'should fail with SystemExit' do
+      lambda { run_command }.should.raise(SystemExit)
+    end
+
+    it 'should exit successfully' do
+      begin
+        run_command
+      rescue SystemExit => e
+        e.success?.should == true
+      end
+    end
+  end
+
   describe "when the 'setup' command is specified" do
     before do
       Object.send(:remove_const, :ARGV)
