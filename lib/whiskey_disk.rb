@@ -137,7 +137,9 @@ class WhiskeyDisk
     end
 
     def ssh(domain, cmd)
-      args = [domain[:name], build_command(domain, cmd)]
+      name, port = domain[:name].split(':')
+      args = [name, build_command(domain, cmd)]
+      args.unshift "-p #{port}" if port
       args.unshift '-v' if Config.debug?
       system('ssh', *args)
     end
