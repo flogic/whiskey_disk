@@ -34,8 +34,16 @@ describe 'wd command' do
       lambda { run_command }
     end
   
-    it 'should fail' do
-      lambda { run_command }.should.raise
+    it 'should exit' do
+      lambda { run_command }.should.raise(SystemExit)
+    end
+    
+    it 'should exit with a failure status' do
+      begin
+        run_command
+      rescue Exception => e
+        e.success?.should == false
+      end
     end
   end
 
@@ -57,7 +65,15 @@ describe 'wd command' do
       ARGV = ['--version']
     end
 
-    it 'should fail with SystemExit' do
+    # TODO: FIXME
+    # 
+    # it 'should output the version stored in the VERSION file' do
+    #   version = File.read(File.expand_path(File.join(File.dirname(__FILE__), '..', 'VERSION'))).chomp
+    #   Kernel.should.receive(:puts) #.with(version)
+    #   lambda { run_command  }
+    # end
+
+    it 'should exit' do
       lambda { run_command }.should.raise(SystemExit)
     end
 
@@ -81,9 +97,17 @@ describe 'wd command' do
         Rake::Application.should.receive(:new).never
         lambda { run_command }
       end
-  
-      it 'should fail' do
-        lambda { run_command }.should.raise
+
+      it 'should exit when a target is specified' do
+        lambda { run_command }.should.raise(SystemExit)
+      end
+
+      it 'should exit with a failing status when a target is specified' do
+        begin
+          run_command
+        rescue SystemExit => e
+          e.success?.should == false
+        end
       end
     end
 
@@ -462,8 +486,16 @@ describe 'wd command' do
         lambda { run_command }
       end
   
-      it 'should fail' do
-        lambda { run_command }.should.raise
+      it 'should exit when a target is specified' do
+        lambda { run_command }.should.raise(SystemExit)
+      end
+
+      it 'should exit with a failing status when a target is specified' do
+        begin
+          run_command
+        rescue SystemExit => e
+          e.success?.should == false
+        end
       end
     end
     
@@ -884,13 +916,36 @@ describe 'wd command' do
       ARGV = ['frazzlebazzle', 'shizzlebizzle']
     end
     
-    it 'should fail if no target is specified' do
-      lambda { run_command }.should.raise
+    describe 'when no target is specified' do
+      it 'should exit when a target is specified' do
+        lambda { run_command }.should.raise(SystemExit)
+      end
+
+      it 'should exit with a failing status when a target is specified' do
+        begin
+          run_command
+        rescue SystemExit => e
+          e.success?.should == false
+        end
+      end
     end
-    
-    it 'should fail even if a target is specified' do
-      ARGV.push('--to=foo')
-      lambda { run_command }.should.raise
+
+    describe 'when a target is specified' do
+      before do
+        ARGV.push('--to=foo')        
+      end
+      
+      it 'should exit when a target is specified' do
+        lambda { run_command }.should.raise(SystemExit)
+      end
+
+      it 'should exit with a failing status when a target is specified' do
+        begin
+          run_command
+        rescue SystemExit => e
+          e.success?.should == false
+        end
+      end
     end
   end
   
@@ -900,13 +955,36 @@ describe 'wd command' do
       ARGV = ['frazzlebazzle']
     end
     
-    it 'should fail when no target is specified' do
-      lambda { run_command }.should.raise
+    describe 'when no target is specified' do
+      it 'should exit when a target is specified' do
+        lambda { run_command }.should.raise(SystemExit)
+      end
+
+      it 'should exit with a failing status when a target is specified' do
+        begin
+          run_command
+        rescue SystemExit => e
+          e.success?.should == false
+        end
+      end
     end
-    
-    it 'should fail when a target is specified' do
-      ARGV.push('--to=foo')
-      lambda { run_command }.should.raise
+
+    describe 'when a target is specified' do
+      before do
+        ARGV.push('--to=foo')        
+      end
+      
+      it 'should exit when a target is specified' do
+        lambda { run_command }.should.raise(SystemExit)
+      end
+
+      it 'should exit with a failing status when a target is specified' do
+        begin
+          run_command
+        rescue SystemExit => e
+          e.success?.should == false
+        end
+      end
     end
   end
 end
