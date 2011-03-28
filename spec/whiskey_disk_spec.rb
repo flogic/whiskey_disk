@@ -351,6 +351,11 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.update_main_repository_checkout
       WhiskeyDisk.buffer.join(' ').should.match(%r{git reset --hard origin/production})
     end
+    
+    it 'should collect git changes data' do
+      WhiskeyDisk.update_main_repository_checkout
+      WhiskeyDisk.buffer.join(' ').should.match(%r{git diff --name-only \$\{ml\}\.\.HEAD > /path/to/main/repo/\.whiskey_disk_git_changes})
+    end
   end
   
   describe 'updating the configuration repository checkout' do
