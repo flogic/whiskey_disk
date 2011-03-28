@@ -428,6 +428,11 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.refresh_configuration
       WhiskeyDisk.buffer.last.should.match(%r{rsync.* /path/to/config/repo/whiskey_disk/staging/ /path/to/main/repo/})
     end
+    
+    it 'should capture rsync change data' do
+      WhiskeyDisk.refresh_configuration
+      WhiskeyDisk.buffer.last.should.match(%r{rsync.* --log-file=/path/to/main/repo/.whiskey_disk_rsync_changes })
+    end
   end
 
   describe 'running post setup hooks' do

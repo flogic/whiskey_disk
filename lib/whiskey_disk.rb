@@ -280,7 +280,9 @@ class WhiskeyDisk
       needs(:deploy_to, :deploy_config_to)
       raise "Must specify project name when using a configuration repository." unless project_name_specified?
       enqueue "echo Rsyncing configuration..."
-      enqueue("rsync -a#{'v --progress' if Config.debug?} #{self[:deploy_config_to]}/#{self[:project]}/#{self[:config_target]}/ #{self[:deploy_to]}/")
+      enqueue("rsync -a#{'v --progress' if Config.debug?} " +
+              "--log-file=#{self[:deploy_to]}/.whiskey_disk_rsync_changes " +
+              "#{self[:deploy_config_to]}/#{self[:project]}/#{self[:config_target]}/ #{self[:deploy_to]}/")
     end
     
     def run_post_setup_hooks
