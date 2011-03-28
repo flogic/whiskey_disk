@@ -13,7 +13,14 @@ end
 
 describe 'wd command' do
   before do
+    @stderr, @stdout = $stderr, $stdout
+    $stderr, $stdout = StringIO.new, StringIO.new
+    
     ENV['to'] = ENV['path'] = nil
+  end
+  
+  after do
+    $stderr, $stdout = @stderr, @stdout
   end
   
   describe 'when no command-line arguments are specified' do
@@ -35,14 +42,12 @@ describe 'wd command' do
   it 'should output usage without a backtrace when --help is specified' do
     Object.send(:remove_const, :ARGV)
     ARGV = ['--help']
-    self.stub!(:abort).and_raise(SystemExit)  # primarily to drop extraneous output
     lambda { run_command }.should.raise(SystemExit)
   end
   
   it 'should output usage without a backtrace when garbage options are specified' do
     Object.send(:remove_const, :ARGV)
     ARGV = ['--slkjfsdflkj']
-    self.stub!(:abort).and_raise(SystemExit)  # primarily to drop extraneous output
     lambda { run_command }.should.raise(SystemExit)
   end
   
