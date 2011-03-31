@@ -80,7 +80,7 @@ integration_spec do
         
         it 'should pass environment variable settings to the post_setup script' do
           run_setup(@args)
-          File.read(integration_log).should =~ /FOO='BAR'/
+          File.read(integration_log).should =~ /FOO=BAR/
         end
             
         it 'should report the remote setup as a failure' do
@@ -145,7 +145,7 @@ integration_spec do
 
           it 'should pass environment variable settings to the post_setup script' do
             run_setup(@args)
-            File.read(integration_log).should =~ /FOO='BAR'/
+            File.read(integration_log).should =~ /FOO=BAR/
           end
 
           it 'should report the remote setup as successful' do
@@ -170,7 +170,7 @@ integration_spec do
 
           it 'should pass environment variable settings to the post_setup script' do
             run_setup(@args)
-            File.read(integration_log).should =~ /FOO='BAR'/
+            File.read(integration_log).should =~ /FOO=BAR/
           end
 
           it 'should report the remote setup as a failure' do
