@@ -90,7 +90,7 @@ integration_spec do
       
       describe 'performing a deployment' do
         before do
-          checkout_repo('project')
+          checkout_repo('project', 'bad_rakefile')
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
         
@@ -144,7 +144,7 @@ integration_spec do
 
       describe 'and doing a deploy' do
         before do
-          checkout_repo('project')
+          checkout_repo('project', 'no_rake_hooks')
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
         
@@ -198,7 +198,7 @@ integration_spec do
 
       describe 'and doing a deploy' do
         before do
-          checkout_repo('project')
+          checkout_repo('project', 'post_rake_tasks')
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
         
