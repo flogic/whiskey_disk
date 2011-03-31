@@ -255,6 +255,7 @@ class WhiskeyDisk
     
     def initialize_git_changes
       needs(:deploy_to)
+      enqueue "cd #{self[:deploy_to]}"
       enqueue "rm -f #{self[:deploy_to]}/.whiskey_disk_git_changes"
       enqueue %Q{ml=\`cat .git/refs/heads/#{branch}\`}
     end
