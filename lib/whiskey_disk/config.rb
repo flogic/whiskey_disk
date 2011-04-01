@@ -32,6 +32,10 @@ class WhiskeyDisk
       def debug?
         !!(ENV['debug'] && ENV['debug'] =~ /^(?:t(?:rue)?|y(?:es)?|1)$/)
       end
+
+      def ssh_auth_agent_forwarding?
+        !ENV['ssh_auth_agent_forwarding'].nil?
+      end
       
       def domain_limit
         return false unless ENV['only'] and ENV['only'] != ''

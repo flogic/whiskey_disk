@@ -139,6 +139,7 @@ class WhiskeyDisk
     def ssh(domain, cmd)
       args = [domain[:name], build_command(domain, cmd)]
       args.unshift '-v' if Config.debug?
+      args.unshift '-A' if Config.ssh_auth_agent_forwarding?
       system('ssh', *args)
     end
     

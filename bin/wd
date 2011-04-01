@@ -19,7 +19,7 @@ op = OptionParser.new do |opts|
     options[:only] = domain
   end
     
-  opts.on('-c', '--check', "do a staleness check before deploying") do |path|
+  opts.on('-c', '--check', "do a staleness check before deploying") do
     options[:check] = 'true'
   end
 
@@ -27,6 +27,10 @@ op = OptionParser.new do |opts|
     options[:debug] = 'true'
   end
     
+  opts.on('-A', "turn on ssh authentication agent forwarding (see man ssh)") do
+    options[:ssh_auth_agent_forwarding] = 'true'
+  end
+
   opts.on('--version', 'show current version') do
     puts File.read(File.expand_path(File.join(File.dirname(__FILE__), '..', 'VERSION')))
     exit 0
@@ -53,6 +57,7 @@ ENV['path'] = options[:path]
 ENV['only'] = options[:only]
 ENV['check'] = options[:check]
 ENV['debug'] = options[:debug]
+ENV['ssh_auth_agent_forwarding'] = options[:ssh_auth_agent_forwarding]
 
 if command == 'deploy'
   Rake::Task['deploy:now'].invoke
