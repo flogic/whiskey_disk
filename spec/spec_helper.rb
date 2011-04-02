@@ -3,6 +3,13 @@ require 'bacon'
 require 'facon'
 require 'fileutils'
 
+if ENV['DEBUG'] and ENV['DEBUG'] != ''
+  STDERR.puts "Enabling debugger for spec runs..."
+  require 'rubygems'
+  require 'ruby-debug'
+  Debugger.start
+end
+
 $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib')))
 
 # local target directory, integration spec workspace
