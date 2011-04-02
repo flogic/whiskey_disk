@@ -303,15 +303,20 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/main/repo})
     end
     
-    it 'should work from the default branch if no branch is specified' do
+    it 'should clear out any existing git changes data' do
       WhiskeyDisk.update_main_repository_checkout
-      WhiskeyDisk.buffer.join(' ').should.match(%r{git checkout master})
+      WhiskeyDisk.buffer.join(' ').should.match(%r{rm -f /path/to/main/repo/.whiskey_disk_git_changes})
     end
-
-    it 'should work from the specified branch if one is specified' do
+        
+    it 'should capture the current git HEAD ref for the specified branch' do
       WhiskeyDisk.configuration = @parameters.merge({'branch' => 'production'})
       WhiskeyDisk.update_main_repository_checkout
-      WhiskeyDisk.buffer.join(' ').should.match(%r{git checkout production})
+      WhiskeyDisk.buffer.join(' ').should.match(%r{ml=\`cat .git/refs/heads/production\`})
+    end
+    
+    it 'should capture the current git HEAD ref for the master branch if no branch is specified' do
+      WhiskeyDisk.update_main_repository_checkout
+      WhiskeyDisk.buffer.join(' ').should.match(%r{ml=\`cat .git/refs/heads/master\`})
     end
     
     it 'should attempt to fetch only the master branch from the origin if no branch is specified' do
@@ -325,6 +330,17 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.buffer.join(' ').should.match(%r{git fetch origin \+refs/heads/production:refs/remotes/origin/production})
     end
 
+    it 'should work from the default branch if no branch is specified' do
+      WhiskeyDisk.update_main_repository_checkout
+      WhiskeyDisk.buffer.join(' ').should.match(%r{git checkout master})
+    end
+
+    it 'should work from the specified branch if one is specified' do
+      WhiskeyDisk.configuration = @parameters.merge({'branch' => 'production'})
+      WhiskeyDisk.update_main_repository_checkout
+      WhiskeyDisk.buffer.join(' ').should.match(%r{git checkout production})
+    end
+
     it 'should attempt to reset the master branch from the origin if no branch is specified' do
       WhiskeyDisk.update_main_repository_checkout
       WhiskeyDisk.buffer.join(' ').should.match(%r{git reset --hard origin/master})
@@ -335,11 +351,16 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.update_main_repository_checkout
       WhiskeyDisk.buffer.join(' ').should.match(%r{git reset --hard origin/production})
     end
+    
+    it 'should collect git changes data' do
+      WhiskeyDisk.update_main_repository_checkout
+      WhiskeyDisk.buffer.join(' ').should.match(%r{git diff --name-only \$\{ml\}\.\.HEAD > /path/to/main/repo/\.whiskey_disk_git_changes})
+    end
   end
   
   describe 'updating the configuration repository checkout' do
     before do
-      @parameters = { 'deploy_config_to' => '/path/to/config/repo' }
+      @parameters = { 'deploy_config_to' => '/path/to/config/repo', 'deploy_to' => '/path/to/main/repo' }
       WhiskeyDisk.configuration = @parameters
     end
     
@@ -351,6 +372,11 @@ describe 'WhiskeyDisk' do
     it 'should work from the main repository checkout path' do
       WhiskeyDisk.update_configuration_repository_checkout
       WhiskeyDisk.buffer.join(' ').should.match(%r{cd /path/to/config/repo})
+    end
+    
+    it 'should clear out any existing rsync changes data' do
+      WhiskeyDisk.update_configuration_repository_checkout
+      WhiskeyDisk.buffer.join(' ').should.match(%r{rm -f /path/to/main/repo/.whiskey_disk_rsync_changes})
     end
     
     it 'should attempt to fetch only the master branch from the origin if no configuration branch is specified' do
@@ -406,6 +432,11 @@ describe 'WhiskeyDisk' do
     it 'should use rsync to overlay the configuration checkout for the project in the config target onto the main checkout' do
       WhiskeyDisk.refresh_configuration
       WhiskeyDisk.buffer.last.should.match(%r{rsync.* /path/to/config/repo/whiskey_disk/staging/ /path/to/main/repo/})
+    end
+    
+    it 'should capture rsync change data' do
+      WhiskeyDisk.refresh_configuration
+      WhiskeyDisk.buffer.last.should.match(%r{rsync.* --log-file=/path/to/main/repo/.whiskey_disk_rsync_changes })
     end
   end
 

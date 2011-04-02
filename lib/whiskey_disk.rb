@@ -160,22 +160,24 @@ class WhiskeyDisk
       @results ||= []
       @results << { :domain => domain, :status => status }
     end
+
+    def summarize_results(results)
+      successes = failures = 0
+      results.each do |result|
+        puts "#{result[:domain]} => #{result[:status] ? 'succeeded' : 'failed'}."
+        if result[:status]
+          successes += 1 
+        else
+          failures += 1
+        end
+      end
+      [successes + failures, successes, failures]
+    end
     
     def summarize
-      puts
-      puts "Results:"
+      puts "\nResults:"
       if results and not results.empty?
-        successes = failures = total = 0
-        results.each do |result|
-          total += 1
-          if result[:status]
-            successes += 1 
-          else
-            failures += 1
-          end
-          
-          puts "#{result[:domain]} => #{result[:status] ? 'succeeded' : 'failed'}."
-        end
+        total, successes, failures = summarize_results(results)
         puts "Total: #{total} deployment#{total == 1 ? '' : 's'}, " +
           "#{successes} success#{successes == 1 ? '' : 'es'}, " +
           "#{failures} failure#{failures == 1 ? '' : 's'}."
@@ -251,13 +253,44 @@ class WhiskeyDisk
       clone_repository(self[:config_repository], self[:deploy_config_to], config_branch)
     end
     
+    def snapshot_git_revision
+      needs(:deploy_to)
+      enqueue "cd #{self[:deploy_to]}"
+      enqueue %Q{ml=\`cat .git/refs/heads/#{branch}\`}
+    end
+    
+    def initialize_git_changes
+      needs(:deploy_to)
+      enqueue "rm -f #{self[:deploy_to]}/.whiskey_disk_git_changes"
+      snapshot_git_revision
+    end
+    
+    def initialize_rsync_changes
+      needs(:deploy_to)
+      enqueue "rm -f #{self[:deploy_to]}/.whiskey_disk_rsync_changes"
+    end
+    
+    def initialize_all_changes
+      needs(:deploy_to)
+      initialize_git_changes
+      initialize_rsync_changes
+    end
+    
+    def capture_git_changes
+      needs(:deploy_to)
+      enqueue "git diff --name-only ${ml}..HEAD > #{self[:deploy_to]}/.whiskey_disk_git_changes"
+    end
+    
     def update_main_repository_checkout
       needs(:deploy_to)
+      initialize_git_changes
       refresh_checkout(self[:deploy_to], branch)
+      capture_git_changes
     end
     
     def update_configuration_repository_checkout
       needs(:deploy_config_to)
+      initialize_rsync_changes
       refresh_checkout(self[:deploy_config_to], config_branch)
     end
     
@@ -265,7 +298,9 @@ class WhiskeyDisk
       needs(:deploy_to, :deploy_config_to)
       raise "Must specify project name when using a configuration repository." unless project_name_specified?
       enqueue "echo Rsyncing configuration..."
-      enqueue("rsync -a#{'v --progress' if Config.debug?} #{self[:deploy_config_to]}/#{self[:project]}/#{self[:config_target]}/ #{self[:deploy_to]}/")
+      enqueue("rsync -a#{'v --progress' if Config.debug?} " +
+              "--log-file=#{self[:deploy_to]}/.whiskey_disk_rsync_changes " +
+              "#{self[:deploy_config_to]}/#{self[:project]}/#{self[:config_target]}/ #{self[:deploy_to]}/")
     end
     
     def run_post_setup_hooks
