@@ -22,7 +22,7 @@ integration_spec do
       
       it 'should do actions guarded by a changed? method when the relevant files have not changed' do
         run_setup(@args)
-        File.read(integration_log).should.not =~ /changed\? was false/
+        File.read(integration_log).should =~ /changed\? was false/
       end
 
       it 'should report the remote setup as successful' do
