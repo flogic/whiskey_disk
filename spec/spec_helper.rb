@@ -62,7 +62,7 @@ def checkout_branch(repo_name, branch = nil)
 end
 
 def jump_to_initial_commit(path)
-  system(%Q(cd #{File.join(deployment_root, path)} && git reset --hard `git log --oneline | head -1 | awk '{print $1}'` >/dev/null 2>/dev/null))
+  system(%Q(cd #{File.join(deployment_root, path)} && git reset --hard `git log --oneline | tail -1 | awk '{print $1}'` >/dev/null 2>/dev/null))
 end
 
 def run_log
