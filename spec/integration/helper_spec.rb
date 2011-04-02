@@ -46,12 +46,12 @@ integration_spec do
         File.exists?(deployed_file('project/README')).should == true
       end
       
-      it 'should do actions guarded by a changed? method when the relevant files have changed' do
+      it 'should run actions contingent on file changes' do
         run_deploy(@args)
         File.read(integration_log).should =~ /changed\? was true/
       end
 
-      it 'should not do actions guarded by a changed? method when the relevant files have not changed' do
+      it 'should not run actions contingent upon files not changing' do
         run_deploy(@args)
         File.read(integration_log).should =~ /changed\? was false/
       end
