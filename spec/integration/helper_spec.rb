@@ -37,7 +37,7 @@ integration_spec do
     
     describe 'and performing a deployment' do
       before do
-        checkout_repo('project')
+        checkout_repo('project', 'hook_with_changed')
         jump_to_initial_commit('project') # reset the deployed checkout
       end
 
