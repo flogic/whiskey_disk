@@ -11,6 +11,7 @@ namespace :deploy do
     WhiskeyDisk.update_main_repository_checkout
     WhiskeyDisk.update_configuration_repository_checkout  if WhiskeyDisk.has_config_repo?
     WhiskeyDisk.refresh_configuration                     if WhiskeyDisk.has_config_repo?
+    WhiskeyDisk.initialize_all_changes
     WhiskeyDisk.run_post_setup_hooks
     WhiskeyDisk.flush
     WhiskeyDisk.summarize

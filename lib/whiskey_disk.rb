@@ -270,6 +270,12 @@ class WhiskeyDisk
       enqueue "rm -f #{self[:deploy_to]}/.whiskey_disk_rsync_changes"
     end
     
+    def initialize_all_changes
+      needs(:deploy_to)
+      initialize_git_changes
+      initialize_rsync_changes
+    end
+    
     def capture_git_changes
       needs(:deploy_to)
       enqueue "git diff --name-only ${ml}..HEAD > #{self[:deploy_to]}/.whiskey_disk_git_changes"
