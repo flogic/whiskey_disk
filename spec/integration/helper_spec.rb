@@ -14,15 +14,15 @@ integration_spec do
         run_setup(@args)
         File.exists?(deployed_file('project/README')).should == true
       end
-      
-      it 'should do actions guarded by a changed? method when the relevant files have changed' do
+
+      it 'should consider all files changed, running any actions guarded by #changed?' do
         run_setup(@args)
         File.read(integration_log).should =~ /changed\? was true/
       end
-      
-      it 'should do actions guarded by a changed? method when the relevant files have not changed' do
+
+      it 'should consider all files changed, not running any actions guarded by ! #changed?' do
         run_setup(@args)
-        File.read(integration_log).should =~ /changed\? was false/
+        File.read(integration_log).should.not =~ /changed\? was false/
       end
 
       it 'should report the remote setup as successful' do
