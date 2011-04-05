@@ -43,10 +43,10 @@ rescue
   abort op.to_s 
 end
 
-raise op.to_s unless options[:target]
-raise op.to_s unless rest and rest.size == 1
+abort op.to_s unless options[:target]
+abort op.to_s unless rest and rest.size == 1
 command = rest.first
-raise op.to_s unless ['deploy', 'setup'].include?(command)
+abort op.to_s unless ['deploy', 'setup'].include?(command)
 
 ENV['to'] = options[:target]
 ENV['path'] = options[:path]
