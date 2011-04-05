@@ -200,7 +200,7 @@ class WhiskeyDisk
     end
     
     def safe_branch_checkout(path, my_branch)
-      %Q(cd #{path} && git checkout -b #{my_branch} origin/#{my_branch} || git checkout #{my_branch})
+      %Q(cd #{path} && git checkout -b #{my_branch} origin/#{my_branch} || git checkout #{my_branch} origin/#{my_branch} || git checkout #{my_branch})
     end
     
     def clone_repository(repo, path, my_branch)

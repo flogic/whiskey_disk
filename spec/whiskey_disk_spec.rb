@@ -221,9 +221,14 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.buffer.join(' ').should.match(%r{git checkout -b master origin/master})
     end
     
+    it 'should fall back to a regular checkout of the master branch with origin branch when no branch is specified' do
+      WhiskeyDisk.checkout_main_repository
+      WhiskeyDisk.buffer.join(' ').should.match(%r{\|\| git checkout master origin/master})
+    end
+    
     it 'should fall back to a regular checkout of the master branch when no branch is specified' do
       WhiskeyDisk.checkout_main_repository
-      WhiskeyDisk.buffer.join(' ').should.match(%r{\|\| git checkout master})
+      WhiskeyDisk.buffer.join(' ').should.match(%r{\|\| git checkout master origin/master \|\| git checkout master})
     end
     
     it 'should do a branch creation checkout of the specified branch when a branch is specified' do
@@ -232,10 +237,16 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.buffer.join(' ').should.match(%r{git checkout -b production origin/production})
     end
 
+    it 'should fall back to a regular checkout of the specified branch with origin branch when a branch is specified' do
+      WhiskeyDisk.configuration = @parameters.merge({'branch' => 'production'})
+      WhiskeyDisk.checkout_main_repository
+      WhiskeyDisk.buffer.join(' ').should.match(%r{\|\| git checkout production origin/production})
+    end
+
     it 'should fall back to a regular checkout of the specified branch when a branch is specified' do
       WhiskeyDisk.configuration = @parameters.merge({'branch' => 'production'})
       WhiskeyDisk.checkout_main_repository
-      WhiskeyDisk.buffer.join(' ').should.match(%r{\|\| git checkout production})
+      WhiskeyDisk.buffer.join(' ').should.match(%r{\|\| git checkout production origin/production \|\| git checkout production})
     end
 
     it 'should do branch checkouts from the repository path' do
@@ -280,11 +291,34 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.buffer.join(' ').should.match(%r{git checkout -b master origin/master})
     end
     
+    it 'should fall back to a regular checkout of the master branch with origin branch when no branch is specified' do
+      WhiskeyDisk.checkout_configuration_repository
+      WhiskeyDisk.buffer.join(' ').should.match(%r{\|\| git checkout master origin/master})
+    end
+    
+    it 'should fall back to a regular checkout of the master branch when no branch is specified' do
+      WhiskeyDisk.checkout_configuration_repository
+      WhiskeyDisk.buffer.join(' ').should.match(%r{\|\| git checkout master origin/master \|\| git checkout master})
+    end
+    
     it 'should do a branch creation checkout of the specified branch when a branch is specified' do
       WhiskeyDisk.configuration = @parameters.merge({'config_branch' => 'production'})
       WhiskeyDisk.checkout_configuration_repository
       WhiskeyDisk.buffer.join(' ').should.match(%r{git checkout -b production origin/production})
     end
+
+    it 'should fall back to a regular checkout of the specified branch with origin branch when a branch is specified' do
+      WhiskeyDisk.configuration = @parameters.merge({'config_branch' => 'production'})
+      WhiskeyDisk.checkout_configuration_repository
+      WhiskeyDisk.buffer.join(' ').should.match(%r{\|\| git checkout production origin/production})
+    end
+    
+    it 'should fall back to a regular checkout of the specified branch when a branch is specified' do
+      WhiskeyDisk.configuration = @parameters.merge({'config_branch' => 'production'})
+      WhiskeyDisk.checkout_configuration_repository
+      WhiskeyDisk.buffer.join(' ').should.match(%r{\|\| git checkout production origin/production \|\| git checkout production})
+    end
+    
   end
   
   describe 'updating the main repository checkout' do
