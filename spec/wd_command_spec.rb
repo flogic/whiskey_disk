@@ -13,14 +13,12 @@ end
 
 describe 'wd command' do
   before do
-    @stderr, @stdout = $stderr, $stdout
-    $stderr, $stdout = StringIO.new, StringIO.new
-    
+    @stderr, @stdout, $stderr, $stdout = $stderr, $stdout, StringIO.new, StringIO.new
     ENV['to'] = ENV['path'] = nil
   end
-  
+
   after do
-    $stderr, $stdout = @stderr, @stdout
+    @stderr, @stdout, $stderr, $stdout = $stderr, $stdout, @stderr, @stdout
   end
   
   describe 'when no command-line arguments are specified' do
@@ -64,19 +62,17 @@ describe 'wd command' do
       Object.send(:remove_const, :ARGV)
       ARGV = ['--version']
     end
-
-    # TODO: FIXME
-    # 
+  
     # it 'should output the version stored in the VERSION file' do
     #   version = File.read(File.expand_path(File.join(File.dirname(__FILE__), '..', 'VERSION'))).chomp
-    #   Kernel.should.receive(:puts) #.with(version)
-    #   lambda { run_command  }
+    #   # TODO: capture version output
+    #   lambda{ run_command }
     # end
-
+  
     it 'should exit' do
       lambda { run_command }.should.raise(SystemExit)
     end
-
+  
     it 'should exit successfully' do
       begin
         run_command
