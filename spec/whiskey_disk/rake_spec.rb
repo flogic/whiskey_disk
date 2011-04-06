@@ -24,6 +24,7 @@ describe 'rake tasks' do
         :update_main_repository_checkout,
         :update_configuration_repository_checkout,
         :refresh_configuration,
+        :initialize_all_changes,
         :run_post_setup_hooks, 
         :flush,
         :summarize
@@ -85,6 +86,11 @@ describe 'rake tasks' do
         WhiskeyDisk.should.receive(:update_configuration_repository_checkout)
         @rake["deploy:setup"].invoke
       end
+    end
+    
+    it 'should clear any tracked git or rsync changes' do
+      WhiskeyDisk.should.receive(:initialize_all_changes)
+      @rake["deploy:setup"].invoke
     end
     
     describe 'when no configuration repository is specified' do

@@ -2,12 +2,23 @@ require File.dirname(__FILE__) + '/spec_helper.rb'
 require 'rake'
 
 def run_command
-  eval File.read(File.join(File.dirname(__FILE__), *%w[.. bin wd]))
+  cmd_path = File.expand_path(File.join(File.dirname(__FILE__), *%w[.. bin wd]))
+  path = File.expand_path(File.dirname(cmd_path))
+  file = File.read(cmd_path)
+
+  Dir.chdir(path) do |path|
+    eval(file)
+  end
 end
 
 describe 'wd command' do
   before do
+    @stderr, @stdout, $stderr, $stdout = $stderr, $stdout, StringIO.new, StringIO.new
     ENV['to'] = ENV['path'] = nil
+  end
+
+  after do
+    @stderr, @stdout, $stderr, $stdout = $stderr, $stdout, @stderr, @stdout
   end
   
   describe 'when no command-line arguments are specified' do
@@ -21,25 +32,56 @@ describe 'wd command' do
       lambda { run_command }
     end
   
-    it 'should fail' do
-      lambda { run_command }.should.raise
+    it 'should exit' do
+      lambda { run_command }.should.raise(SystemExit)
+    end
+    
+    it 'should exit with a failure status' do
+      begin
+        run_command
+      rescue Exception => e
+        e.success?.should == false
+      end
     end
   end
 
   it 'should output usage without a backtrace when --help is specified' do
     Object.send(:remove_const, :ARGV)
     ARGV = ['--help']
-    self.stub!(:abort).and_raise(SystemExit)  # primarily to drop extraneous output
     lambda { run_command }.should.raise(SystemExit)
   end
   
   it 'should output usage without a backtrace when garbage options are specified' do
     Object.send(:remove_const, :ARGV)
     ARGV = ['--slkjfsdflkj']
-    self.stub!(:abort).and_raise(SystemExit)  # primarily to drop extraneous output
     lambda { run_command }.should.raise(SystemExit)
   end
   
+  describe 'when --version argument is specified' do
+    before do
+      Object.send(:remove_const, :ARGV)
+      ARGV = ['--version']
+    end
+  
+    # it 'should output the version stored in the VERSION file' do
+    #   version = File.read(File.expand_path(File.join(File.dirname(__FILE__), '..', 'VERSION'))).chomp
+    #   # TODO: capture version output
+    #   lambda{ run_command }
+    # end
+  
+    it 'should exit' do
+      lambda { run_command }.should.raise(SystemExit)
+    end
+  
+    it 'should exit successfully' do
+      begin
+        run_command
+      rescue SystemExit => e
+        e.success?.should == true
+      end
+    end
+  end
+
   describe "when the 'setup' command is specified" do
     before do
       Object.send(:remove_const, :ARGV)
@@ -51,9 +93,17 @@ describe 'wd command' do
         Rake::Application.should.receive(:new).never
         lambda { run_command }
       end
-  
-      it 'should fail' do
-        lambda { run_command }.should.raise
+
+      it 'should exit when a target is specified' do
+        lambda { run_command }.should.raise(SystemExit)
+      end
+
+      it 'should exit with a failing status when a target is specified' do
+        begin
+          run_command
+        rescue SystemExit => e
+          e.success?.should == false
+        end
       end
     end
 
@@ -432,8 +482,16 @@ describe 'wd command' do
         lambda { run_command }
       end
   
-      it 'should fail' do
-        lambda { run_command }.should.raise
+      it 'should exit when a target is specified' do
+        lambda { run_command }.should.raise(SystemExit)
+      end
+
+      it 'should exit with a failing status when a target is specified' do
+        begin
+          run_command
+        rescue SystemExit => e
+          e.success?.should == false
+        end
       end
     end
     
@@ -854,13 +912,36 @@ describe 'wd command' do
       ARGV = ['frazzlebazzle', 'shizzlebizzle']
     end
     
-    it 'should fail if no target is specified' do
-      lambda { run_command }.should.raise
+    describe 'when no target is specified' do
+      it 'should exit when a target is specified' do
+        lambda { run_command }.should.raise(SystemExit)
+      end
+
+      it 'should exit with a failing status when a target is specified' do
+        begin
+          run_command
+        rescue SystemExit => e
+          e.success?.should == false
+        end
+      end
     end
-    
-    it 'should fail even if a target is specified' do
-      ARGV.push('--to=foo')
-      lambda { run_command }.should.raise
+
+    describe 'when a target is specified' do
+      before do
+        ARGV.push('--to=foo')        
+      end
+      
+      it 'should exit when a target is specified' do
+        lambda { run_command }.should.raise(SystemExit)
+      end
+
+      it 'should exit with a failing status when a target is specified' do
+        begin
+          run_command
+        rescue SystemExit => e
+          e.success?.should == false
+        end
+      end
     end
   end
   
@@ -870,13 +951,36 @@ describe 'wd command' do
       ARGV = ['frazzlebazzle']
     end
     
-    it 'should fail when no target is specified' do
-      lambda { run_command }.should.raise
+    describe 'when no target is specified' do
+      it 'should exit when a target is specified' do
+        lambda { run_command }.should.raise(SystemExit)
+      end
+
+      it 'should exit with a failing status when a target is specified' do
+        begin
+          run_command
+        rescue SystemExit => e
+          e.success?.should == false
+        end
+      end
     end
-    
-    it 'should fail when a target is specified' do
-      ARGV.push('--to=foo')
-      lambda { run_command }.should.raise
+
+    describe 'when a target is specified' do
+      before do
+        ARGV.push('--to=foo')        
+      end
+      
+      it 'should exit when a target is specified' do
+        lambda { run_command }.should.raise(SystemExit)
+      end
+
+      it 'should exit with a failing status when a target is specified' do
+        begin
+          run_command
+        rescue SystemExit => e
+          e.success?.should == false
+        end
+      end
     end
   end
 end

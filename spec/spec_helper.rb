@@ -3,6 +3,13 @@ require 'bacon'
 require 'facon'
 require 'fileutils'
 
+if ENV['DEBUG'] and ENV['DEBUG'] != ''
+  STDERR.puts "Enabling debugger for spec runs..."
+  require 'rubygems'
+  require 'ruby-debug'
+  Debugger.start
+end
+
 $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib')))
 
 # local target directory, integration spec workspace
@@ -50,9 +57,19 @@ def scenario_config(path)
 end
 
 # clone a git repository locally (as if a "wd setup" had been deployed)
-def checkout_repo(repo_name, name = '')
+def checkout_repo(repo_name, branch = nil)
   repo_path = File.expand_path(File.join(File.dirname(__FILE__), '..', 'scenarios', 'git_repositories', "#{repo_name}.git"))
-  system("cd #{deployment_root} && git clone #{repo_path} #{name} >/dev/null 2>/dev/null")
+  system("cd #{deployment_root} && git clone #{repo_path} >/dev/null 2>/dev/null")
+  checkout_branch(repo_name, branch)
+end
+
+def checkout_branch(repo_name, branch = nil)
+  return unless branch
+  system("cd #{deployment_root}/#{repo_name} && git checkout #{branch} >/dev/null 2>/dev/null")
+end
+
+def jump_to_initial_commit(path)
+  system(%Q(cd #{File.join(deployment_root, path)} && git reset --hard `git log --oneline | tail -1 | awk '{print $1}'` >/dev/null 2>/dev/null))
 end
 
 def run_log
