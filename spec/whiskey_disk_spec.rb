@@ -996,6 +996,7 @@ describe 'WhiskeyDisk' do
       @domain = { :name => @domain_name }
       WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
       WhiskeyDisk.stub!(:system)
+      WhiskeyDisk.stub!(:puts)
     end
     
     it 'should accept a domain and a command string' do
@@ -1045,6 +1046,7 @@ describe 'WhiskeyDisk' do
       @domain = { :name => @domain_name }
       WhiskeyDisk.configuration = { 'domain' => [ @domain ] }
       WhiskeyDisk.stub!(:system)
+      WhiskeyDisk.stub!(:puts)
     end
     
     it 'should accept a domain and a command string' do

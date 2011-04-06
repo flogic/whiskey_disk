@@ -137,12 +137,14 @@ class WhiskeyDisk
     end
 
     def ssh(domain, cmd)
+      puts "Running command on [#{domain}]: [#{cmd}]" if Config.debug?
       args = [domain[:name], build_command(domain, cmd)]
       args.unshift '-v' if Config.debug?
       system('ssh', *args)
     end
     
     def shell(domain, cmd)
+      puts "Running command locally: [#{cmd}]" if Config.debug?
       system('bash', '-c', build_command(domain, cmd))
     end
     
