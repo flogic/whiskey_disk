@@ -59,5 +59,7 @@ project:
     domain: "user@wd-app1.example.com"
     deploy_to: "/tmp/wd-integration-target/destination/project"
     repository: "git://wd-git.example.com/project.git"
+    deploy_config_to: "/tmp/wd-integration-target/destination/config"
+    config_repository: "git://wd-git.example.com/config.git"
     branch: "hook_with_changed"
 

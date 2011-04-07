@@ -197,6 +197,7 @@ describe "when finding files changed by rsync in a deployment" do
 2011/02/27 20:12:09 [36808] sent 24 bytes  received 9 bytes  total size 0
 2011/02/27 20:12:19 [36835] receiving file list
 2011/02/27 20:12:19 [36835] .d..t.... ./
+2011/02/27 20:12:19 [36835] >f+++++++ Info.plist
 2011/02/27 20:12:19 [36835] cd+++++++ Application Support/
 2011/02/27 20:12:19 [36835] cd+++++++ Application Support/Google/
 2011/02/27 20:12:19 [36835] cd+++++++ Application Support/Google/GoogleTalkPlugin.app/
@@ -247,6 +248,7 @@ describe "when finding files changed by rsync in a deployment" do
 '
 
     @changes = [
+        "Info.plist",
         "Application Support",
         "Application Support/Google",
         "Application Support/Google/GoogleTalkPlugin.app",
