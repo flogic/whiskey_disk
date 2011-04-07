@@ -1,4 +1,13 @@
 
+0.6.21 / 2011-04-06 
+==================
+
+  * change rsync changes capturing mechanism to be more portable
+  * upgrade integration spec to test rsync/#changed?/config repo
+  * helpers spec now tests root path rsync changes
+  * deploy.yml to test rsync changes w/ config repo
+  * integration spec project and config changes to stored git repos
+
 0.6.20 / 2011-04-06 
 ==================
 
