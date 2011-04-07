@@ -20,9 +20,19 @@ integration_spec do
         File.read(integration_log).should =~ /changed\? was true/
       end
 
+      it 'should consider all files changed, including by rsync, running any actions guarded by #changed?' do
+        run_setup(@args)
+        File.read(integration_log).should =~ /changed\? by rsync was true/
+      end
+
       it 'should consider all files changed, not running any actions guarded by ! #changed?' do
         run_setup(@args)
         File.read(integration_log).should.not =~ /changed\? was false/
+      end
+
+      it 'should consider all files changed, including by rsync not running any actions guarded by ! #changed?' do
+        run_setup(@args)
+        File.read(integration_log).should.not =~ /changed\? by rsync was false/
       end
 
       it 'should report the remote setup as successful' do
@@ -38,6 +48,7 @@ integration_spec do
     describe 'and performing a deployment' do
       before do
         checkout_repo('project', 'hook_with_changed')
+        checkout_repo('config')
         jump_to_initial_commit('project') # reset the deployed checkout
       end
 
@@ -50,10 +61,20 @@ integration_spec do
         run_deploy(@args)
         File.read(integration_log).should =~ /changed\? was true/
       end
+      
+      it 'should run actions contingent on rsync file changes' do
+        run_deploy(@args)
+        File.read(integration_log).should =~ /changed\? by rsync was true/        
+      end
 
       it 'should not run actions contingent upon files not changing' do
         run_deploy(@args)
         File.read(integration_log).should =~ /changed\? was false/
+      end
+
+      it 'should not run actions contingent upon rsync files not changing' do
+        run_deploy(@args)
+        File.read(integration_log).should =~ /changed\? by rsync was false/
       end
 
       it 'should exit with a true status' do

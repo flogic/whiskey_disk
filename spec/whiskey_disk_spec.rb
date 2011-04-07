@@ -470,7 +470,7 @@ describe 'WhiskeyDisk' do
     
     it 'should capture rsync change data' do
       WhiskeyDisk.refresh_configuration
-      WhiskeyDisk.buffer.last.should.match(%r{rsync.* --log-file=/path/to/main/repo/.whiskey_disk_rsync_changes })
+      WhiskeyDisk.buffer.last.should.match(%r{rsync.* --log-format="%t \[%p\] %i %n".*> /path/to/main/repo/.whiskey_disk_rsync_changes})
     end
   end
 
