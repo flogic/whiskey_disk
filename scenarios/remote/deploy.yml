@@ -55,3 +55,11 @@ project:
     post_deploy_script: "bin/failing_post_deploy_script.sh"
     rake_env:
       FOO: "BAR"
+  "hook_with_changed":
+    domain: "user@wd-app1.example.com"
+    deploy_to: "/tmp/wd-integration-target/destination/project"
+    repository: "git://wd-git.example.com/project.git"
+    deploy_config_to: "/tmp/wd-integration-target/destination/config"
+    config_repository: "git://wd-git.example.com/config.git"
+    branch: "hook_with_changed"
+

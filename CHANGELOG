@@ -1,4 +1,47 @@
 
+0.6.21 / 2011-04-06 
+==================
+
+  * change rsync changes capturing mechanism to be more portable
+  * upgrade integration spec to test rsync/#changed?/config repo
+  * helpers spec now tests root path rsync changes
+  * deploy.yml to test rsync changes w/ config repo
+  * integration spec project and config changes to stored git repos
+
+0.6.20 / 2011-04-06 
+==================
+
+  * Output the entire command before running it when debugging.
+  * more anal git checkouts on clones to support older gits
+  * abort instead of raising in wd
+  * Neuter commandline output in wd command spec
+  * Make #changes work on setup
+  * Allow enabling debugger in specs w/ non-empty ENV['debug']
+  * Fix setup #changed? integration specs
+  * Improve example text for deployment #changed? integration specs
+  * Factor out snapshotting of git revision from WD.initialize_git_changes
+  * Fix the direction of the setup #changed? integration spec test
+  * Fixing jump_to_initial_commit spec helper
+  * Helper integration spec should use the correct branch when setting up.
+  * adjust env testing in integration specs
+  * update some specs to work with updated checkout/setup helpers
+  * use branches in integration checks so full checkouts will work
+  * when initializing git changes data, work from deployment path
+  * allow integration spec checkouts to switch to a specific branch
+  * record git changes for later use by #changed?
+  * capture rsync changes for later #changed? analysis
+  * capture initial git HEAD ref for later #changes comparisons
+  * clean out any prior git/rsync changes data before refreshing repos
+  * Add specs for version command-line argument
+  * Change spec helper run_command method set pwd to bin/
+  * integration spec for #changed? in post_setup tasks
+  * adding #changed? helper (and friends) to whiskey_disk/helpers
+  * spec_helper method to rewind a git repo to the beginning
+  * git project scenario changes to support integration testing of #changes helper
+  * refactor:  splitting up WD.summarize method
+  * README updates for #changed? helper functionality
+
+
 0.6.17 / 2011-03-25 
 ==================
 

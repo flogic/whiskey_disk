@@ -58,6 +58,7 @@ integration_spec do
 
         it 'should have the working copy set to the specified branch when one is available' do
           @args = "--path=#{@config} --to=project:remote-on-other-branch"
+          checkout_branch('project', 'no_rake_hooks')
           run_deploy(@args)
           current_branch('project').should == 'no_rake_hooks'          
         end
@@ -90,9 +91,13 @@ integration_spec do
           end
 
           it 'should have the working copy set to the specified branch when one is available' do
+            setup_deployment_area
+
             @args = "--path=#{@config} --to=project:remote-on-other-branch"
             run_setup(@args)
+
             File.unlink(deployed_file('project/README'))
+
             run_deploy(@args)
             current_branch('project').should == 'no_rake_hooks'          
           end
