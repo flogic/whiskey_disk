@@ -342,15 +342,15 @@ describe 'WhiskeyDisk' do
       WhiskeyDisk.buffer.join(' ').should.match(%r{rm -f /path/to/main/repo/.whiskey_disk_git_changes})
     end
         
-    it 'should capture the current git HEAD ref for the specified branch' do
+    it 'should capture the current git HEAD ref for the current branch' do
       WhiskeyDisk.configuration = @parameters.merge({'branch' => 'production'})
       WhiskeyDisk.update_main_repository_checkout
-      WhiskeyDisk.buffer.join(' ').should.match(%r{ml=\`cat .git/refs/heads/production\`})
+      WhiskeyDisk.buffer.join(' ').should.match(%r{ml=\`git log -1 --pretty=format:%H\`})
     end
     
-    it 'should capture the current git HEAD ref for the master branch if no branch is specified' do
+    it 'should capture the current git HEAD ref for the current branch if no branch is specified' do
       WhiskeyDisk.update_main_repository_checkout
-      WhiskeyDisk.buffer.join(' ').should.match(%r{ml=\`cat .git/refs/heads/master\`})
+      WhiskeyDisk.buffer.join(' ').should.match(%r{ml=\`git log -1 --pretty=format:%H\`})
     end
     
     it 'should attempt to fetch only the master branch from the origin if no branch is specified' do
@@ -800,16 +800,16 @@ describe 'WhiskeyDisk' do
             WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("then { COMMAND ; }; else echo \"No changes to deploy.\"; fi")))            
           end
           
-          it "should query the head of the main checkout's master branch if no branch is specified" do
+          it "should query the head of the main checkout's current branch if no branch is specified" do
             WhiskeyDisk.enqueue("COMMAND")
-            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`cat .git/refs/heads/master\`;")))
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`git log -1 --pretty=format:%H\`;")))
           end
           
-          it "should query the head of the main checkout's specified branch if a branch is specified" do
+          it "should query the head of the main checkout's current branch if a branch is specified" do
             WhiskeyDisk.configuration = @parameters.merge({'branch' => 'production'})
             WhiskeyDisk.enable_staleness_checks
             WhiskeyDisk.enqueue("COMMAND")
-            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`cat .git/refs/heads/production\`;")))
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`git log -1 --pretty=format:%H\`;")))
           end
           
           it "should query the head on the main repository's master branch if no branch is specified" do            
@@ -864,16 +864,16 @@ describe 'WhiskeyDisk' do
             WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("then { COMMAND ; }; else echo \"No changes to deploy.\"; fi")))            
           end
           
-          it "should query the head of the main checkout's master branch if no branch is specified" do
+          it "should query the head of the main checkout's current branch if no branch is specified" do
             WhiskeyDisk.enqueue("COMMAND")
-            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`cat .git/refs/heads/master\`;")))
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`git log -1 --pretty=format:%H\`;")))
           end
           
-          it "should query the head of the main checkout's specified branch if a branch is specified" do
+          it "should query the head of the main checkout's current branch if a branch is specified" do
             WhiskeyDisk.configuration = @parameters.merge({'branch' => 'production'})
             WhiskeyDisk.enable_staleness_checks
             WhiskeyDisk.enqueue("COMMAND")
-            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`cat .git/refs/heads/production\`;")))
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`git log -1 --pretty=format:%H\`;")))
           end
           
           it "should query the head on the main repository's master branch if no branch is specified" do            
@@ -888,16 +888,16 @@ describe 'WhiskeyDisk' do
             WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("mr=\`git ls-remote #{@repository} refs/heads/production\`;")))
           end
           
-          it "should query the head of the config checkout's master branch if no branch is specified" do
+          it "should query the head of the config checkout's current branch if no branch is specified" do
             WhiskeyDisk.enqueue("COMMAND")
-            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_config_to}; cl=\`cat .git/refs/heads/master\`;")))
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_config_to}; cl=\`git log -1 --pretty=format:%H\`;")))
           end
           
-          it "should query the head of the config checkout's specified branch if a branch is specified" do
+          it "should query the head of the config checkout's current branch if a branch is specified" do
             WhiskeyDisk.configuration = @parameters.merge({'config_branch' => 'production'})
             WhiskeyDisk.enable_staleness_checks
             WhiskeyDisk.enqueue("COMMAND")
-            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_config_to}; cl=\`cat .git/refs/heads/production\`;")))
+            WhiskeyDisk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_config_to}; cl=\`git log -1 --pretty=format:%H\`;")))
           end
           
           it "should query the head on the config repository's master branch if no branch is specified" do            

@@ -91,12 +91,12 @@ class WhiskeyDisk
       needs(:deploy_to, :repository)
       
       check = "cd #{self[:deploy_to]}; " +
-              "ml=\`cat .git/refs/heads/#{branch}\`; " +
+              "ml=\`git log -1 --pretty=format:%H\`; " +
               "mr=\`git ls-remote #{self[:repository]} refs/heads/#{branch}\`; "
       
       if self[:deploy_config_to]
         check += "cd #{self[:deploy_config_to]}; " +
-                 "cl=\`cat .git/refs/heads/#{config_branch}\`; " +
+                 "cl=\`git log -1 --pretty=format:%H\`; " +
                  "cr=\`git ls-remote #{self[:config_repository]} refs/heads/#{config_branch}\`; "
       end
       
@@ -258,7 +258,7 @@ class WhiskeyDisk
     def snapshot_git_revision
       needs(:deploy_to)
       enqueue "cd #{self[:deploy_to]}"
-      enqueue %Q{ml=\`cat .git/refs/heads/#{branch}\`}
+      enqueue %Q{ml=\`git log -1 --pretty=format:%H\`}
     end
     
     def initialize_git_changes
