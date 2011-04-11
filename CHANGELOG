@@ -1,4 +1,10 @@
 
+0.6.22 / 2011-04-10 
+==================
+
+  * support branch-switching on deployments
+  * added integration spec for "branch switching" behavior
+
 0.6.21 / 2011-04-06 
 ==================
 
