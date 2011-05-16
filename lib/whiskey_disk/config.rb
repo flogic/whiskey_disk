@@ -5,14 +5,27 @@ require 'open-uri'
 class WhiskeyDisk
   class Config
     class << self
+      def env_has_key?(key)
+        ENV[key] && ENV[key] != ''
+      end
+
+      def env_setting_is_truthy?(key)
+        !!(env_has_key?(key) && ENV[key] =~ /^(?:t(?:rue)?|y(?:es)?|1)$/)
+      end
+
+      def env_key_or_false?(key)
+        env_has_key?(key) ? ENV[key] : false
+      end
+
       def environment_name
-        return false unless (ENV['to'] && ENV['to'] != '')
+        return false unless env_has_key?('to')
         return ENV['to'] unless ENV['to'] =~ /:/
         ENV['to'].split(/:/)[1]
       end
 
       def specified_project_name
-        return false unless (ENV['to'] && ENV['to'] =~ /:/)
+        return false unless env_has_key?('to')
+        return false unless ENV['to'] =~ /:/
         ENV['to'].split(/:/).first
       end
 
@@ -20,22 +33,21 @@ class WhiskeyDisk
         return if ENV['to'] && ENV['to'] =~ /:/
         ENV['to'] = data[environment_name]['project'] + ':' + ENV['to'] if data[environment_name]['project']
       end
-
+      
       def path
-        (ENV['path'] && ENV['path'] != '') ? ENV['path'] : false
+        env_key_or_false?('path')
       end
 
       def check_staleness?
-        !!(ENV['check'] && ENV['check'] =~ /^(?:t(?:rue)?|y(?:es)?|1)$/)
+        env_setting_is_truthy?('check')
       end
 
       def debug?
-        !!(ENV['debug'] && ENV['debug'] =~ /^(?:t(?:rue)?|y(?:es)?|1)$/)
+        env_setting_is_truthy?('debug')
       end
       
       def domain_limit
-        return false unless ENV['only'] and ENV['only'] != ''
-        ENV['only']
+        env_key_or_false?('only')
       end
 
       def contains_rakefile?(path)
