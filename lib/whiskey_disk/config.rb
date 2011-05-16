@@ -9,7 +9,7 @@ class WhiskeyDisk
         ENV[key] && ENV[key] != ''
       end
 
-      def env_setting_is_truthy?(key)
+      def env_flag_is_true?(key)
         !!(env_has_key?(key) && ENV[key] =~ /^(?:t(?:rue)?|y(?:es)?|1)$/)
       end
 
@@ -39,11 +39,11 @@ class WhiskeyDisk
       end
 
       def check_staleness?
-        env_setting_is_truthy?('check')
+        env_flag_is_true?('check')
       end
 
       def debug?
-        env_setting_is_truthy?('debug')
+        env_flag_is_true?('debug')
       end
       
       def domain_limit
