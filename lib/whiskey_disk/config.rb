@@ -66,18 +66,14 @@ class WhiskeyDisk
       end
 
       def base_path
-        return path if path
-        find_rakefile_from_current_path
+        path || find_rakefile_from_current_path
       end
 
       def valid_path?(path)
-        if path
-          uri = URI.parse(path)
-          return path if uri.scheme
-          return path if File.file?(path)
-        end
-        
-        false
+        return false unless path
+        uri = URI.parse(path)
+        return path if uri.scheme
+        return path if File.file?(path)
       end
 
       def configuration_file
