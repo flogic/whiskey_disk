@@ -62,7 +62,7 @@ describe '@whiskey_disk' do
         @domain = 'myhost'
         @config = WhiskeyDisk::Config.new
         @config.stub!(:domain_limit).and_return(@domain)
-        @whiskey_disk.stub!(:config).and_return(@config)
+        @whiskey_disk.config = @config
       end
       
       it 'should return false if the provided domain is nil' do
@@ -90,7 +90,7 @@ describe '@whiskey_disk' do
       before do
         @config = WhiskeyDisk::Config.new
         @config.stub!(:domain_limit).and_return(nil)
-        @whiskey_disk.stub!(:config).and_return(@config)
+        @whiskey_disk.config = @config
       end
 
       it 'should return false if the provided domain is nil' do
@@ -924,7 +924,7 @@ describe '@whiskey_disk' do
     before do
       @config = WhiskeyDisk::Config.new
       @config.stub!(:domain_limit).and_return(false)
-      @whiskey_disk.stub!(:config).and_return(@config)
+      @whiskey_disk.config = @config
     end
     
     it 'should allow specifying a domain' do

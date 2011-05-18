@@ -1,7 +1,7 @@
 require File.expand_path(File.join(File.dirname(__FILE__), 'whiskey_disk', 'config'))
 
 class WhiskeyDisk
-  attr_writer :configuration
+  attr_writer :configuration, :config
   attr_reader :results
   
   def initialize
