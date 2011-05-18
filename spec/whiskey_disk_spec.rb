@@ -60,7 +60,9 @@ describe '@whiskey_disk' do
     describe 'when a domain limit is specified in the configuration' do
       before do
         @domain = 'myhost'
-        WhiskeyDisk::Config.stub!(:domain_limit).and_return(@domain)
+        @config = WhiskeyDisk::Config.new
+        @config.stub!(:domain_limit).and_return(@domain)
+        @whiskey_disk.stub!(:config).and_return(@config)
       end
       
       it 'should return false if the provided domain is nil' do
@@ -86,7 +88,9 @@ describe '@whiskey_disk' do
     
     describe 'when no domain limit is specified in the configuration' do
       before do
-        WhiskeyDisk::Config.stub!(:domain_limit).and_return(nil)
+        @config = WhiskeyDisk::Config.new
+        @config.stub!(:domain_limit).and_return(nil)
+        @whiskey_disk.stub!(:config).and_return(@config)
       end
 
       it 'should return false if the provided domain is nil' do
@@ -918,7 +922,9 @@ describe '@whiskey_disk' do
   
   describe 'determining if a domain is of interest to us' do
     before do
-      WhiskeyDisk::Config.stub!(:domain_limit).and_return(false)
+      @config = WhiskeyDisk::Config.new
+      @config.stub!(:domain_limit).and_return(false)
+      @whiskey_disk.stub!(:config).and_return(@config)
     end
     
     it 'should allow specifying a domain' do
@@ -930,22 +936,22 @@ describe '@whiskey_disk' do
     end
     
     it 'should return true when our configuration does not specify a domain limit' do
-      WhiskeyDisk::Config.stub!(:domain_limit).and_return(false)
+      @config.stub!(:domain_limit).and_return(false)
       @whiskey_disk.domain_of_interest?('somedomain').should == true
     end
     
     it 'should return true when the specified domain matches the configuration domain limit' do
-      WhiskeyDisk::Config.stub!(:domain_limit).and_return('somedomain')
+      @config.stub!(:domain_limit).and_return('somedomain')
       @whiskey_disk.domain_of_interest?('somedomain').should == true      
     end
     
     it 'should return true when the specified domain matches the configuration domain limit, with a prepended "user@"' do
-      WhiskeyDisk::Config.stub!(:domain_limit).and_return('somedomain')
+      @config.stub!(:domain_limit).and_return('somedomain')
       @whiskey_disk.domain_of_interest?('user@somedomain').should == true      
     end    
     
     it 'should return false when the specified domain does not match the configuration domain limit' do
-      WhiskeyDisk::Config.stub!(:domain_limit).and_return('otherdomain')
+      @config.stub!(:domain_limit).and_return('otherdomain')
       @whiskey_disk.domain_of_interest?('somedomain').should == false  
     end
   end
