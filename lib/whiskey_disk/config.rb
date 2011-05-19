@@ -4,18 +4,6 @@ require 'open-uri'
 
 class WhiskeyDisk
   class Config
-    def env_has_key?(key)
-      ENV[key] && ENV[key] != ''
-    end
-
-    def env_flag_is_true?(key)
-      !!(env_has_key?(key) && ENV[key] =~ /^(?:t(?:rue)?|y(?:es)?|1)$/)
-    end
-
-    def env_key_or_false?(key)
-      env_has_key?(key) ? ENV[key] : false
-    end
-
     def environment_name
       return false unless env_has_key?('to')
       return ENV['to'] unless ENV['to'] =~ /:/
@@ -198,5 +186,19 @@ class WhiskeyDisk
       raise "Cannot determine current environment -- try rake ... to=staging, for example." unless environment_name
       filter_data(load_data)
     end
+    
+  private
+
+    def env_has_key?(key)
+      ENV[key] && ENV[key] != ''
+    end
+
+    def env_flag_is_true?(key)
+      !!(env_has_key?(key) && ENV[key] =~ /^(?:t(?:rue)?|y(?:es)?|1)$/)
+    end
+
+    def env_key_or_false?(key)
+      env_has_key?(key) ? ENV[key] : false
+    end  
   end
 end
