@@ -4,6 +4,11 @@ require 'open-uri'
 
 class WhiskeyDisk
   class Config
+    def fetch
+      raise "Cannot determine current environment -- try rake ... to=staging, for example." unless environment_name
+      filter_data(load_data)
+    end
+    
     def environment_name
       return false unless env_has_key?('to')
       return ENV['to'] unless ENV['to'] =~ /:/
@@ -21,10 +26,6 @@ class WhiskeyDisk
       ENV['to'] = data[environment_name]['project'] + ':' + ENV['to'] if data[environment_name]['project']
     end
     
-    def path
-      env_key_or_false?('path')
-    end
-
     def check_staleness?
       env_flag_is_true?('check')
     end
@@ -182,12 +183,11 @@ class WhiskeyDisk
       current
     end
 
-    def fetch
-      raise "Cannot determine current environment -- try rake ... to=staging, for example." unless environment_name
-      filter_data(load_data)
-    end
-    
   private
+
+    def path
+      env_key_or_false?('path')
+    end
 
     def env_has_key?(key)
       ENV[key] && ENV[key] != ''
