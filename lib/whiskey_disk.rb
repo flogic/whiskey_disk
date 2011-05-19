@@ -4,13 +4,6 @@ class WhiskeyDisk
   attr_writer :configuration, :config
   attr_reader :results
   
-  def initialize
-    @configuration = nil
-    @buffer = nil
-    @staleness_checks = nil
-    @results = nil
-  end
-  
   def buffer
     @buffer ||= []
   end
