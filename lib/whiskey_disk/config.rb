@@ -8,7 +8,40 @@ class WhiskeyDisk
       raise "Cannot determine current environment -- try rake ... to=staging, for example." unless environment_name
       filter_data(load_data)
     end
+
+    def debug?
+      env_flag_is_true?('debug')
+    end
     
+    def domain_limit
+      env_key_or_false?('only')
+    end
+    
+    def check_staleness?
+      env_flag_is_true?('check')
+    end
+    
+    def configuration_file
+      return path if valid_path?(path)
+      
+      files = []
+
+      files += [
+        File.join(base_path, 'deploy', specified_project_name, "#{environment_name}.yml"),  # /deploy/foo/staging.yml
+        File.join(base_path, 'deploy', "#{specified_project_name}.yml") # /deploy/foo.yml
+      ] if specified_project_name
+
+      files += [
+        File.join(base_path, 'deploy', "#{environment_name}.yml"),  # /deploy/staging.yml
+        File.join(base_path, "#{environment_name}.yml"), # /staging.yml
+        File.join(base_path, 'deploy.yml') # /deploy.yml
+      ]
+
+      files.each { |file|  return file if File.exists?(file) }
+
+      raise "Could not locate configuration file in path [#{base_path}]"
+    end
+
     def environment_name
       return false unless env_has_key?('to')
       return ENV['to'] unless ENV['to'] =~ /:/
@@ -26,18 +59,6 @@ class WhiskeyDisk
       ENV['to'] = data[environment_name]['project'] + ':' + ENV['to'] if data[environment_name]['project']
     end
     
-    def check_staleness?
-      env_flag_is_true?('check')
-    end
-
-    def debug?
-      env_flag_is_true?('debug')
-    end
-    
-    def domain_limit
-      env_key_or_false?('only')
-    end
-
     def contains_rakefile?(path)
       File.exists?(File.expand_path(File.join(path, 'Rakefile')))
     end
@@ -62,27 +83,6 @@ class WhiskeyDisk
       uri = URI.parse(path)
       return path if uri.scheme
       return path if File.file?(path)
-    end
-
-    def configuration_file
-      return path if valid_path?(path)
-      
-      files = []
-
-      files += [
-        File.join(base_path, 'deploy', specified_project_name, "#{environment_name}.yml"),  # /deploy/foo/staging.yml
-        File.join(base_path, 'deploy', "#{specified_project_name}.yml") # /deploy/foo.yml
-      ] if specified_project_name
-
-      files += [
-        File.join(base_path, 'deploy', "#{environment_name}.yml"),  # /deploy/staging.yml
-        File.join(base_path, "#{environment_name}.yml"), # /staging.yml
-        File.join(base_path, 'deploy.yml') # /deploy.yml
-      ]
-
-      files.each { |file|  return file if File.exists?(file) }
-
-      raise "Could not locate configuration file in path [#{base_path}]"
     end
 
     def configuration_data
