@@ -1,11 +1,11 @@
-## Whiskey Disk -- embarrassingly fast deployments. ##
+## Whisky Disk -- embarrassingly fast deployments. ##
 
 
 A very opinionated deployment tool, designed to be as fast as technologically possible.  (For more background, read the [WHY.txt](http://github.com/flogic/whiskey_disk/raw/master/WHY.txt) file)  Should work with any project which is git hosted, not just Ruby / Ruby on Rails projects.  Allows for local deploys as well as remote.
 
 Right-arrow through a short whiskey_disk presentation at [http://wd2010.rickbradley.com/](http://wd2010.rickbradley.com) (slide source available [here](http://github.com/rick/whiskey_disk_presentation).), covering the 0.2.*-era functionality.
 
-You can also right-arrow through a shorter but more up-to-date whiskey_disk "lightning talk" presentation 
+You can also right-arrow through a shorter but more up-to-date whiskey_disk "lightning talk" presentation
 (from the 2010 Ruby Hoedown) at [http://wdlightning.rickbradley.com/](http://wdlightning.rickbradley.com) (slide source available [here](http://github.com/rick/whiskey_disk_presentation/tree/lightning).), covering the 0.4.*-era functionality.
 
 ### tl;dr ###
@@ -23,7 +23,7 @@ Then make a deploy.yml file (in config/ if you're doing a Rails project):
       repository: "https://github.com/username/project.git"
       branch: "staging"
       rake_env:
-        RAILS_ENV: 'production'	    
+        RAILS_ENV: 'production'
 
 then:
 
@@ -62,9 +62,9 @@ current local checkout.
   - You can do multi-project deployments, specifying deployment data in a single
     deploy.yml config file, or keep an entire directory of project deployment config files.
 
-  - You can separate per-deployment application configuration information (e.g., passwords, 
-    database configs, hoptoad/AWS/email config data, etc.) in separate repositories from 
-    the application, and whiskey\_disk will merge the correct data onto the deployed 
+  - You can separate per-deployment application configuration information (e.g., passwords,
+    database configs, hoptoad/AWS/email config data, etc.) in separate repositories from
+    the application, and whiskey\_disk will merge the correct data onto the deployed
     application at deployment time.  You can even share sets of configuration files among
     deployment targets that behave alike.
 
@@ -73,9 +73,9 @@ current local checkout.
     specify a config_branch and everyone can have their own local setup that just
     works.
 
-  - There's no before\_after\_before_after hooks.  You can use a well-defined rake hook and/or a 
+  - There's no before\_after\_before_after hooks.  You can use a well-defined rake hook and/or a
     bash script to run additional tasks.
- 
+
   - You can enable "staleness checks" so that deployments only happen if
     either the main repo, or the config repo (if you're using one) has
     changes that are newer than what is currently deployed.
@@ -85,10 +85,10 @@ current local checkout.
     deployment branch of choice!
 
   - You can deploy to multiple remote targets at once.  Currently this is limited
-    to one-after-the-other synchronous deployments, but we're thinking about 
+    to one-after-the-other synchronous deployments, but we're thinking about
     doing them in parallel once we're happy with the stability of this feature.
 
-  - Assign hosts to roles (e.g., "web", "db", "app") and vary the shell or rake 
+  - Assign hosts to roles (e.g., "web", "db", "app") and vary the shell or rake
     post-setup/post-deploy actions you run based on those roles.
 
   - Limit the actions you run after deployment based on whether files of interest
@@ -104,14 +104,14 @@ current local checkout.
 
 ### Dependencies ###
 
-On the server from which the whiskey_disk process will be kicked off:  
+On the server from which the whiskey_disk process will be kicked off:
 
  - ruby
  - rake
  - whiskey\_disk
- - ssh (if doing a remote deployment).  
+ - ssh (if doing a remote deployment).
 
-On the deployment target server (which may be the same as the first server):  
+On the deployment target server (which may be the same as the first server):
 
  - a bash-compatible shell
  - rsync (only if using a configuration repository)
@@ -136,7 +136,7 @@ As a rails plugin:
  - config files are YAML, with a section for each target.
 
 Known config file settings (if you're familiar with capistrano and vlad these should seem eerily familiar):
- 
+
     domain:              host or list of hosts on which to deploy (these are ssh connect strings)
                          can also optionally include role information for each host
     deploy_to:           path to which to deploy main application
@@ -153,7 +153,7 @@ Known config file settings (if you're familiar with capistrano and vlad these sh
 
 
 A simple config/deploy.yml might look like:
-  
+
     qa:
       domain: "ogc@qa.ogtastic.com"
       deploy_to: "/var/www/www.ogtastic.com"
@@ -230,7 +230,7 @@ Just a single domain:
 Just a single domain, but specified as a one-item list:
 
     qa:
-      domain: 
+      domain:
       - "foo@qa.example.com"
 
 A list of multiple domains:
@@ -249,7 +249,7 @@ otherwise it's optional and superfluous):
       - name: "build@ci.example.com"
 
 It's also possible to assign various "roles" to the domains to which you deploy.  Some common usages would be
-"www", which might need a post\_deploy task which notifies some web server software (apache, nginx, passenger, 
+"www", which might need a post\_deploy task which notifies some web server software (apache, nginx, passenger,
 unicorn, etc.) that it should refresh the contents being served; or perhaps "db", which might need some set of
 post-deployment database migrations run (and which shouldn't be run from multiple servers).
 
@@ -273,7 +273,7 @@ While multiple roles for a domain must be specified as a list:
     production:
       domain:
       - name: "foo@appserver1.example.com"
-        roles: 
+        roles:
         - "web"
         - "app"
         - "db"
@@ -285,7 +285,7 @@ But domains with roles can be specified alongside simple domains as well:
       - name: "bar@demo.example.com"
       - "user@otherhost.domain.com"
       - name: "foo@appserver1.example.com"
-        roles: 
+        roles:
         - "web"
         - "app"
         - "db"
@@ -296,7 +296,7 @@ And, if you need to assign roles for a local deployment, you can do that as well
     local:
       domain:
       - name: "local"
-        roles: 
+        roles:
         - "web"
         - "app"
         - "db"
@@ -309,22 +309,22 @@ All that said, it's often simpler to refrain from carving up hosts into roles.  
 ### post\_deploy\_script and post\_setup\_script ###
 
 Whiskey\_disk provides rake task hooks (deploy:post\_setup and deploy:post\_deploy) to allow running custom
-code after setup or deployment.  There are situations where it is desirable to run some commands prior to 
+code after setup or deployment.  There are situations where it is desirable to run some commands prior to
 running those rake tasks (e.g., if using bundler and needing to do a 'bundle install' before running rake).
 It may also be the case that the target system doesn't have rake (and/or ruby) installed, but some post-setup
 or post-deploy operations need to happen.  For these reasons, whiskey\_disk allows specifying a (bash-compatible)
 shell script to run after setup and/or deployment via the post\_deploy\_script and post\_setup\_script settings
-in the configuration file.  These scripts, when specified, are run immediately before running the deploy:post\_setup 
+in the configuration file.  These scripts, when specified, are run immediately before running the deploy:post\_setup
 or deploy:post\_deploy rake tasks, if they are present.
 
 The paths provided to post\_deploy\_script and post\_setup\_script can be either absolute or relative.  A path
-starting with a '/' is an absolute path, and the script specified should be at that exact location on the 
+starting with a '/' is an absolute path, and the script specified should be at that exact location on the
 target filesystem.  A path which does not start with a '/' is a relative path, and the script specified should
-be located at the specified path under the deployed application path.  This implies that it's possible to 
+be located at the specified path under the deployed application path.  This implies that it's possible to
 manage post\_setup and post\_deploy scripts out of a configuration repository.
 
 A config/deploy.yml using post\_deploy\_script and post\_setup\_script might look like this:
-  
+
     production:
       domain: "ogc@www.ogtastic.com"
       deploy_to: "/var/www/www.ogtastic.com"
@@ -335,7 +335,7 @@ A config/deploy.yml using post\_deploy\_script and post\_setup\_script might loo
       rake_env:
         RAILS_ENV: 'production'
 
-The post\_deploy\_script will be run from /var/www/www.ogtastic.com/bin/post-deploy.sh on the 
+The post\_deploy\_script will be run from /var/www/www.ogtastic.com/bin/post-deploy.sh on the
 target system.
 
 
@@ -356,7 +356,7 @@ role.  For example:
           Dir.chdir(RAILS_ROOT)
           system("mkdir -p log tmp")
         end
-      end        
+      end
 
       task :db_migrate_if_necessary do
 				Rake::Task['db:migrate'] if role? :db
@@ -370,17 +370,17 @@ role.  For example:
           Rake::Task['ts:start'].invoke
         end
       end
-    
+
       task :bounce_passenger do
         if role? :www
           puts "restarting Passenger web server"
           Dir.chdir(RAILS_ROOT)
-          system("touch tmp/restart.txt")    
+          system("touch tmp/restart.txt")
         end
       end
 
       # etc...
-    
+
       task :post_setup  => [ :create_rails_directories ]
       task :post_deploy => [ :db_migrate_if_necessary, :thinking_sphinx_restart, :bounce_passenger ]
     end
@@ -399,36 +399,36 @@ are in an environment where the 'app' role is active but the 'web' role is not:
 
 
     $ wd_role web && rock || shocker
-         .-.     
-       .-.U|     
-       |U| | .-. 
-       | | |_|U| 
-       | | | | | 
+         .-.
+       .-.U|
+       |U| | .-.
+       | | |_|U|
+       | | | | |
       /|     ` |
-     | |       | 
-     |         | 
-      \        / 
-      |       |  
-      |       |  
-                 
+     | |       |
+     |         |
+      \        /
+      |       |
+      |       |
+
     $ wd_role app && rock || shocker
-       .-.       
-       |U|       
-       | |   .-. 
-       | |-._|U| 
-       | | | | | 
-      /|     ` | 
-     | |       | 
-     |         | 
-              / 
-      |       |  
-      |       |  
-    
+       .-.
+       |U|
+       | |   .-.
+       | |-._|U|
+       | | | | |
+      /|     ` |
+     | |       |
+     |         |
+              /
+      |       |
+      |       |
+
 
 
 
 ### Running whiskey\_disk from the command-line ###
-  
+
     % wd setup --to=<target>
     % wd setup --to=<project>:<target>
     % wd setup --to=foo:qa --path=/etc/whiskey_disk/deploy.yml
@@ -449,7 +449,7 @@ are in an environment where the 'app' role is active but the 'web' role is not:
 Also, `--debug` can be used to enable verbose output when running `wd setup` or `wd deploy`.
 
 Note that the wd command (unlike rake, which requires a Rakefile in the current directory) can be run from anywhere, so you can deploy any project, working from any path, and can even specify where to find the deployment YAML configuration file.
-  
+
 The --path argument can take either a file or a directory.  When given a file it will use that file as the configuration file.  When given a directory it will look in that directory for deploy/&lt;project&gt;/&lt;target&gt;.yml, then deploy/&lt;project&gt;.yml, then deploy/&lt;target&gt;.yml, then &lt;target&gt;.yml, and finally, deploy.yml.
 
 To make things even better, you can provide an URL as the --path argument and have a central location from which to pull deployment YAML data.  This means that you can centrally administer the definitive deployment information for the various projects and targets you manage.  This could be as simple as keeping them in a text file hosted on a web server, checking them into git and using github or gitweb to serve up the file contents on HEAD, or it could be a programmatically managed configuration management system returning dynamically-generated results.
@@ -480,7 +480,7 @@ The --only setting is used to tell a node what its name is, and to tell it not t
 
 ### A note about post\_{setup,deploy} Rake tasks
 
-If you want actions to run on the deployment target after you do a whiskey\_disk setup or whiskey\_disk deploy, 
+If you want actions to run on the deployment target after you do a whiskey\_disk setup or whiskey\_disk deploy,
 you will need to make sure that whiskey\_disk is available on the target system (either by gem installation,
 as a rails plugin in the Rails application to be deployed, or as a vendored library in the application to be
 deployed).  Whiskey\_disk provides the basic deploy:post\_setup and deploy:post\_deploy hooks which get called.
@@ -505,7 +505,7 @@ Do you want to run database migrations when no migrations have been added?  Why 
       end
 
       task :compress_assets do
-        if changed?('public/stylesheets') or changed?('public/javascripts') 
+        if changed?('public/stylesheets') or changed?('public/javascripts')
           puts "Getting my asset munge on..."
           # do some expensive asset compression stuff
         end
@@ -578,7 +578,7 @@ environment variable to the string 'true' or 'yes':
 
 #### What's all this about a second repository for configuration stuff? ####
 
-This is completely optional, but we really are digging this, so maybe 
+This is completely optional, but we really are digging this, so maybe
 you should try it.  Basically it goes like this...
 
 We have a number of web applications that we manage.  Usually there's a
@@ -746,7 +746,7 @@ Notice that there are no separate trees for 'uat' and 'qa' targets.
 
     RAILS_ENV=ENV['RAILS_ENV'] if ENV['RAILS_ENV'] and '' != ENV['RAILS_ENV']
     Rake::Task['environment'].invoke
-    
+
     require 'asset_cache_sweeper'
 
     namespace :deploy do
@@ -755,30 +755,30 @@ Notice that there are no separate trees for 'uat' and 'qa' targets.
         Dir.chdir(RAILS_ROOT)
         system("mkdir -p log tmp")
       end
-    
+
       # note that the plpgsql language needs to be installed by the db admin at initial database creation :-/
       task :setup_postgres_for_thinking_sphinx => [ :environment ] do
         ThinkingSphinx::PostgreSQLAdapter.new(Product).setup
       end
-    
+
       # whytf is this even necessary?  Come on.  This should be built into ts:restart.
       task :thinking_sphinx_restart => [:environment] do
         Rake::Task['ts:stop'].invoke rescue nil
         Rake::Task['ts:index'].invoke
         Rake::Task['ts:start'].invoke
       end
-    
+
       task :bounce_passenger do
         puts "restarting Passenger web server"
         Dir.chdir(RAILS_ROOT)
-        system("touch tmp/restart.txt")    
+        system("touch tmp/restart.txt")
       end
-    
+
       task :clear_asset_cache => [:environment] do
         STDERR.puts "Expiring cached Assets for domains [#{AssetCacheSweeper.domains.join(", ")}]"
         AssetCacheSweeper.expire
       end
-    
+
       task :post_setup => [ :create_rails_directories, :setup_postgres_for_thinking_sphinx ]
       task :post_deploy => [ 'db:migrate', 'ts:config', :thinking_sphinx_restart, :bounce_passenger, :clear_asset_cache ]
     end
