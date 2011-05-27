@@ -85,10 +85,6 @@ class WhiskeyDisk
       return path if File.file?(path)
     end
 
-    def configuration_data
-      open(configuration_file) {|f| f.read }
-    end
-
     def project_name
       specified_project_name || 'unnamed_project'
     end
@@ -128,6 +124,7 @@ class WhiskeyDisk
       [ list ].flatten.delete_if { |d| d.nil? or d == '' }
     end
     
+    # called only by normalize_domains
     def normalize_domain(data)
       compacted = localize_domain_list(data)
       compacted = [ 'local' ] if compacted.empty?
@@ -144,6 +141,7 @@ class WhiskeyDisk
       end
     end
     
+    # called only by normalize_domains
     def check_duplicates(project, target, domain_list)
       seen = {}
       domain_list.each do |domain|
@@ -152,6 +150,7 @@ class WhiskeyDisk
       end
     end
     
+    # called only by normalize_data
     def normalize_domains(data)
       data.each_pair do |project, project_data|
         project_data.each_pair do |target, target_data|
@@ -160,16 +159,24 @@ class WhiskeyDisk
       end
     end
 
+    # called only by #load_data
+    def configuration_data
+      open(configuration_file) {|f| f.read }
+    end
+
+    # called only by #load_data
     def normalize_data(data)
       normalize_domains(add_project_scoping(add_environment_scoping(data.clone)))
     end
 
+    # called only by #fetch
     def load_data
       normalize_data(YAML.load(configuration_data))
     rescue Exception => e
       raise %Q{Error reading configuration file [#{configuration_file}]: "#{e}"}
     end
 
+    # called only by #fetch
     def filter_data(data)
       current = data[project_name][environment_name] rescue nil
       raise "No configuration file defined data for project `#{project_name}`, environment `#{environment_name}`" unless current
