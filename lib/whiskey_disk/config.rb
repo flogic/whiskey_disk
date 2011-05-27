@@ -157,6 +157,7 @@ class WhiskeyDisk
           target_data['domain'] = check_duplicates(project, target, normalize_domain(target_data['domain']))
         end
       end
+      data
     end
 
     # called only by #load_data
@@ -171,13 +172,13 @@ class WhiskeyDisk
 
     # called only by #fetch
     def load_data
-      normalize_data(YAML.load(configuration_data))
+      YAML.load(configuration_data)
     rescue Exception => e
       raise %Q{Error reading configuration file [#{configuration_file}]: "#{e}"}
     end
 
-    # called only by #fetch
-    def current_data(data)
+    # called only by #filter_data
+    def check_for_project_and_environment(data)
       raise "No configuration file defined data for project `#{project_name}`, environment `#{environment_name}`" unless data and data[project_name] and data[project_name][environment_name]
       data[project_name][environment_name]
     end
@@ -197,7 +198,8 @@ class WhiskeyDisk
     
     # called only by #fetch
     def filter_data(data)
-      current = current_data(data)
+      current = normalize_data(data)
+      current = check_for_project_and_environment(current)
       current = add_environment_name(current)
       current = add_project_name(current)
       current = default_config_target(current)
