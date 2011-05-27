@@ -177,17 +177,30 @@ class WhiskeyDisk
     end
 
     # called only by #fetch
-    def filter_data(data)
-      current = data[project_name][environment_name] rescue nil
-      raise "No configuration file defined data for project `#{project_name}`, environment `#{environment_name}`" unless current
+    def current_data(data)
+      raise "No configuration file defined data for project `#{project_name}`, environment `#{environment_name}`" unless data and data[project_name] and data[project_name][environment_name]
+      data[project_name][environment_name]
+    end
 
-      current.merge!({
-        'environment' => environment_name,
-        'project' => project_name,
-      })
-      
-      current['config_target'] ||= environment_name
-      current
+    def add_environment_name(data)
+      data.merge( { 'environment' => environment_name } )
+    end
+
+    def add_project_name(data)
+      data.merge( { 'project' => project_name } )
+    end
+
+    def default_config_target(data)
+      return data if data['config_target']
+      data.merge( { 'config_target' => environment_name })
+    end
+    
+    # called only by #fetch
+    def filter_data(data)
+      current = current_data(data)
+      current = add_environment_name(current)
+      current = add_project_name(current)
+      current = default_config_target(current)
     end
 
   private
