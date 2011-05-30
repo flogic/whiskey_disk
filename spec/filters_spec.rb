@@ -24,19 +24,19 @@ describe 'filtering configuration data' do
       @proj_data  = { 'foo' => @env_data }
     end
 
-    it 'should fail if the configuration data is not a hash' do
+    it 'fails if the configuration data is not a hash' do
       lambda { @config.add_environment_scoping([]) }.should.raise
     end
 
-    it 'should return the original data if it has both project and environment scoping' do
+    it 'returns the original data if it has both project and environment scoping' do
       @config.add_environment_scoping(@proj_data).should == @proj_data
     end
 
-    it 'should return the original data if it has environment scoping' do
+    it 'returns the original data if it has environment scoping' do
       @config.add_environment_scoping(@env_data).should == @env_data
     end
 
-    it 'should return the data wrapped in an environment scope if it has no environment scoping' do
+    it 'returns the data wrapped in an environment scope if it has no environment scoping' do
       @config.add_environment_scoping(@bare_data).should == { 'staging' => @bare_data }
     end
   end
@@ -50,7 +50,7 @@ describe 'filtering configuration data' do
       @proj_data  = { 'foo' => @bare_data }
     end
 
-    it 'should fail if the configuration data is not a hash' do
+    it 'fails if the configuration data is not a hash' do
       lambda { @config.add_project_scoping([]) }.should.raise
     end
 
@@ -59,12 +59,12 @@ describe 'filtering configuration data' do
         ENV['to'] = @env = 'staging'
       end
 
-      it 'should return the original data if it has both project and environment scoping' do
+      it 'returns the original data if it has both project and environment scoping' do
         @config.add_project_scoping(@proj_data).should == @proj_data
       end
 
       describe 'when no project name is specified in the bare config hash' do
-        it 'should return the original data wrapped in project scope, using a dummy project, if it has environment scoping but no project scoping' do
+        it 'returns the original data wrapped in project scope, using a dummy project, if it has environment scoping but no project scoping' do
           @config.add_project_scoping(@bare_data).should == { 'unnamed_project' => @bare_data }
         end
       end
@@ -74,7 +74,7 @@ describe 'filtering configuration data' do
           @bare_data['staging']['project'] = 'whiskey_disk'
         end
 
-        it 'should return the original data wrapped in project scope if it has environment scoping but no project scoping' do
+        it 'returns the original data wrapped in project scope if it has environment scoping but no project scoping' do
           @config.add_project_scoping(@bare_data).should == { 'whiskey_disk' => @bare_data }
         end
       end
@@ -86,11 +86,11 @@ describe 'filtering configuration data' do
       end
     
       describe 'when a project name is not specified in the bare config hash' do
-        it 'should return the original data if it has both project and environment scoping' do
+        it 'returns the original data if it has both project and environment scoping' do
           @config.add_project_scoping(@proj_data).should == @proj_data
         end
     
-        it 'should return the original data wrapped in project scope if it has environment scoping but no project scoping' do
+        it 'returns the original data wrapped in project scope if it has environment scoping but no project scoping' do
           @config.add_project_scoping(@bare_data).should == { 'whiskey_disk' => @bare_data }
         end
       end
@@ -100,11 +100,11 @@ describe 'filtering configuration data' do
           @bare_data['staging']['project'] = 'whiskey_disk'
         end
     
-        it 'should return the original data if it has both project and environment scoping' do
+        it 'returns the original data if it has both project and environment scoping' do
           @config.add_project_scoping(@proj_data).should == @proj_data
         end
     
-        it 'should return the original data wrapped in project scope if it has environment scoping but no project scoping' do
+        it 'returns the original data wrapped in project scope if it has environment scoping but no project scoping' do
           @config.add_project_scoping(@bare_data).should == { 'whiskey_disk' => @bare_data }
         end
       end
@@ -159,79 +159,79 @@ describe 'filtering configuration data' do
       }
     end
   
-    it 'should set the domain to "local" when no domain is specified' do
+    it 'sets the domain to "local" when no domain is specified' do
       @config.normalize_domains(@data)['foo']['xyz']['domain'].should == [ { :name => 'local' } ]   
     end
     
-    it 'should handle nil domains across all projects and targets' do
+    it 'handles nil domains across all projects and targets' do
       @config.normalize_domains(@data)['zyx']['xyz']['domain'].should == [ { :name => 'local' } ]
     end
   
-    it 'should return domain as "local" if a single empty domain was specified' do
+    it 'returns domain as "local" if a single empty domain was specified' do
       @config.normalize_domains(@data)['foo']['eee']['domain'].should == [ { :name => 'local' } ]
     end
     
-    it 'should handle single empty specified domains across all projects and targets' do
+    it 'handles single empty specified domains across all projects and targets' do
       @config.normalize_domains(@data)['zyx']['eee']['domain'].should == [ { :name => 'local' } ]                 
     end
     
-    it 'should return domain as a single element list with a name if a single non-empty domain was specified' do
+    it 'returns domain as a single element list with a name if a single non-empty domain was specified' do
       @config.normalize_domains(@data)['foo']['abc']['domain'].should == [ { :name => 'what@example.com' } ]
     end
     
-    it 'should handle single specified domains across all projects and targets' do
+    it 'handles single specified domains across all projects and targets' do
       @config.normalize_domains(@data)['zyx']['abc']['domain'].should == [ { :name => 'what@example.com' } ]
     end
   
-    it 'should return the list of domain name hashes when a list of domains is specified' do
+    it 'returns the list of domain name hashes when a list of domains is specified' do
       @config.normalize_domains(@data)['foo']['baz']['domain'].should == [ 
         { :name => 'bar@example.com' }, { :name => 'baz@domain.com' } 
       ]
     end
   
-    it 'should handle lists of domains across all projects and targets' do
+    it 'handles lists of domains across all projects and targets' do
       @config.normalize_domains(@data)['zyx']['hij']['domain'].should == [ 
         { :name => 'bar@example.com' }, { :name => 'baz@domain.com' } 
        ]
     end
     
-    it 'should replace any nil domains with "local" domains in a domain list' do
+    it 'replaces any nil domains with "local" domains in a domain list' do
       @config.normalize_domains(@data)['foo']['bar']['domain'].should == [
         { :name => 'user@example.com' }, { :name => 'local' }, { :name => 'foo@domain.com' }
        ]
     end
     
-    it 'should handle localizing nils across all projects and targets' do
+    it 'handles localizing nils across all projects and targets' do
       @config.normalize_domains(@data)['zyx']['def']['domain'].should == [
         { :name => 'user@example.com' }, { :name => 'local' }, { :name => 'foo@domain.com' }
        ]
     end
     
-    it 'should replace any blank domains with "local" domains in a domain list' do
+    it 'replaces any blank domains with "local" domains in a domain list' do
       @config.normalize_domains(@data)['foo']['bat']['domain'].should == [
         { :name => 'user@example.com' }, { :name => 'foo@domain.com' }, { :name => 'local' }
        ]
     end
     
-    it 'should handle localizing blanks across all projects and targets' do
+    it 'handles localizing blanks across all projects and targets' do
       @config.normalize_domains(@data)['zyx']['dex']['domain'].should == [
         { :name => 'user@example.com' }, { :name => 'foo@domain.com' }, { :name => 'local' }
        ]
     end
     
-    it 'should not include roles when only nil, blank or empty roles lists are specified' do
+    it 'does not include roles when only nil, blank or empty roles lists are specified' do
       @config.normalize_domains(@data)['foo']['erl']['domain'].should == [
         { :name => 'bar@example.com' }, { :name => 'baz@domain.com' }, { :name => 'aok@domain.com' }
        ]        
     end
   
-    it 'should handle filtering empty roles across all projects and targets ' do
+    it 'handles filtering empty roles across all projects and targets ' do
       @config.normalize_domains(@data)['zyx']['erl']['domain'].should == [
         { :name => 'bar@example.com' }, { :name => 'baz@domain.com' }, { :name => 'aok@domain.com' }
        ]        
     end
     
-    it 'should include and normalize roles when specified as strings or lists' do
+    it 'includes and normalizes roles when specified as strings or lists' do
       @config.normalize_domains(@data)['foo']['rol']['domain'].should == [
         { :name => 'bar@example.com', :roles => [ 'web', 'db' ] }, 
         { :name => 'baz@domain.com',  :roles => [ 'db' ] }, 
@@ -239,7 +239,7 @@ describe 'filtering configuration data' do
        ]        
     end
   
-    it 'should handle normalizing roles across all projects and targets ' do
+    it 'handles normalizing roles across all projects and targets ' do
       @config.normalize_domains(@data)['zyx']['rol']['domain'].should == [
         { :name => 'bar@example.com', :roles => [ 'web', 'db' ] }, 
         { :name => 'baz@domain.com',  :roles => [ 'db' ] }, 
@@ -247,7 +247,7 @@ describe 'filtering configuration data' do
        ]        
     end
     
-    it 'should respect empty domains among role data' do
+    it 'respects empty domains among role data' do
       @config.normalize_domains(@data)['foo']['wow']['domain'].should == [
         { :name => 'bar@example.com', :roles => [ 'web', 'db' ] }, 
         { :name => 'baz@domain.com',  :roles => [ 'db' ] }, 
@@ -257,7 +257,7 @@ describe 'filtering configuration data' do
        ]                
     end
     
-    it 'should handle empty domain filtering among roles across all projects and targets' do
+    it 'handles empty domain filtering among roles across all projects and targets' do
       @config.normalize_domains(@data)['zyx']['wow']['domain'].should == [
         { :name => 'bar@example.com', :roles => [ 'web', 'db' ] }, 
         { :name => 'baz@domain.com',  :roles => [ 'db' ] }, 
@@ -267,7 +267,7 @@ describe 'filtering configuration data' do
        ]        
     end
     
-    it 'should raise an exception if a domain appears more than once in a target' do
+    it 'raises an exception if a domain appears more than once in a target' do
       @data = {
         'foo' => { 
           'erl' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => nil }, 
@@ -281,7 +281,7 @@ describe 'filtering configuration data' do
   end
 
   describe 'by checking for project and environment' do
-  
+    
   end
 
   describe 'by adding the environment name' do
