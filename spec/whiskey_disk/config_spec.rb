@@ -36,113 +36,113 @@ describe WhiskeyDisk::Config do
   end
   
   describe 'when computing the environment name' do
-    it 'should return false when there is no ENV["to"] setting' do
+    it 'returns false when there is no ENV["to"] setting' do
       ENV['to'] = nil
       @config.environment_name.should == false
     end
 
-    it 'should return false when the ENV["to"] setting is blank' do
+    it 'returns false when the ENV["to"] setting is blank' do
       ENV['to'] = ''
       @config.environment_name.should == false
     end
 
-    it 'should return the ENV["to"] setting when it is non-blank' do
+    it 'returns the ENV["to"] setting when it is non-blank' do
       ENV['to'] = 'staging'
       @config.environment_name.should == 'staging'
     end
 
-    it 'should return the environment portion of the ENV["to"] setting when a project is specified' do
+    it 'returns the environment portion of the ENV["to"] setting when a project is specified' do
       ENV['to'] = 'project:staging'
       @config.environment_name.should == 'staging'
     end
   end
 
   describe 'when determining whether to do a staleness check before updating' do
-    it 'should return false when there is no ENV["check"] setting' do
+    it 'returns false when there is no ENV["check"] setting' do
       ENV['check'] = nil
       @config.check_staleness?.should == false
     end
 
-    it 'should return false when the ENV["check"] setting is blank' do
+    it 'returns false when the ENV["check"] setting is blank' do
       ENV['check'] = ''
       @config.check_staleness?.should == false
     end
 
-    it 'should return true if the ENV["check"] setting is "t"' do
+    it 'returns true if the ENV["check"] setting is "t"' do
       ENV['check'] = 't'
       @config.check_staleness?.should == true
     end
 
-    it 'should return true if the ENV["check"] setting is "true"' do
+    it 'returns true if the ENV["check"] setting is "true"' do
       ENV['check'] = 'true'
       @config.check_staleness?.should == true
     end
 
-    it 'should return true if the ENV["check"] setting is "y"' do
+    it 'returns true if the ENV["check"] setting is "y"' do
       ENV['check'] = 'y'
       @config.check_staleness?.should == true
     end
 
-    it 'should return true if the ENV["check"] setting is "yes"' do
+    it 'returns true if the ENV["check"] setting is "yes"' do
       ENV['check'] = 'yes'
       @config.check_staleness?.should == true
     end
 
-    it 'should return true if the ENV["check"] setting is "1"' do
+    it 'returns true if the ENV["check"] setting is "1"' do
       ENV['check'] = '1'
       @config.check_staleness?.should == true
     end
   end
   
   describe 'when determining whether there is a domain limit set' do
-    it 'should return false when ENV["only"] is nil' do
+    it 'returns false when ENV["only"] is nil' do
       ENV['only'] = nil
       @config.domain_limit.should == false
     end
     
-    it 'should return false when ENV["only"] is empty' do
+    it 'returns false when ENV["only"] is empty' do
       ENV['only'] = ''
       @config.domain_limit.should == false
     end
     
-    it 'should return the value in ENV["only"] when it is non-empty' do
+    it 'returns the value in ENV["only"] when it is non-empty' do
       ENV['only'] = 'somedomain'
       @config.domain_limit.should == 'somedomain'      
     end
   end
 
   describe 'when determining whether to turn debug mode on' do
-    it 'should return false when there is no ENV["debug"] setting' do
+    it 'returns false when there is no ENV["debug"] setting' do
       ENV['debug'] = nil
       @config.debug?.should == false
     end
 
-    it 'should return false when the ENV["debug"] setting is blank' do
+    it 'returns false when the ENV["debug"] setting is blank' do
       ENV['debug'] = ''
       @config.debug?.should == false
     end
 
-    it 'should return true if the ENV["debug"] setting is "t"' do
+    it 'returns true if the ENV["debug"] setting is "t"' do
       ENV['debug'] = 't'
       @config.debug?.should == true
     end
 
-    it 'should return true if the ENV["debug"] setting is "true"' do
+    it 'returns true if the ENV["debug"] setting is "true"' do
       ENV['debug'] = 'true'
       @config.debug?.should == true
     end
 
-    it 'should return true if the ENV["debug"] setting is "y"' do
+    it 'returns true if the ENV["debug"] setting is "y"' do
       ENV['debug'] = 'y'
       @config.debug?.should == true
     end
 
-    it 'should return true if the ENV["debug"] setting is "yes"' do
+    it 'returns true if the ENV["debug"] setting is "yes"' do
       ENV['debug'] = 'yes'
       @config.debug?.should == true
     end
 
-    it 'should return true if the ENV["debug"] setting is "1"' do
+    it 'returns true if the ENV["debug"] setting is "1"' do
       ENV['debug'] = '1'
       @config.debug?.should == true
     end
@@ -156,27 +156,27 @@ describe WhiskeyDisk::Config do
         @config = TestURLConfig.new
       end
       
-      it 'should fail if the current environment cannot be determined' do
+      it 'fails if the current environment cannot be determined' do
         ENV['to'] = nil
         lambda { @config.fetch }.should.raise
       end
 
-      it 'should fail if the configuration data cannot be retrieved' do
+      it 'fails if the configuration data cannot be retrieved' do
         @config.stub!(:open).and_raise(RuntimeError)
         lambda { @config.fetch }.should.raise
       end
 
-      it 'should fail if the retrieved configuration data is invalid' do
+      it 'fails if the retrieved configuration data is invalid' do
         @config.stub!(:open).and_return("}")
         lambda { @config.fetch }.should.raise
       end
 
-      it 'should fail if the retrieved configuration data does not define data for this environment' do
+      it 'fails if the retrieved configuration data does not define data for this environment' do
         @config.set_response('foo' => { 'production' => { 'a' => 'b'} })
         lambda { @config.fetch }.should.raise
       end
 
-      it 'should return the retrieved configuration yaml data for this environment as a hash' do
+      it 'returns the retrieved configuration yaml data for this environment as a hash' do
         staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
         @config.set_response('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         result = @config.fetch
@@ -185,56 +185,56 @@ describe WhiskeyDisk::Config do
         end
       end
     
-      it 'should not include configuration information for other environments in the returned hash' do
+      it 'does not include configuration information for other environments in the returned hash' do
         staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
         @config.set_response('production' => { 'repository' => 'c', 'a' => 'b'}, 'staging' => staging)
         @config.fetch['a'].should.be.nil
       end
 
-      it 'should include the environment in the hash' do
+      it 'includes the environment in the hash' do
         staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
         @config.set_response('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         @config.fetch['environment'].should == 'staging'
       end
 
-      it 'should not allow overriding the environment in the configuration file' do
+      it 'does not allow overriding the environment in the configuration file' do
         staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'environment' => 'production' }
         @config.set_response('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         @config.fetch['environment'].should == 'staging'
       end
 
-      it 'should include the project handle in the hash' do
+      it 'includes the project handle in the hash' do
         staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
         @config.set_response('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         @config.fetch['project'].should == 'foo'
       end
 
-      it 'should not allow overriding the project handle in the configuration file when a project root is specified' do
+      it 'does not allow overriding the project handle in the configuration file when a project root is specified' do
         staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
         @config.set_response('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         @config.fetch['project'].should == 'foo'
       end
 
-      it 'should allow overriding the project handle in the configuration file when a project root is not specified' do
+      it 'allows overriding the project handle in the configuration file when a project root is not specified' do
         ENV['to'] = @env = 'staging'
         staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
         @config.set_response('production' => { 'repository' => 'b'}, 'staging' => staging)
         @config.fetch['project'].should == 'diskey_whisk'
       end
     
-      it 'should include the environment name as the config_target setting when no config_target is specified' do
+      it 'includes the environment name as the config_target setting when no config_target is specified' do
         staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
         @config.set_response('production' => { 'repository' => 'b'}, 'staging' => staging)
         @config.fetch['config_target'].should == 'staging'
       end
     
-      it 'should include the config_target setting when a config_target is specified' do
+      it 'includes the config_target setting when a config_target is specified' do
         staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk', 'config_target' => 'testing' }
         @config.set_response('production' => { 'repository' => 'b'}, 'staging' => staging)
         @config.fetch['config_target'].should == 'testing'
       end
       
-      it 'should fail if the named target cannot be found' do
+      it 'fails if the named target cannot be found' do
         ENV['to'] = @env = 'bogus:thing'
         lambda { @config.fetch }.should.raise
       end
@@ -251,31 +251,31 @@ describe WhiskeyDisk::Config do
         FileUtils.rm_rf(@path)
       end
       
-      it 'should fail if the current environment cannot be determined' do
+      it 'fails if the current environment cannot be determined' do
         ENV['to'] = nil
         lambda { @config.fetch }.should.raise
       end
 
-      it 'should fail if the configuration file does not exist' do
+      it 'fails if the configuration file does not exist' do
         lambda { @config.fetch }.should.raise
       end
 
-      it 'should fail if the configuration file cannot be read' do
+      it 'fails if the configuration file cannot be read' do
         Dir.mkdir(File.join(@path, 'tmp'))
         lambda { @config.fetch }.should.raise
       end
 
-      it 'should fail if the configuration file is invalid' do
+      it 'fails if the configuration file is invalid' do
         File.open(@config_file, 'w') {|f| f.puts "}" }
         lambda { @config.fetch }.should.raise
       end
 
-      it 'should fail if the configuration file does not define data for this environment' do
+      it 'fails if the configuration file does not define data for this environment' do
         write_config_file('foo' => { 'production' => { 'a' => 'b'} })
         lambda { @config.fetch }.should.raise
       end
 
-      it 'should return the configuration yaml file data for this environment as a hash' do
+      it 'returns the configuration yaml file data for this environment as a hash' do
         staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
         write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         result = @config.fetch
@@ -284,56 +284,56 @@ describe WhiskeyDisk::Config do
         end
       end
     
-      it 'should not include configuration information for other environments in the returned hash' do
+      it 'does not include configuration information for other environments in the returned hash' do
         staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
         write_config_file('production' => { 'repository' => 'c', 'a' => 'b'}, 'staging' => staging)
         @config.fetch['a'].should.be.nil
       end
 
-      it 'should include the environment in the hash' do
+      it 'includes the environment in the hash' do
         staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
         write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         @config.fetch['environment'].should == 'staging'
       end
 
-      it 'should not allow overriding the environment in the configuration file' do
+      it 'does not allow overriding the environment in the configuration file' do
         staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'environment' => 'production' }
         write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         @config.fetch['environment'].should == 'staging'
       end
 
-      it 'should include the project handle in the hash' do
+      it 'includes the project handle in the hash' do
         staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
         write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         @config.fetch['project'].should == 'foo'
       end
 
-      it 'should not allow overriding the project handle in the configuration file when a project root is specified' do
+      it 'does not allow overriding the project handle in the configuration file when a project root is specified' do
         staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
         write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         @config.fetch['project'].should == 'foo'
       end
 
-      it 'should allow overriding the project handle in the configuration file when a project root is not specified' do
+      it 'allows overriding the project handle in the configuration file when a project root is not specified' do
         ENV['to'] = @env = 'staging'
         staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
         write_config_file('production' => { 'repository' => 'b'}, 'staging' => staging)
         @config.fetch['project'].should == 'diskey_whisk'
       end
     
-      it 'should include the environment name as the config_target setting when no config_target is specified' do
+      it 'includes the environment name as the config_target setting when no config_target is specified' do
         staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
         write_config_file('production' => { 'repository' => 'b'}, 'staging' => staging)
         @config.fetch['config_target'].should == 'staging'
       end
     
-      it 'should include the config_target setting when a config_target is specified' do
+      it 'includes the config_target setting when a config_target is specified' do
         staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk', 'config_target' => 'testing' }
         write_config_file('production' => { 'repository' => 'b'}, 'staging' => staging)
         @config.fetch['config_target'].should == 'testing'
       end
       
-      it 'should fail if the named target cannot be found' do
+      it 'fails if the named target cannot be found' do
         ENV['to'] = @env = 'bogus:thing'
         lambda { @config.fetch }.should.raise
       end
@@ -350,11 +350,11 @@ describe WhiskeyDisk::Config do
       FileUtils.rm_rf(@path)
     end
 
-    it 'should fail if the configuration file does not exist' do
+    it 'fails if the configuration file does not exist' do
       lambda { @config.configuration_data }.should.raise
     end
 
-    it 'should return the contents of the configuration file' do
+    it 'returns the contents of the configuration file' do
       File.open(@config_file, 'w') { |f| f.puts "file contents" }
       @config.configuration_data.should == "file contents\n"
     end
@@ -371,33 +371,33 @@ describe WhiskeyDisk::Config do
       FileUtils.rm_rf(@path)
     end
     
-    it 'should fail if the configuration data cannot be loaded' do
+    it 'fails if the configuration data cannot be loaded' do
       lambda { @config.load_data }.should.raise
     end
 
-    it 'should fail if converting the configuration data from YAML fails' do
+    it 'fails if converting the configuration data from YAML fails' do
       File.open(@config_file, 'w') { |f| f.puts "}" }
       lambda { @config.load_data }.should.raise
     end
 
-    it 'should return the un-YAMLized configuration data' do
+    it 'returns the un-YAMLized configuration data' do
       write_config_file('repository' => 'x')
       @config.load_data.should == { 'repository' => 'x' }
     end    
   end
 
   describe 'computing the project name' do
-    it 'should return the project name from the ENV["to"] setting when it is available' do
+    it 'returns the project name from the ENV["to"] setting when it is available' do
       ENV['to'] = 'foo:staging'
       @config.project_name.should == 'foo'
     end
 
-    it 'should return "unnamed_project" when ENV["to"] is unset' do
+    it 'returns "unnamed_project" when ENV["to"] is unset' do
       ENV['to'] = ''
       @config.project_name.should == 'unnamed_project'
     end
 
-    it 'should return "unnamed_project" when no ENV["to"] project setting is available' do
+    it 'returns "unnamed_project" when no ENV["to"] project setting is available' do
       ENV['to'] = 'staging'
       @config.project_name.should == 'unnamed_project'
     end
@@ -437,29 +437,29 @@ describe WhiskeyDisk::Config do
           ENV['to'] = @env = 'foo:staging'
         end
 
-        it 'should return the path to deploy/foo/<environment>.yml under the project base path if it exists' do
+        it 'returns the path to deploy/foo/<environment>.yml under the project base path if it exists' do
           @config.configuration_file.should == "#{@dir}/deploy/foo/staging.yml"
         end
 
-        it 'should return the path to deploy/foo.yml under the project base path if it exists' do
+        it 'returns the path to deploy/foo.yml under the project base path if it exists' do
           File.unlink("#{@dir}/deploy/foo/staging.yml")
           @config.configuration_file.should == "#{@dir}/deploy/foo.yml"
         end
 
-        it 'should return the path to a per-environment configuration file in the deploy/ directory under the project base path if it exists' do
+        it 'returns the path to a per-environment configuration file in the deploy/ directory under the project base path if it exists' do
           File.unlink("#{@dir}/deploy/foo/staging.yml")
           File.unlink("#{@dir}/deploy/foo.yml")
           @config.configuration_file.should == "#{@dir}/deploy/staging.yml"
         end
 
-        it 'should return the path to a per-environment configuration file under the project base path if it exists' do
+        it 'returns the path to a per-environment configuration file under the project base path if it exists' do
           File.unlink("#{@dir}/deploy/foo/staging.yml")
           File.unlink("#{@dir}/deploy/foo.yml")
           File.unlink("#{@dir}/deploy/staging.yml")
           @config.configuration_file.should == "#{@dir}/staging.yml"
         end
 
-        it 'should return the path to deploy.yml under the project base path' do
+        it 'returns the path to deploy.yml under the project base path' do
           File.unlink("#{@dir}/deploy/foo/staging.yml")
           File.unlink("#{@dir}/deploy/foo.yml")
           File.unlink("#{@dir}/deploy/staging.yml")
@@ -467,7 +467,7 @@ describe WhiskeyDisk::Config do
           @config.configuration_file.should == "#{@dir}/deploy.yml"
         end
 
-        it 'should fail if no per-environment config file nor deploy.yml exists under the project base path' do
+        it 'fails if no per-environment config file nor deploy.yml exists under the project base path' do
           File.unlink("#{@dir}/deploy/foo/staging.yml")
           File.unlink("#{@dir}/deploy/foo.yml")
           File.unlink("#{@dir}/deploy/staging.yml")
@@ -478,22 +478,22 @@ describe WhiskeyDisk::Config do
       end
 
       describe 'and no project name is specified in ENV["to"]' do
-        it 'should return the path to a per-environment configuration file in the deploy/ directory under the project base path if it exists' do
+        it 'returns the path to a per-environment configuration file in the deploy/ directory under the project base path if it exists' do
           @config.configuration_file.should == "#{@dir}/deploy/staging.yml"
         end
 
-        it 'should return the path to a per-environment configuration file under the project base path if it exists' do
+        it 'returns the path to a per-environment configuration file under the project base path if it exists' do
           File.unlink("#{@dir}/deploy/staging.yml")
           @config.configuration_file.should == "#{@dir}/staging.yml"
         end
 
-        it 'should return the path to deploy.yml under the project base path' do
+        it 'returns the path to deploy.yml under the project base path' do
           File.unlink("#{@dir}/deploy/staging.yml")
           File.unlink("#{@dir}/staging.yml")
           @config.configuration_file.should == "#{@dir}/deploy.yml"
         end
 
-        it 'should fail if no per-environment config file nor deploy.yml exists under the project base path' do
+        it 'fails if no per-environment config file nor deploy.yml exists under the project base path' do
           File.unlink("#{@dir}/deploy/staging.yml")
           File.unlink("#{@dir}/staging.yml")
           File.unlink("#{@dir}/deploy.yml")
@@ -512,11 +512,11 @@ describe WhiskeyDisk::Config do
         FileUtils.rm_rf(@path)
       end
     
-      it 'should fail if a path is specified which does not exist' do
+      it 'fails if a path is specified which does not exist' do
         lambda { @config.configuration_file }.should.raise
       end
 
-      it 'should return the file path when a path which points to an existing file is specified' do
+      it 'returns the file path when a path which points to an existing file is specified' do
         FileUtils.touch(@config_file)
         @config.configuration_file.should == @config_file
       end
@@ -544,29 +544,29 @@ describe WhiskeyDisk::Config do
           ENV['to'] = @env = 'foo:staging'
         end
 
-        it 'should return the path to deploy/foo/<environment>.yml under the project base path if it exists' do
+        it 'returns the path to deploy/foo/<environment>.yml under the project base path if it exists' do
           @config.configuration_file.should == File.join(@path, 'deploy', 'foo' ,'staging.yml')
         end
 
-        it 'should return the path to deploy/foo.yml under the project base path if it exists' do
+        it 'returns the path to deploy/foo.yml under the project base path if it exists' do
           File.unlink(File.join(@path, 'deploy', 'foo', 'staging.yml'))
           @config.configuration_file.should == File.join(@path, 'deploy', 'foo.yml')
         end
 
-        it 'should return the path to a per-environment configuration file under deploy/ in the path specified if that file exists' do
+        it 'returns the path to a per-environment configuration file under deploy/ in the path specified if that file exists' do
           File.unlink(File.join(@path, 'deploy', 'foo', 'staging.yml'))
           File.unlink(File.join(@path, 'deploy', 'foo.yml'))
           @config.configuration_file.should == File.join(@path, 'deploy', 'staging.yml')
         end
 
-        it 'should return the path to a per-environment configuration file in the path specified if that file exists' do
+        it 'returns the path to a per-environment configuration file in the path specified if that file exists' do
           File.unlink(File.join(@path, 'deploy', 'foo', 'staging.yml'))
           File.unlink(File.join(@path, 'deploy', 'foo.yml'))
           File.unlink(File.join(@path, 'deploy', 'staging.yml'))
           @config.configuration_file.should == File.join(@path, 'staging.yml')
         end
 
-        it 'should return the path to deploy.yaml in the path specified if deploy.yml exists' do
+        it 'returns the path to deploy.yaml in the path specified if deploy.yml exists' do
           File.unlink(File.join(@path, 'deploy', 'foo', 'staging.yml'))
           File.unlink(File.join(@path, 'deploy', 'foo.yml'))
           File.unlink(File.join(@path, 'deploy', 'staging.yml'))
@@ -574,7 +574,7 @@ describe WhiskeyDisk::Config do
           @config.configuration_file.should == File.join(@path, 'deploy.yml')
         end
 
-        it 'should fail if no per-environment configuration file nor deploy.yml exists in the path specified' do
+        it 'fails if no per-environment configuration file nor deploy.yml exists in the path specified' do
           File.unlink(File.join(@path, 'deploy', 'foo', 'staging.yml'))
           File.unlink(File.join(@path, 'deploy', 'foo.yml'))
           File.unlink(File.join(@path, 'deploy', 'staging.yml'))
@@ -585,22 +585,22 @@ describe WhiskeyDisk::Config do
       end
 
       describe 'and no project name is specified in ENV["to"]' do
-        it 'should return the path to a per-environment configuration file under deploy/ in the path specified if that file exists' do
+        it 'returns the path to a per-environment configuration file under deploy/ in the path specified if that file exists' do
           @config.configuration_file.should == File.join(@path, 'deploy', 'staging.yml')
         end
 
-        it 'should return the path to a per-environment configuration file in the path specified if that file exists' do
+        it 'returns the path to a per-environment configuration file in the path specified if that file exists' do
           File.unlink(File.join(@path, 'deploy', 'staging.yml'))
           @config.configuration_file.should == File.join(@path, 'staging.yml')
         end
 
-        it 'should return the path to deploy.yaml in the path specified if deploy.yml exists' do
+        it 'returns the path to deploy.yaml in the path specified if deploy.yml exists' do
           File.unlink(File.join(@path, 'deploy', 'staging.yml'))
           File.unlink(File.join(@path, 'staging.yml'))
           @config.configuration_file.should == File.join(@path, 'deploy.yml')
         end
 
-        it 'should fail if no per-environment configuration file nor deploy.yml exists in the path specified' do
+        it 'fails if no per-environment configuration file nor deploy.yml exists in the path specified' do
           File.unlink(File.join(@path, 'deploy', 'staging.yml'))
           File.unlink(File.join(@path, 'staging.yml'))
           File.unlink(File.join(@path, 'deploy.yml'))
@@ -631,11 +631,11 @@ describe WhiskeyDisk::Config do
         Dir.chdir(@original_path)
       end
 
-      it 'should return the path set in the "path" environment variable' do
+      it 'returns the path set in the "path" environment variable' do
         @config.base_path.should == @path
       end
 
-      it 'should leave the current working path the same as when the base path lookup started' do
+      it 'leaves the current working path the same as when the base path lookup started' do
         @config.base_path
         Dir.pwd.should == @original_path
       end
@@ -653,11 +653,11 @@ describe WhiskeyDisk::Config do
         FileUtils.rm_rf(@path)
       end
 
-      it 'should return the config directory under the current directory if there is no Rakefile along the root path to the current directory' do
+      it 'returns the config directory under the current directory if there is no Rakefile along the root path to the current directory' do
         @config.base_path.should == File.join(@path, 'config')
       end
 
-      it 'should leave the current working path the same as when the base path lookup started' do
+      it 'leaves the current working path the same as when the base path lookup started' do
         prior = Dir.pwd
         @config.base_path
         Dir.pwd.should == prior
@@ -681,7 +681,7 @@ describe WhiskeyDisk::Config do
         @config.base_path.should == File.join(@path, 'config')
       end
 
-      it 'should leave the current working path the same as when the base path lookup started' do
+      it 'leaves the current working path the same as when the base path lookup started' do
         prior = Dir.pwd
         @config.base_path
         Dir.pwd.should == prior
