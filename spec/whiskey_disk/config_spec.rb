@@ -386,7 +386,7 @@ describe WhiskeyDisk::Config do
     end    
   end
 
-  describe 'computing the project name from a configuration hash' do
+  describe 'computing the project name' do
     it 'should return the project name from the ENV["to"] setting when it is available' do
       ENV['to'] = 'foo:staging'
       @config.project_name.should == 'foo'
