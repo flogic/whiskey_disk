@@ -27,16 +27,16 @@ describe 'wd command' do
       ARGV = []
     end  
     
-    it 'should not run rake tasks' do
+    it 'does not run rake tasks' do
       Rake::Application.should.receive(:new).never
       lambda { run_command }
     end
   
-    it 'should exit' do
+    it 'exits' do
       lambda { run_command }.should.raise(SystemExit)
     end
     
-    it 'should exit with a failure status' do
+    it 'exits with a failure status' do
       begin
         run_command
       rescue Exception => e
@@ -45,13 +45,13 @@ describe 'wd command' do
     end
   end
 
-  it 'should output usage without a backtrace when --help is specified' do
+  it 'outputs usage without a backtrace when --help is specified' do
     Object.send(:remove_const, :ARGV)
     ARGV = ['--help']
     lambda { run_command }.should.raise(SystemExit)
   end
   
-  it 'should output usage without a backtrace when garbage options are specified' do
+  it 'outputs usage without a backtrace when garbage options are specified' do
     Object.send(:remove_const, :ARGV)
     ARGV = ['--slkjfsdflkj']
     lambda { run_command }.should.raise(SystemExit)
@@ -63,17 +63,17 @@ describe 'wd command' do
       ARGV = ['--version']
     end
   
-    # it 'should output the version stored in the VERSION file' do
+    # it 'outputs the version stored in the VERSION file' do
     #   version = File.read(File.expand_path(File.join(File.dirname(__FILE__), '..', 'VERSION'))).chomp
     #   # TODO: capture version output
     #   lambda{ run_command }
     # end
   
-    it 'should exit' do
+    it 'exits' do
       lambda { run_command }.should.raise(SystemExit)
     end
   
-    it 'should exit successfully' do
+    it 'exits successfully' do
       begin
         run_command
       rescue SystemExit => e
@@ -89,16 +89,16 @@ describe 'wd command' do
     end  
 
     describe 'and no target is specified' do    
-      it 'should not run rake tasks' do
+      it 'does not run rake tasks' do
         Rake::Application.should.receive(:new).never
         lambda { run_command }
       end
 
-      it 'should exit when a target is specified' do
+      it 'exits when a target is specified' do
         lambda { run_command }.should.raise(SystemExit)
       end
 
-      it 'should exit with a failing status when a target is specified' do
+      it 'exits with a failing status when a target is specified' do
         begin
           run_command
         rescue SystemExit => e
@@ -115,16 +115,16 @@ describe 'wd command' do
         @rake.stub!(:invoke)
       end
       
-      it 'should not fail' do
+      it 'does not fail' do
         lambda { run_command }.should.not.raise
       end
       
-      it 'should run the deploy:setup rake task' do
+      it 'runs the deploy:setup rake task' do
         @rake.should.receive(:invoke)
         run_command
       end
       
-      it 'should make the specified target available as a "to" argument to the rake task' do
+      it 'makes the specified target available as a "to" argument to the rake task' do
         run_command
         ENV['to'].should == 'foo'
       end
@@ -134,17 +134,17 @@ describe 'wd command' do
           ARGV.push '--path=/path/to/foo'
         end
         
-        it 'should make the specified path available as a "path" argument to the rake task' do
+        it 'makes the specified path available as a "path" argument to the rake task' do
           run_command
           ENV['path'].should == '/path/to/foo'
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -156,33 +156,33 @@ describe 'wd command' do
           ARGV.push '/path/to/foo'
         end
         
-        it 'should make the specified path available as a "path" argument to the rake task' do
+        it 'makes the specified path available as a "path" argument to the rake task' do
           run_command
           ENV['path'].should == '/path/to/foo'
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
       
       describe 'and no --path or -p argument is specified' do
-        it 'should not make a "path" argument available to the rake task' do
+        it 'nots make a "path" argument available to the rake task' do
           ENV['path'].should.be.nil
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -194,17 +194,17 @@ describe 'wd command' do
           ARGV.push "--only=#{@domain}"
         end
 
-        it 'should make the specified domain available as an "only" argument to the rake task' do
+        it 'makes the specified domain available as an "only" argument to the rake task' do
           run_command
           ENV['only'].should == @domain
         end
 
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -217,34 +217,34 @@ describe 'wd command' do
           ARGV.push @domain
         end
 
-        it 'should make the specified domain available as an "only" argument to the rake task' do
+        it 'makes the specified domain available as an "only" argument to the rake task' do
           run_command
           ENV['only'].should == @domain
         end
 
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
 
       describe 'and no --only or -o argument is specified' do
-        it 'should not make an "only" argument available to the rake task' do
+        it 'nots make an "only" argument available to the rake task' do
           run_command
           ENV['only'].should.be.nil
         end
 
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
-        it 'should not fail if the rake task succeeds' do
+        it 'nots fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -255,22 +255,22 @@ describe 'wd command' do
           ARGV.push '--debug'
         end
 
-        it 'should run the deploy:now rake task' do
+        it 'runs the deploy:now rake task' do
           @rake.should.receive(:invoke)
           run_command
         end
 
-        it 'should make the specified target available as a "debug" argument to the rake task' do
+        it 'makes the specified target available as a "debug" argument to the rake task' do
           run_command
           ENV['debug'].should == 'true'
         end
 
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -281,44 +281,44 @@ describe 'wd command' do
           ARGV.push '-d'
         end
 
-        it 'should run the deploy:now rake task' do
+        it 'runs the deploy:now rake task' do
           @rake.should.receive(:invoke)
           run_command
         end
 
-        it 'should make the specified target available as a "debug" argument to the rake task' do
+        it 'makes the specified target available as a "debug" argument to the rake task' do
           run_command
           ENV['debug'].should == 'true'
         end
 
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
 
       describe 'and no --debug or -d argument is specified' do
-        it 'should not make a "debug" argument available to the rake task' do
+        it 'nots make a "debug" argument available to the rake task' do
           run_command
           ENV['debug'].should.be.nil
         end
 
-        it 'should run the deploy:now rake task' do
+        it 'runs the deploy:now rake task' do
           @rake.should.receive(:invoke)
           run_command
         end
 
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -333,16 +333,16 @@ describe 'wd command' do
         @rake.stub!(:invoke)
       end
 
-      it 'should not fail' do
+      it 'does not fail' do
         lambda { run_command }.should.not.raise
       end
 
-      it 'should run the deploy:setup rake task' do
+      it 'runs the deploy:setup rake task' do
         @rake.should.receive(:invoke)
         run_command
       end
 
-      it 'should make the specified target available as a "to" argument to the rake task' do
+      it 'makes the specified target available as a "to" argument to the rake task' do
         run_command
         ENV['to'].should == 'foo'
       end
@@ -352,17 +352,17 @@ describe 'wd command' do
           ARGV.push '--path=/path/to/foo'
         end
         
-        it 'should make the specified path available as a "path" argument to the rake task' do
+        it 'makes the specified path available as a "path" argument to the rake task' do
           run_command
           ENV['path'].should == '/path/to/foo'
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -374,33 +374,33 @@ describe 'wd command' do
           ARGV.push '/path/to/foo'
         end
         
-        it 'should make the specified path available as a "path" argument to the rake task' do
+        it 'makes the specified path available as a "path" argument to the rake task' do
           run_command
           ENV['path'].should == '/path/to/foo'
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
       
       describe 'and no --path or -p argument is specified' do
-        it 'should not make a "path" argument available to the rake task' do
+        it 'does not make a "path" argument available to the rake task' do
           ENV['path'].should.be.nil
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -412,17 +412,17 @@ describe 'wd command' do
           ARGV.push "--only=#{@domain}"
         end
 
-        it 'should make the specified domain available as an "only" argument to the rake task' do
+        it 'makes the specified domain available as an "only" argument to the rake task' do
           run_command
           ENV['only'].should == @domain
         end
 
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -435,34 +435,34 @@ describe 'wd command' do
           ARGV.push @domain
         end
 
-        it 'should make the specified domain available as an "only" argument to the rake task' do
+        it 'makes the specified domain available as an "only" argument to the rake task' do
           run_command
           ENV['only'].should == @domain
         end
 
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
 
       describe 'and no --only or -o argument is specified' do
-        it 'should not make an "only" argument available to the rake task' do
+        it 'nots make an "only" argument available to the rake task' do
           run_command
           ENV['only'].should.be.nil
         end
 
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -477,16 +477,16 @@ describe 'wd command' do
     end  
 
     describe 'but no target is specified' do
-      it 'should not run rake tasks' do
+      it 'does not run rake tasks' do
         Rake::Application.should.receive(:new).never
         lambda { run_command }
       end
   
-      it 'should exit when a target is specified' do
+      it 'exits when a target is specified' do
         lambda { run_command }.should.raise(SystemExit)
       end
 
-      it 'should exit with a failing status when a target is specified' do
+      it 'exits with a failing status when a target is specified' do
         begin
           run_command
         rescue SystemExit => e
@@ -502,16 +502,16 @@ describe 'wd command' do
         @rake.stub!(:invoke)
       end
       
-      it 'should not fail' do
+      it 'does not fail' do
         lambda { run_command }.should.not.raise
       end
       
-      it 'should run the deploy:now rake task' do
+      it 'runs the deploy:now rake task' do
         @rake.should.receive(:invoke)
         run_command
       end
       
-      it 'should make the specified target available as a "to" argument to the rake task' do
+      it 'makes the specified target available as a "to" argument to the rake task' do
         run_command
         ENV['to'].should == 'foo'
       end
@@ -523,16 +523,16 @@ describe 'wd command' do
           @rake.stub!(:invoke)
         end
            
-        it 'should not fail' do
+        it 'does not fail' do
           lambda { run_command }.should.not.raise
         end
       
-        it 'should run the deploy:now rake task' do
+        it 'runs the deploy:now rake task' do
           @rake.should.receive(:invoke)
           run_command
         end
       
-        it 'should make the specified target available as a "check" argument to the rake task' do
+        it 'makes the specified target available as a "check" argument to the rake task' do
           run_command
           ENV['check'].should == 'true'
         end
@@ -545,33 +545,33 @@ describe 'wd command' do
           @rake.stub!(:invoke)
         end
            
-        it 'should not fail' do
+        it 'does not fail' do
           lambda { run_command }.should.not.raise
         end
       
-        it 'should run the deploy:now rake task' do
+        it 'runs the deploy:now rake task' do
           @rake.should.receive(:invoke)
           run_command
         end
       
-        it 'should make the specified target available as a "check" argument to the rake task' do
+        it 'makes the specified target available as a "check" argument to the rake task' do
           run_command
           ENV['check'].should == 'true'
         end
       end
 
       describe 'and no --check or -c argument is specified' do        
-        it 'should not make a "check" argument available to the rake task' do          
+        it 'does not make a "check" argument available to the rake task' do          
           run_command
           ENV['check'].should.be.nil
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -582,17 +582,17 @@ describe 'wd command' do
           ARGV.push '--path=/path/to/foo'
         end
         
-        it 'should make the specified path available as a "path" argument to the rake task' do
+        it 'makes the specified path available as a "path" argument to the rake task' do
           run_command
           ENV['path'].should == '/path/to/foo'
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -604,34 +604,34 @@ describe 'wd command' do
           ARGV.push '/path/to/foo'
         end
         
-        it 'should make the specified path available as a "path" argument to the rake task' do
+        it 'makes the specified path available as a "path" argument to the rake task' do
           run_command
           ENV['path'].should == '/path/to/foo'
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
       
       describe 'and no --path or -p argument is specified' do        
-        it 'should not make a "path" argument available to the rake task' do
+        it 'does not make a "path" argument available to the rake task' do
           run_command
           ENV['path'].should.be.nil
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -643,17 +643,17 @@ describe 'wd command' do
           ARGV.push "--only=#{@domain}"
         end
         
-        it 'should make the specified domain available as an "only" argument to the rake task' do
+        it 'makes the specified domain available as an "only" argument to the rake task' do
           run_command
           ENV['only'].should == @domain
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -666,34 +666,34 @@ describe 'wd command' do
           ARGV.push @domain
         end
         
-        it 'should make the specified domain available as an "only" argument to the rake task' do
+        it 'makes the specified domain available as an "only" argument to the rake task' do
           run_command
           ENV['only'].should == @domain
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
       
       describe 'and no --only or -o argument is specified' do
-        it 'should not make an "only" argument available to the rake task' do
+        it 'does not make an "only" argument available to the rake task' do
           run_command
           ENV['only'].should.be.nil
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -708,16 +708,16 @@ describe 'wd command' do
         @rake.stub!(:invoke)
       end
 
-      it 'should not fail' do
+      it 'does not fail' do
         lambda { run_command }.should.not.raise
       end
 
-      it 'should run the deploy:now rake task' do
+      it 'runs the deploy:now rake task' do
         @rake.should.receive(:invoke)
         run_command
       end
 
-      it 'should make the specified target available as a "to" argument to the rake task' do
+      it 'makes the specified target available as a "to" argument to the rake task' do
         run_command
         ENV['to'].should == 'foo'
       end
@@ -729,16 +729,16 @@ describe 'wd command' do
           @rake.stub!(:invoke)
         end
          
-        it 'should not fail' do
+        it 'does not fail' do
           lambda { run_command }.should.not.raise
         end
     
-        it 'should run the deploy:now rake task' do
+        it 'runs the deploy:now rake task' do
           @rake.should.receive(:invoke)
           run_command
         end
     
-        it 'should make the specified target available as a "check" argument to the rake task' do
+        it 'makes the specified target available as a "check" argument to the rake task' do
           run_command
           ENV['check'].should == 'true'
         end
@@ -751,33 +751,33 @@ describe 'wd command' do
           @rake.stub!(:invoke)
         end
          
-        it 'should not fail' do
+        it 'does not fail' do
           lambda { run_command }.should.not.raise
         end
     
-        it 'should run the deploy:now rake task' do
+        it 'runs the deploy:now rake task' do
           @rake.should.receive(:invoke)
           run_command
         end
     
-        it 'should make the specified target available as a "check" argument to the rake task' do
+        it 'makes the specified target available as a "check" argument to the rake task' do
           run_command
           ENV['check'].should == 'true'
         end
       end
 
       describe 'and no --check or -c argument is specified' do        
-        it 'should not make a "check" argument available to the rake task' do          
+        it 'does not make a "check" argument available to the rake task' do          
           run_command
           ENV['check'].should.be.nil
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -788,17 +788,17 @@ describe 'wd command' do
           ARGV.push '--path=/path/to/foo'
         end
         
-        it 'should make the specified path available as a "path" argument to the rake task' do
+        it 'makes the specified path available as a "path" argument to the rake task' do
           run_command
           ENV['path'].should == '/path/to/foo'
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -810,33 +810,33 @@ describe 'wd command' do
           ARGV.push '/path/to/foo'
         end
         
-        it 'should make the specified path available as a "path" argument to the rake task' do
+        it 'makes the specified path available as a "path" argument to the rake task' do
           run_command
           ENV['path'].should == '/path/to/foo'
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
       
       describe 'and no --path or -p argument is specified' do
-        it 'should not make a "path" argument available to the rake task' do
+        it 'nots make a "path" argument available to the rake task' do
           ENV['path'].should.be.nil
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -848,17 +848,17 @@ describe 'wd command' do
           ARGV.push "--only=#{@domain}"
         end
         
-        it 'should make the specified domain available as an "only" argument to the rake task' do
+        it 'makes the specified domain available as an "only" argument to the rake task' do
           run_command
           ENV['only'].should == @domain
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -871,34 +871,34 @@ describe 'wd command' do
           ARGV.push @domain
         end
         
-        it 'should make the specified domain available as an "only" argument to the rake task' do
+        it 'makes the specified domain available as an "only" argument to the rake task' do
           run_command
           ENV['only'].should == @domain
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
       
       describe 'and no --only or -o argument is specified' do
-        it 'should not make an "only" argument available to the rake task' do
+        it 'nots make an "only" argument available to the rake task' do
           run_command
           ENV['only'].should.be.nil
         end
       
-        it 'should fail if the rake task fails' do
+        it 'fails if the rake task fails' do
           @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
-        it 'should not fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -913,11 +913,11 @@ describe 'wd command' do
     end
     
     describe 'when no target is specified' do
-      it 'should exit when a target is specified' do
+      it 'exits when a target is specified' do
         lambda { run_command }.should.raise(SystemExit)
       end
 
-      it 'should exit with a failing status when a target is specified' do
+      it 'exits with a failing status when a target is specified' do
         begin
           run_command
         rescue SystemExit => e
@@ -931,11 +931,11 @@ describe 'wd command' do
         ARGV.push('--to=foo')        
       end
       
-      it 'should exit when a target is specified' do
+      it 'exits when a target is specified' do
         lambda { run_command }.should.raise(SystemExit)
       end
 
-      it 'should exit with a failing status when a target is specified' do
+      it 'exits with a failing status when a target is specified' do
         begin
           run_command
         rescue SystemExit => e
@@ -952,11 +952,11 @@ describe 'wd command' do
     end
     
     describe 'when no target is specified' do
-      it 'should exit when a target is specified' do
+      it 'exits when a target is specified' do
         lambda { run_command }.should.raise(SystemExit)
       end
 
-      it 'should exit with a failing status when a target is specified' do
+      it 'exits with a failing status when a target is specified' do
         begin
           run_command
         rescue SystemExit => e
@@ -970,11 +970,11 @@ describe 'wd command' do
         ARGV.push('--to=foo')        
       end
       
-      it 'should exit when a target is specified' do
+      it 'exits when a target is specified' do
         lambda { run_command }.should.raise(SystemExit)
       end
 
-      it 'should exit with a failing status when a target is specified' do
+      it 'exits with a failing status when a target is specified' do
         begin
           run_command
         rescue SystemExit => e
