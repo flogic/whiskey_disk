@@ -14,22 +14,22 @@ integration_spec do
       end
       
       describe 'performing a setup' do
-        it 'should perform a checkout of the repository to the target path' do
+        it 'performs a checkout of the repository to the target path' do
           run_setup(@args)
           File.exists?(deployed_file('project/README')).should == true
         end
         
-        it 'should not run a post_setup script' do
+        it 'does not run a post_setup script' do
           run_setup(@args)
           File.read(integration_log).should.not =~ /^Running post script/
         end
             
-        it 'should report the remote setup as successful' do
+        it 'reports the remote setup as successful' do
           run_setup(@args)
           File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
         end
 
-        it 'should exit with a true status' do
+        it 'exits with a true status' do
           run_setup(@args).should == true
         end
       end
@@ -40,22 +40,22 @@ integration_spec do
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
         
-        it 'should update the checkout of the repository on the target path' do
+        it 'updates the checkout of the repository on the target path' do
           run_deploy(@args)
           File.exists?(deployed_file('project/README')).should == true
         end    
 
-        it 'should not run a post_deploy script' do
+        it 'does not run a post_deploy script' do
           run_deploy(@args)
           File.read(integration_log).should.not =~ /^Running post script/
         end
             
-        it 'should report the remote deployment as successful' do
+        it 'reports the remote deployment as successful' do
           run_deploy(@args)
           File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
         end
 
-        it 'should exit with a true status' do
+        it 'exits with a true status' do
           run_deploy(@args).should == true
         end
       end
@@ -68,27 +68,27 @@ integration_spec do
       end
       
       describe 'performing a setup' do
-        it 'should perform a checkout of the repository to the target path' do
+        it 'performs a checkout of the repository to the target path' do
           run_setup(@args)
           File.exists?(deployed_file('project/README')).should == true
         end
         
-        it 'should attempt to run a post_setup script' do
+        it 'attempts to run a post_setup script' do
           run_setup(@args)
           File.read(integration_log).should =~ /^Running post script/
         end
         
-        it 'should pass environment variable settings to the post_setup script' do
+        it 'passes environment variable settings to the post_setup script' do
           run_setup(@args)
           File.read(integration_log).should =~ /FOO=BAR/
         end
             
-        it 'should report the remote setup as a failure' do
+        it 'reports the remote setup as a failure' do
           run_setup(@args)
           File.read(integration_log).should =~ /wd-app1.example.com => failed/
         end
 
-        it 'should exit with a false status' do
+        it 'exits with a false status' do
           run_setup(@args).should == false
         end
       end
@@ -99,27 +99,27 @@ integration_spec do
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
         
-        it 'should update the checkout of the repository on the target path' do
+        it 'updates the checkout of the repository on the target path' do
           run_deploy(@args)
           File.exists?(deployed_file('project/README')).should == true
         end    
 
-        it 'should attempt to run a post_deploy script' do
+        it 'attempts to run a post_deploy script' do
           run_deploy(@args)
           File.read(integration_log).should =~ /^Running post script/
         end
             
-        it 'should pass environment variable settings to the post_deploy script' do
+        it 'passes environment variable settings to the post_deploy script' do
           run_deploy(@args)
           File.read(integration_log).should =~ /FOO='BAR'/
         end
             
-        it 'should report the remote deployment as a failure' do
+        it 'reports the remote deployment as a failure' do
           run_deploy(@args)
           File.read(integration_log).should =~ /wd-app1.example.com => failed/
         end
 
-        it 'should exit with a false status' do
+        it 'exits with a false status' do
           run_deploy(@args).should == false
         end
       end      
@@ -132,28 +132,28 @@ integration_spec do
       end
       
       describe 'and doing a setup' do
-        it 'should perform a checkout of the repository to the target path' do
+        it 'performs a checkout of the repository to the target path' do
           run_setup(@args)
           File.exists?(deployed_file('project/README')).should == true
         end
         
         describe 'and the post_setup script is successful' do
-          it 'should run the post_setup script' do
+          it 'runs the post_setup script' do
             run_setup(@args)
             File.read(integration_log).should =~ /^Running the post_setup script/
           end
 
-          it 'should pass environment variable settings to the post_setup script' do
+          it 'passes environment variable settings to the post_setup script' do
             run_setup(@args)
             File.read(integration_log).should =~ /FOO=BAR/
           end
 
-          it 'should report the remote setup as successful' do
+          it 'reports the remote setup as successful' do
             run_setup(@args)
             File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
           end
 
-          it 'should exit with a true status' do
+          it 'exits with a true status' do
             run_setup(@args).should == true
           end          
         end
@@ -163,22 +163,22 @@ integration_spec do
             @args = "--path=#{@config} --to=project:with_failing_post_scripts"
           end
           
-          it 'should run the post_setup script' do
+          it 'runs the post_setup script' do
             run_setup(@args)
             File.read(integration_log).should =~ /^Running the post_setup script/
           end
 
-          it 'should pass environment variable settings to the post_setup script' do
+          it 'passes environment variable settings to the post_setup script' do
             run_setup(@args)
             File.read(integration_log).should =~ /FOO=BAR/
           end
 
-          it 'should report the remote setup as a failure' do
+          it 'reports the remote setup as a failure' do
             run_setup(@args)
             File.read(integration_log).should =~ /wd-app1.example.com => failed/
           end
 
-          it 'should exit with a false status' do
+          it 'exits with a false status' do
             run_setup(@args).should == false
           end          
         end
@@ -190,28 +190,28 @@ integration_spec do
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
         
-        it 'should update the checkout of the repository on the target path' do
+        it 'updates the checkout of the repository on the target path' do
           run_deploy(@args)
           File.exists?(deployed_file('project/README')).should == true
         end    
 
         describe 'and the post_deploy script is successful' do
-          it 'should run the post_deploy script' do
+          it 'runs the post_deploy script' do
             run_deploy(@args)
             File.read(integration_log).should =~ /^Running the post_deploy script/
           end
 
-          it 'should pass environment variable settings to the post_deploy script' do
+          it 'passes environment variable settings to the post_deploy script' do
             run_deploy(@args)
             File.read(integration_log).should =~ /FOO='BAR'/
           end
 
-          it 'should report the remote deployment as successful' do
+          it 'reports the remote deployment as successful' do
             run_deploy(@args)
             File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
           end
 
-          it 'should exit with a true status' do
+          it 'exits with a true status' do
             run_deploy(@args).should == true
           end          
         end
@@ -221,22 +221,22 @@ integration_spec do
             @args = "--path=#{@config} --to=project:with_failing_post_scripts"
           end
           
-          it 'should run the post_deploy script' do
+          it 'runs the post_deploy script' do
             run_deploy(@args)
             File.read(integration_log).should =~ /^Running the post_deploy script/
           end
 
-          it 'should pass environment variable settings to the post_deploy script' do
+          it 'passes environment variable settings to the post_deploy script' do
             run_deploy(@args)
             File.read(integration_log).should =~ /FOO='BAR'/
           end
 
-          it 'should report the remote deployment as a failure' do
+          it 'reports the remote deployment as a failure' do
             run_deploy(@args)
             File.read(integration_log).should =~ /wd-app1.example.com => failed/
           end
 
-          it 'should exit with a false status' do
+          it 'exits with a false status' do
             run_deploy(@args).should == false
           end          
         end
