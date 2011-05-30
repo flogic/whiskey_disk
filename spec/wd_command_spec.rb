@@ -173,7 +173,7 @@ describe 'wd command' do
       end
       
       describe 'and no --path or -p argument is specified' do
-        it 'nots make a "path" argument available to the rake task' do
+        it 'does not make a "path" argument available to the rake task' do
           ENV['path'].should.be.nil
         end
       
@@ -234,7 +234,7 @@ describe 'wd command' do
       end
 
       describe 'and no --only or -o argument is specified' do
-        it 'nots make an "only" argument available to the rake task' do
+        it 'does not make an "only" argument available to the rake task' do
           run_command
           ENV['only'].should.be.nil
         end
@@ -244,7 +244,7 @@ describe 'wd command' do
           lambda { run_command }.should.raise
         end
 
-        it 'nots fail if the rake task succeeds' do
+        it 'does not fail if the rake task succeeds' do
           @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
@@ -303,7 +303,7 @@ describe 'wd command' do
       end
 
       describe 'and no --debug or -d argument is specified' do
-        it 'nots make a "debug" argument available to the rake task' do
+        it 'does not make a "debug" argument available to the rake task' do
           run_command
           ENV['debug'].should.be.nil
         end
@@ -452,7 +452,7 @@ describe 'wd command' do
       end
 
       describe 'and no --only or -o argument is specified' do
-        it 'nots make an "only" argument available to the rake task' do
+        it 'does not make an "only" argument available to the rake task' do
           run_command
           ENV['only'].should.be.nil
         end
@@ -827,7 +827,7 @@ describe 'wd command' do
       end
       
       describe 'and no --path or -p argument is specified' do
-        it 'nots make a "path" argument available to the rake task' do
+        it 'does not make a "path" argument available to the rake task' do
           ENV['path'].should.be.nil
         end
       
@@ -888,7 +888,7 @@ describe 'wd command' do
       end
       
       describe 'and no --only or -o argument is specified' do
-        it 'nots make an "only" argument available to the rake task' do
+        it 'does not make an "only" argument available to the rake task' do
           run_command
           ENV['only'].should.be.nil
         end
