@@ -294,7 +294,18 @@ describe 'filtering configuration data' do
   end
 
   describe 'by adding the environment name' do
-  
+    before do
+      @config = WhiskeyDisk::Config.new
+      ENV['to'] = 'project:environment'
+    end
+    
+    it 'adds an environment value when none is present' do
+      @config.add_environment_name('foo' => 'bar').should == { 'environment' => 'environment', 'foo' => 'bar' }
+    end
+    
+    it 'overwrites an environment value when one is present' do
+      @config.add_environment_name('environment' => 'baz', 'foo' => 'bar').should == { 'environment' => 'environment', 'foo' => 'bar' }      
+    end
   end
 
   describe 'by adding the project name' do
