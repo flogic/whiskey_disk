@@ -1,19 +1,7 @@
 require File.expand_path(File.join(File.dirname(__FILE__), 'spec_helper.rb'))
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib', 'whiskey_disk', 'config'))
 
-# # called only by #fetch
-# def filter_data(data)
-#   current = add_environment_scoping(data.clone)
-#   current = add_project_scoping(current)
-#   current = normalize_domains(current)
-#   current = check_for_project_and_environment(current)
-#   current = add_environment_name(current)
-#   current = add_project_name(current)
-#   current = default_config_target(current)
-# end
-
-describe 'filtering configuration data' do
-  
+describe 'filtering configuration data' do  
   describe 'by adding environment scoping' do
     before do
       @config = WhiskeyDisk::Config.new
@@ -280,8 +268,29 @@ describe 'filtering configuration data' do
     end
   end
 
-  describe 'by checking for project and environment' do
+  describe 'by selecting the data for the project and environment' do
+    before do
+      @config = WhiskeyDisk::Config.new
+      @data = { 
+        'project' => { 'environment' => { 'a' => 'b' } },
+        'other'   => { 'missing' => { 'c' => 'd' } },
+      }
+    end
     
+    it 'fails when the specified project cannot be found' do
+      ENV['to'] = @env = 'something:environment'
+      lambda { @config.select_project_and_environment(@data) }.should.raise
+    end
+
+    it 'fails when the specified environment cannot be found for the specified project' do
+      ENV['to'] = @env = 'other:environment'
+      lambda { @config.select_project_and_environment(@data) }.should.raise
+    end
+
+    it 'returns only the data for the specified project and environment' do
+      ENV['to'] = @env = 'project:environment'
+      @config.select_project_and_environment(@data).should == @data['project']['environment']
+    end
   end
 
   describe 'by adding the environment name' do
@@ -297,4 +306,15 @@ describe 'filtering configuration data' do
   end
 end
     
+
+# # called only by #fetch
+# def filter_data(data)
+#   current = add_environment_scoping(data.clone)
+#   current = add_project_scoping(current)
+#   current = normalize_domains(current)
+#   current = check_for_project_and_environment(current)
+#   current = add_environment_name(current)
+#   current = add_project_name(current)
+#   current = default_config_target(current)
+# end
 

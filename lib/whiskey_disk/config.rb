@@ -171,7 +171,7 @@ class WhiskeyDisk
       raise %Q{Error reading configuration file [#{configuration_file}]: "#{e}"}
     end
 
-    def check_for_project_and_environment(data)
+    def select_project_and_environment(data)
       raise "No configuration file defined data for project `#{project_name}`, environment `#{environment_name}`" unless data and data[project_name] and data[project_name][environment_name]
       data[project_name][environment_name]
     end
@@ -194,7 +194,7 @@ class WhiskeyDisk
       current = add_environment_scoping(data.clone)
       current = add_project_scoping(current)
       current = normalize_domains(current)
-      current = check_for_project_and_environment(current)
+      current = select_project_and_environment(current)
       current = add_environment_name(current)
       current = add_project_name(current)
       current = default_config_target(current)
