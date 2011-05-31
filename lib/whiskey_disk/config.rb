@@ -105,6 +105,18 @@ class WhiskeyDisk
       repository_depth(data) == 1
     end
 
+    # called only by #load_data
+    def configuration_data
+      open(configuration_file) {|f| f.read }
+    end
+
+    # called only by #fetch
+    def load_data
+      YAML.load(configuration_data)
+    rescue Exception => e
+      raise %Q{Error reading configuration file [#{configuration_file}]: "#{e}"}
+    end
+    
     def add_environment_scoping(data)
       return data unless needs_environment_scoping?(data)
       { environment_name => data }
@@ -158,19 +170,7 @@ class WhiskeyDisk
       end
       data
     end
-
-    # called only by #load_data
-    def configuration_data
-      open(configuration_file) {|f| f.read }
-    end
-
-    # called only by #fetch
-    def load_data
-      YAML.load(configuration_data)
-    rescue Exception => e
-      raise %Q{Error reading configuration file [#{configuration_file}]: "#{e}"}
-    end
-
+    
     def select_project_and_environment(data)
       raise "No configuration file defined data for project `#{project_name}`, environment `#{environment_name}`" unless data and data[project_name] and data[project_name][environment_name]
       data[project_name][environment_name]

@@ -324,19 +324,17 @@ describe 'filtering configuration data' do
   end
 
   describe 'by defaulting the config target' do
-  
+    before do
+      @config = WhiskeyDisk::Config.new
+      ENV['to'] = 'project:environment'
+    end
+    
+    it 'adds a config_target value set to the environment name when none is present' do
+      @config.default_config_target('foo' => 'bar').should == { 'config_target' => 'environment', 'foo' => 'bar' }
+    end
+    
+    it 'preserves the existing config_target when one is present' do
+      @config.default_config_target('config_target' => 'baz', 'foo' => 'bar').should == { 'config_target' => 'baz', 'foo' => 'bar' }      
+    end    
   end
 end
-    
-
-# # called only by #fetch
-# def filter_data(data)
-#   current = add_environment_scoping(data.clone)
-#   current = add_project_scoping(current)
-#   current = normalize_domains(current)
-#   current = check_for_project_and_environment(current)
-#   current = add_environment_name(current)
-#   current = add_project_name(current)
-#   current = default_config_target(current)
-# end
-
