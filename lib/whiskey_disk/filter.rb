@@ -6,6 +6,14 @@ class WhiskeyDisk
       def initialize(config)
         @config = config
       end
+      
+      def project_name
+        config.project_name
+      end
+      
+      def environment_name
+        config.environment_name
+      end
     end
 
     module ScopeHelper
@@ -26,7 +34,7 @@ class WhiskeyDisk
       
       def filter(data)
         return data unless needs_environment_scoping?(data)
-        { config.environment_name => data }
+        { environment_name => data }
       end
     end
     
@@ -47,7 +55,7 @@ class WhiskeyDisk
       def filter(data)
         return data unless needs_project_scoping?(data)
         config.override_project_name!(data)
-        { config.project_name => data }
+        { project_name => data }
       end
     end
     
@@ -98,8 +106,8 @@ class WhiskeyDisk
     
     class SelectProjectAndEnvironmentFilter < AbstractFilter
       def filter(data)
-        raise "No configuration file defined data for project `#{config.project_name}`, environment `#{config.environment_name}`" unless data and data[config.project_name] and data[config.project_name][config.environment_name]
-        data[config.project_name][config.environment_name]
+        raise "No configuration file defined data for project `#{project_name}`, environment `#{environment_name}`" unless data and data[project_name] and data[project_name][environment_name]
+        data[project_name][environment_name]
       end
     end
     
