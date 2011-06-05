@@ -1,6 +1,7 @@
 require 'yaml'
 require 'uri'
 require 'open-uri'
+require 'whiskey_disk/filter'
 
 class WhiskeyDisk
   class Config
@@ -191,13 +192,8 @@ class WhiskeyDisk
     
     # called only by #fetch
     def filter_data(data)
-      current = add_environment_scoping(data.clone)
-      current = add_project_scoping(current)
-      current = normalize_domains(current)
-      current = select_project_and_environment(current)
-      current = add_environment_name(current)
-      current = add_project_name(current)
-      current = default_config_target(current)
+      filter = WhiskeyDisk::Config::Filter.new(self)
+      filter.filter_data(data)
     end
 
   private
