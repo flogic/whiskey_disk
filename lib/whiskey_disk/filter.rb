@@ -118,6 +118,12 @@ class WhiskeyDisk
       end
     end
     
+    class AddEnvironmentNameFilter < AbstractFilter
+      def filter(data)
+        data.merge( { 'environment' => environment_name } )
+      end
+    end
+    
     class Filter
       attr_reader :config
   
@@ -130,7 +136,7 @@ class WhiskeyDisk
         current = ProjectScopeFilter.new(config).filter(current)
         current = NormalizeDomainsFilter.new(config).filter(current)
         current = SelectProjectAndEnvironmentFilter.new(config).filter(current)
-        current = config.add_environment_name(current)
+        current = AddEnvironmentNameFilter.new(config).filter(current)
         current = config.add_project_name(current)
         current = config.default_config_target(current)
       end    
