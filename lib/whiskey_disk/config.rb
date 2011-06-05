@@ -97,11 +97,6 @@ class WhiskeyDisk
       raise %Q{Error reading configuration file [#{configuration_file}]: "#{e}"}
     end
     
-    def default_config_target(data)
-      return data if data['config_target']
-      data.merge( { 'config_target' => environment_name })
-    end
-    
     def filter
       @filter ||= WhiskeyDisk::Config::Filter.new(self)
     end
