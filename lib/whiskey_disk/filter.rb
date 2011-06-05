@@ -130,6 +130,13 @@ class WhiskeyDisk
       end
     end
     
+    class DefaultConfigTargetFilter < AbstractFilter
+      def filter(data)
+        return data if data['config_target']
+        data.merge( { 'config_target' => environment_name })
+      end
+    end
+    
     class Filter
       attr_reader :config
   
@@ -144,7 +151,7 @@ class WhiskeyDisk
         current = SelectProjectAndEnvironmentFilter.new(config).filter(current)
         current = AddEnvironmentNameFilter.new(config).filter(current)
         current = AddProjectNameFilter.new(config).filter(current)
-        current = config.default_config_target(current)
+        current = DefaultConfigTargetFilter.new(config).filter(current)
       end    
     end
   end
