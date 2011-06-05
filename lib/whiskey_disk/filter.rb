@@ -51,10 +51,17 @@ class WhiskeyDisk
       def needs_project_scoping?(data)
         repository_depth(data) == 1
       end
-      
+
+      # TODO: why do we continue to need override_project_name! ?
+      # TODO: this is invasive into Config's implementation
+      def override_project_name!(data)
+        return if ENV['to'] && ENV['to'] =~ /:/
+        ENV['to'] = data[environment_name]['project'] + ':' + ENV['to'] if data[environment_name]['project']
+      end
+
       def filter(data)
         return data unless needs_project_scoping?(data)
-        config.override_project_name!(data)
+        override_project_name!(data)
         { project_name => data }
       end
     end

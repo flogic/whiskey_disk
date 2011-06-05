@@ -54,11 +54,6 @@ class WhiskeyDisk
       return false unless ENV['to'] =~ /:/
       ENV['to'].split(/:/).first
     end
-
-    def override_project_name!(data)
-      return if ENV['to'] && ENV['to'] =~ /:/
-      ENV['to'] = data[environment_name]['project'] + ':' + ENV['to'] if data[environment_name]['project']
-    end
     
     def contains_rakefile?(path)
       File.exists?(File.expand_path(File.join(path, 'Rakefile')))
