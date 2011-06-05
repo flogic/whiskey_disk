@@ -277,6 +277,8 @@ describe 'filtering configuration data' do
   describe 'by selecting the data for the project and environment' do
     before do
       @config = WhiskeyDisk::Config.new
+      @filter = WhiskeyDisk::Config::SelectProjectAndEnvironmentFilter.new(@config)
+      
       @data = { 
         'project' => { 'environment' => { 'a' => 'b' } },
         'other'   => { 'missing' => { 'c' => 'd' } },
@@ -285,17 +287,17 @@ describe 'filtering configuration data' do
     
     it 'fails when the specified project cannot be found' do
       ENV['to'] = @env = 'something:environment'
-      lambda { @config.select_project_and_environment(@data) }.should.raise
+      lambda { @filter.filter(@data) }.should.raise
     end
 
     it 'fails when the specified environment cannot be found for the specified project' do
       ENV['to'] = @env = 'other:environment'
-      lambda { @config.select_project_and_environment(@data) }.should.raise
+      lambda { @filter.filter(@data) }.should.raise
     end
 
     it 'returns only the data for the specified project and environment' do
       ENV['to'] = @env = 'project:environment'
-      @config.select_project_and_environment(@data).should == @data['project']['environment']
+      @filter.filter(@data).should == @data['project']['environment']
     end
   end
 
