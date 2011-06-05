@@ -96,6 +96,13 @@ class WhiskeyDisk
       end
     end
     
+    class SelectProjectAndEnvironmentFilter < AbstractFilter
+      def filter(data)
+        raise "No configuration file defined data for project `#{config.project_name}`, environment `#{config.environment_name}`" unless data and data[config.project_name] and data[config.project_name][config.environment_name]
+        data[config.project_name][config.environment_name]
+      end
+    end
+    
     class Filter
       attr_reader :config
   
@@ -107,7 +114,7 @@ class WhiskeyDisk
         current = EnvironmentScopeFilter.new(config).filter(data.clone)
         current = ProjectScopeFilter.new(config).filter(current)
         current = NormalizeDomainsFilter.new(config).filter(current)
-        current = config.select_project_and_environment(current)
+        current = SelectProjectAndEnvironmentFilter.new(config).filter(current)
         current = config.add_environment_name(current)
         current = config.add_project_name(current)
         current = config.default_config_target(current)
