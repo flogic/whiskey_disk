@@ -97,10 +97,6 @@ class WhiskeyDisk
       raise %Q{Error reading configuration file [#{configuration_file}]: "#{e}"}
     end
     
-    def add_environment_name(data)
-      data.merge( { 'environment' => environment_name } )
-    end
-
     def add_project_name(data)
       data.merge( { 'project' => project_name } )
     end
