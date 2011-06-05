@@ -102,11 +102,6 @@ class WhiskeyDisk
       raise %Q{Error reading configuration file [#{configuration_file}]: "#{e}"}
     end
     
-    def select_project_and_environment(data)
-      raise "No configuration file defined data for project `#{project_name}`, environment `#{environment_name}`" unless data and data[project_name] and data[project_name][environment_name]
-      data[project_name][environment_name]
-    end
-
     def add_environment_name(data)
       data.merge( { 'environment' => environment_name } )
     end
