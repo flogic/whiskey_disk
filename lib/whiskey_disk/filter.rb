@@ -1,5 +1,23 @@
 class WhiskeyDisk
   class Config
+    class EnvironmentScopeFilter
+      def repository_depth(data, depth = 0)
+        raise 'no repository found' unless data.respond_to?(:has_key?)
+        return depth if data.has_key?('repository')
+        repository_depth(data.values.first, depth + 1)
+      end
+
+      # is this data hash a bottom-level data hash without an environment name?
+      def needs_environment_scoping?(data)
+        repository_depth(data) == 0
+      end
+      
+      def filter(data)
+        return data unless needs_environment_scoping?(data)
+        { environment_name => data }
+      end
+    end
+    
     class Filter
       attr_reader :config
   
@@ -8,7 +26,7 @@ class WhiskeyDisk
       end
   
       def filter_data(data)
-        current = config.add_environment_scoping(data.clone)
+        current = EnvironmentScopeFilter.new.filter(data.clone)
         current = config.add_project_scoping(current)
         current = config.normalize_domains(current)
         current = config.select_project_and_environment(current)
