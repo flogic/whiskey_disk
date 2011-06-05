@@ -90,22 +90,6 @@ class WhiskeyDisk
       specified_project_name || 'unnamed_project'
     end
 
-    def repository_depth(data, depth = 0)
-      raise 'no repository found' unless data.respond_to?(:has_key?)
-      return depth if data.has_key?('repository')
-      repository_depth(data.values.first, depth + 1)
-    end
-
-    # is this data hash a bottom-level data hash without an environment name?
-    def needs_environment_scoping?(data)
-      repository_depth(data) == 0
-    end
-
-    # is this data hash an environment data hash without a project name?
-    def needs_project_scoping?(data)
-      repository_depth(data) == 1
-    end
-
     # called only by #load_data
     def configuration_data
       open(configuration_file) {|f| f.read }
@@ -116,17 +100,6 @@ class WhiskeyDisk
       YAML.load(configuration_data)
     rescue Exception => e
       raise %Q{Error reading configuration file [#{configuration_file}]: "#{e}"}
-    end
-    
-    def add_environment_scoping(data)
-      return data unless needs_environment_scoping?(data)
-      { environment_name => data }
-    end
-
-    def add_project_scoping(data)
-      return data unless needs_project_scoping?(data)
-      override_project_name!(data)
-      { project_name => data }
     end
 
     def localize_domain_list(list)
