@@ -337,15 +337,16 @@ describe 'filtering configuration data' do
   describe 'by defaulting the config target' do
     before do
       @config = WhiskeyDisk::Config.new
+      @filter = WhiskeyDisk::Config::DefaultConfigTargetFilter.new(@config)
       ENV['to'] = 'project:environment'
     end
     
     it 'adds a config_target value set to the environment name when none is present' do
-      @config.default_config_target('foo' => 'bar').should == { 'config_target' => 'environment', 'foo' => 'bar' }
+      @filter.filter('foo' => 'bar').should == { 'config_target' => 'environment', 'foo' => 'bar' }
     end
     
     it 'preserves the existing config_target when one is present' do
-      @config.default_config_target('config_target' => 'baz', 'foo' => 'bar').should == { 'config_target' => 'baz', 'foo' => 'bar' }      
+      @filter.filter('config_target' => 'baz', 'foo' => 'bar').should == { 'config_target' => 'baz', 'foo' => 'bar' }      
     end    
   end
 end
