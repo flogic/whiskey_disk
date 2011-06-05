@@ -4,8 +4,10 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib', 'whiskey
 describe 'filtering configuration data' do  
   describe 'by adding environment scoping' do
     before do
-      @config = WhiskeyDisk::Config.new
       ENV['to'] = @env = 'foo:staging'
+
+      @config = WhiskeyDisk::Config.new
+      @filter = WhiskeyDisk::Config::EnvironmentScopeFilter.new(@config)
 
       @bare_data  = { 'repository' => 'git://foo/bar.git', 'domain' => [ { :name => 'ogc@ogtastic.com' } ] }
       @env_data   = { 'staging' => @bare_data }
@@ -13,19 +15,19 @@ describe 'filtering configuration data' do
     end
 
     it 'fails if the configuration data is not a hash' do
-      lambda { @config.add_environment_scoping([]) }.should.raise
+      lambda { @filter.filter([]) }.should.raise
     end
 
     it 'returns the original data if it has both project and environment scoping' do
-      @config.add_environment_scoping(@proj_data).should == @proj_data
+      @filter.filter(@proj_data).should == @proj_data
     end
 
     it 'returns the original data if it has environment scoping' do
-      @config.add_environment_scoping(@env_data).should == @env_data
+      @filter.filter(@env_data).should == @env_data
     end
 
     it 'returns the data wrapped in an environment scope if it has no environment scoping' do
-      @config.add_environment_scoping(@bare_data).should == { 'staging' => @bare_data }
+      @filter.filter(@bare_data).should == { 'staging' => @bare_data }
     end
   end
 
