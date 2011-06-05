@@ -190,9 +190,12 @@ class WhiskeyDisk
       data.merge( { 'config_target' => environment_name })
     end
     
+    def filter
+      @filter ||= WhiskeyDisk::Config::Filter.new(self)
+    end
+    
     # called only by #fetch
     def filter_data(data)
-      filter = WhiskeyDisk::Config::Filter.new(self)
       filter.filter_data(data)
     end
 
