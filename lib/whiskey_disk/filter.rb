@@ -1,12 +1,14 @@
 class WhiskeyDisk
   class Config
-    class EnvironmentScopeFilter
+    class AbstractFilter
       attr_reader :config
       
       def initialize(config)
         @config = config
       end
-      
+    end
+    
+    class EnvironmentScopeFilter < AbstractFilter      
       def repository_depth(data, depth = 0)
         raise 'no repository found' unless data.respond_to?(:has_key?)
         return depth if data.has_key?('repository')
@@ -24,13 +26,7 @@ class WhiskeyDisk
       end
     end
     
-    class ProjectScopeFilter
-      attr_reader :config
-      
-      def initialize(config)
-        @config = config
-      end
-      
+    class ProjectScopeFilter < AbstractFilter
       def repository_depth(data, depth = 0)
         raise 'no repository found' unless data.respond_to?(:has_key?)
         return depth if data.has_key?('repository')
