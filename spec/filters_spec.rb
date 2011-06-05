@@ -33,15 +33,17 @@ describe 'filtering configuration data' do
 
   describe 'by adding project scoping' do
     before do
-      @config = WhiskeyDisk::Config.new
       ENV['to'] = @env = 'foo:staging'
+
+      @config = WhiskeyDisk::Config.new
+      @filter = WhiskeyDisk::Config::ProjectScopeFilter.new(@config)
 
       @bare_data  = { 'staging' => { 'repository' => 'git://foo/bar.git', 'domain' => [ { :name => 'ogc@ogtastic.com' } ] } }
       @proj_data  = { 'foo' => @bare_data }
     end
 
     it 'fails if the configuration data is not a hash' do
-      lambda { @config.add_project_scoping([]) }.should.raise
+      lambda { @filter.filter([]) }.should.raise
     end
 
     describe 'when no project name is specified via ENV["to"]' do
@@ -50,12 +52,12 @@ describe 'filtering configuration data' do
       end
 
       it 'returns the original data if it has both project and environment scoping' do
-        @config.add_project_scoping(@proj_data).should == @proj_data
+        @filter.filter(@proj_data).should == @proj_data
       end
 
       describe 'when no project name is specified in the bare config hash' do
         it 'returns the original data wrapped in project scope, using a dummy project, if it has environment scoping but no project scoping' do
-          @config.add_project_scoping(@bare_data).should == { 'unnamed_project' => @bare_data }
+          @filter.filter(@bare_data).should == { 'unnamed_project' => @bare_data }
         end
       end
 
@@ -65,7 +67,7 @@ describe 'filtering configuration data' do
         end
 
         it 'returns the original data wrapped in project scope if it has environment scoping but no project scoping' do
-          @config.add_project_scoping(@bare_data).should == { 'whiskey_disk' => @bare_data }
+          @filter.filter(@bare_data).should == { 'whiskey_disk' => @bare_data }
         end
       end
     end
@@ -77,11 +79,11 @@ describe 'filtering configuration data' do
     
       describe 'when a project name is not specified in the bare config hash' do
         it 'returns the original data if it has both project and environment scoping' do
-          @config.add_project_scoping(@proj_data).should == @proj_data
+          @filter.filter(@proj_data).should == @proj_data
         end
     
         it 'returns the original data wrapped in project scope if it has environment scoping but no project scoping' do
-          @config.add_project_scoping(@bare_data).should == { 'whiskey_disk' => @bare_data }
+          @filter.filter(@bare_data).should == { 'whiskey_disk' => @bare_data }
         end
       end
     
@@ -91,11 +93,11 @@ describe 'filtering configuration data' do
         end
     
         it 'returns the original data if it has both project and environment scoping' do
-          @config.add_project_scoping(@proj_data).should == @proj_data
+          @filter.filter(@proj_data).should == @proj_data
         end
     
         it 'returns the original data wrapped in project scope if it has environment scoping but no project scoping' do
-          @config.add_project_scoping(@bare_data).should == { 'whiskey_disk' => @bare_data }
+          @filter.filter(@bare_data).should == { 'whiskey_disk' => @bare_data }
         end
       end
     end 
