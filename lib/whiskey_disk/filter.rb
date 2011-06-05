@@ -7,13 +7,17 @@ class WhiskeyDisk
         @config = config
       end
     end
-    
-    class EnvironmentScopeFilter < AbstractFilter      
+
+    module ScopeHelper
       def repository_depth(data, depth = 0)
         raise 'no repository found' unless data.respond_to?(:has_key?)
         return depth if data.has_key?('repository')
         repository_depth(data.values.first, depth + 1)
       end
+    end
+    
+    class EnvironmentScopeFilter < AbstractFilter      
+      include ScopeHelper
 
       # is this data hash a bottom-level data hash without an environment name?
       def needs_environment_scoping?(data)
@@ -27,6 +31,8 @@ class WhiskeyDisk
     end
     
     class ProjectScopeFilter < AbstractFilter
+      include ScopeHelper
+
       def repository_depth(data, depth = 0)
         raise 'no repository found' unless data.respond_to?(:has_key?)
         return depth if data.has_key?('repository')
