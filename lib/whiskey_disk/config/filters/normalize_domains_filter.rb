@@ -11,7 +11,6 @@ class WhiskeyDisk
         [ list ].flatten.delete_if { |d| d.nil? or d == '' }
       end
 
-      # called only by normalize_domains
       def normalize_domain(data)
         compacted = localize_domain_list(data)
         compacted = [ 'local' ] if compacted.empty?
@@ -28,7 +27,6 @@ class WhiskeyDisk
         end
       end
 
-      # called only by normalize_domains
       def check_duplicates(project, target, domain_list)
         seen = {}
         domain_list.each do |domain|
