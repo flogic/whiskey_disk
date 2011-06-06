@@ -16,11 +16,11 @@ class WhiskeyDisk
         @filters = [
           EnvironmentScopeFilter,
           ProjectScopeFilter,
-          NormalizeDomainsFilter,
           SelectProjectAndEnvironmentFilter,
           AddEnvironmentNameFilter,
           AddProjectNameFilter,
-          DefaultConfigTargetFilter
+          DefaultConfigTargetFilter,
+          NormalizeDomainsFilter
         ]
       end
   

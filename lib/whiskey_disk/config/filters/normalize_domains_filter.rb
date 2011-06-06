@@ -36,12 +36,7 @@ class WhiskeyDisk
       end
 
       def filter(data)
-        data.each_pair do |project, project_data|
-          project_data.each_pair do |target, target_data|
-            target_data['domain'] = check_duplicates(normalize_domain(target_data['domain']))
-          end
-        end
-        data
+        data.merge('domain' => check_duplicates(normalize_domain(data['domain'])))
       end
     end
   end
