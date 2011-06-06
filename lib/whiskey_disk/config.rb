@@ -1,7 +1,7 @@
 require 'yaml'
 require 'uri'
 require 'open-uri'
-require 'whiskey_disk/filter'
+require 'whiskey_disk/config/filter'
 
 class WhiskeyDisk
   class Config
