@@ -138,20 +138,25 @@ class WhiskeyDisk
     end
     
     class Filter
-      attr_reader :config
+      attr_reader :config, :filters
   
       def initialize(config)
         @config = config
+        @filters = [
+          EnvironmentScopeFilter,
+          ProjectScopeFilter,
+          NormalizeDomainsFilter,
+          SelectProjectAndEnvironmentFilter,
+          AddEnvironmentNameFilter,
+          AddProjectNameFilter,
+          DefaultConfigTargetFilter
+        ]
       end
   
       def filter_data(data)
-        current = EnvironmentScopeFilter.new(config).filter(data.clone)
-        current = ProjectScopeFilter.new(config).filter(current)
-        current = NormalizeDomainsFilter.new(config).filter(current)
-        current = SelectProjectAndEnvironmentFilter.new(config).filter(current)
-        current = AddEnvironmentNameFilter.new(config).filter(current)
-        current = AddProjectNameFilter.new(config).filter(current)
-        current = DefaultConfigTargetFilter.new(config).filter(current)
+        filters.inject(data.clone) do |result, filter|
+          result = filter.new(config).filter(result)
+        end
       end    
     end
   end
