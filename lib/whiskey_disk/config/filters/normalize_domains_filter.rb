@@ -27,10 +27,10 @@ class WhiskeyDisk
         end
       end
 
-      def check_duplicates(project, target, domain_list)
+      def check_duplicates(domain_list)
         seen = {}
         domain_list.each do |domain|
-          raise "duplicate domain [#{domain[:name]}] in configuration file for project [#{project}], target [#{target}]" if seen[domain[:name]]
+          raise "duplicate domain [#{domain[:name]}] in configuration file for project [#{environment_name}], target [#{environment_name}]" if seen[domain[:name]]
           seen[domain[:name]] = true
         end
       end
@@ -38,7 +38,7 @@ class WhiskeyDisk
       def filter(data)
         data.each_pair do |project, project_data|
           project_data.each_pair do |target, target_data|
-            target_data['domain'] = check_duplicates(project, target, normalize_domain(target_data['domain']))
+            target_data['domain'] = check_duplicates(normalize_domain(target_data['domain']))
           end
         end
         data
