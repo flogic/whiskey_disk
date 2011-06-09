@@ -744,12 +744,12 @@ Notice that there are no separate trees for 'uat' and 'qa' targets.
 
  - Here is a sample of a lib/tasks/deploy.rake from a Rails application we deployed once upon a time:
  
-     RAILS_ENV=ENV['RAILS_ENV'] if ENV['RAILS_ENV'] and '' != ENV['RAILS_ENV']
-     Rake::Task['environment'].invoke
-     
-     require 'asset_cache_sweeper'
- 
-     namespace :deploy do
+      RAILS_ENV=ENV['RAILS_ENV'] if ENV['RAILS_ENV'] and '' != ENV['RAILS_ENV']
+      Rake::Task['environment'].invoke
+       
+      require 'asset_cache_sweeper'
+  
+      namespace :deploy do
        task :create_rails_directories do
          puts "creating log/ and tmp/ directories"
          Dir.chdir(RAILS_ROOT)
