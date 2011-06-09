@@ -814,4 +814,5 @@ The IRC channel is #whiskey_disk on freenode.
  - [Alex Sharp](https://github.com/ajsharp): issues, real-world usage cases, design help
  - [Yossef Mendelssohn](https://github.com/ymendel): design help, proofreading
  - [Josh Moore](https://github.com/joshsmoore): bug-hunting
- - [Cristi Balan](https://github.com/evilchelu): feedback, proofreading
+
+ - Documentation/feedback: [Cristi Balan](https://github.com/evilchelu), [Hedgehog](http://github.com/hedgehog)
