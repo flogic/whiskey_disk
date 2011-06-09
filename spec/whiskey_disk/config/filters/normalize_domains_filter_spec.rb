@@ -159,14 +159,4 @@ describe 'filtering configuration data by normalizing domains' do
       { :name => 'aok@domain.com',  :roles => [ 'app' ] }
      ]        
   end
-  
-  it 'raises an exception if a domain appears more than once in a target' do
-    @data = { 
-      'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => nil }, 
-                                         { 'name' => 'baz@domain.com', 'roles' => '' },
-                                         { 'name' => 'bar@example.com', 'roles' => [] } ]
-    }
-    
-    lambda { @filter.filter(@data) }.should.raise
-  end
 end

@@ -1,5 +1,7 @@
 require 'whiskey_disk/config/abstract_filter'
 
+#TODO: filter to symbolize hash keys
+
 class WhiskeyDisk
   class Config
     class NormalizeDomainsFilter < AbstractFilter
@@ -27,16 +29,8 @@ class WhiskeyDisk
         end
       end
 
-      def check_duplicates(domain_list)
-        seen = {}
-        domain_list.each do |domain|
-          raise "duplicate domain [#{domain[:name]}] in configuration file for project [#{environment_name}], target [#{environment_name}]" if seen[domain[:name]]
-          seen[domain[:name]] = true
-        end
-      end
-
       def filter(data)
-        data.merge('domain' => check_duplicates(normalize_domain(data['domain'])))
+        data.merge('domain' => normalize_domain(data['domain']))
       end
     end
   end
