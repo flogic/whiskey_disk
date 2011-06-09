@@ -750,40 +750,40 @@ Notice that there are no separate trees for 'uat' and 'qa' targets.
         Rake::Task['environment'].invoke
          
         require 'asset_cache_sweeper'
-   
-     namespace :deploy do
-       task :create_rails_directories do
-         puts "creating log/ and tmp/ directories"
-         Dir.chdir(RAILS_ROOT)
-         system("mkdir -p log tmp")
-       end
-     
-       # note that the plpgsql language needs to be installed by the db admin at initial database creation :-/
-       task :setup_postgres_for_thinking_sphinx => [ :environment ] do
-         ThinkingSphinx::PostgreSQLAdapter.new(Product).setup
-       end
-     
-       # whytf is this even necessary?  Come on.  This should be built into ts:restart.
-       task :thinking_sphinx_restart => [:environment] do
-         Rake::Task['ts:stop'].invoke rescue nil
-         Rake::Task['ts:index'].invoke
-         Rake::Task['ts:start'].invoke
-       end
-     
-       task :bounce_passenger do
-         puts "restarting Passenger web server"
-         Dir.chdir(RAILS_ROOT)
-         system("touch tmp/restart.txt")    
-       end
-     
-       task :clear_asset_cache => [:environment] do
-         STDERR.puts "Expiring cached Assets for domains [#{AssetCacheSweeper.domains.join(", ")}]"
-         AssetCacheSweeper.expire
-       end
-     
-       task :post_setup => [ :create_rails_directories, :setup_postgres_for_thinking_sphinx ]
-       task :post_deploy => [ 'db:migrate', 'ts:config', :thinking_sphinx_restart, :bounce_passenger, :clear_asset_cache ]
-     end 
+      
+        namespace :deploy do
+          task :create_rails_directories do
+            puts "creating log/ and tmp/ directories"
+            Dir.chdir(RAILS_ROOT)
+            system("mkdir -p log tmp")
+          end
+        
+          # note that the plpgsql language needs to be installed by the db admin at initial database creation :-/
+          task :setup_postgres_for_thinking_sphinx => [ :environment ] do
+            ThinkingSphinx::PostgreSQLAdapter.new(Product).setup
+          end
+        
+          # whytf is this even necessary?  Come on.  This should be built into ts:restart.
+          task :thinking_sphinx_restart => [:environment] do
+            Rake::Task['ts:stop'].invoke rescue nil
+            Rake::Task['ts:index'].invoke
+            Rake::Task['ts:start'].invoke
+          end
+        
+          task :bounce_passenger do
+            puts "restarting Passenger web server"
+            Dir.chdir(RAILS_ROOT)
+            system("touch tmp/restart.txt")    
+          end
+        
+          task :clear_asset_cache => [:environment] do
+            STDERR.puts "Expiring cached Assets for domains [#{AssetCacheSweeper.domains.join(", ")}]"
+            AssetCacheSweeper.expire
+          end
+        
+          task :post_setup => [ :create_rails_directories, :setup_postgres_for_thinking_sphinx ]
+          task :post_deploy => [ 'db:migrate', 'ts:config', :thinking_sphinx_restart, :bounce_passenger, :clear_asset_cache ]
+        end 
  
 ### Future Directions ###
 
