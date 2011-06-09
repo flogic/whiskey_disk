@@ -743,6 +743,7 @@ Notice that there are no separate trees for 'uat' and 'qa' targets.
  - We are using whiskey\_disk to manage larry.  See [https://github.com/flogic/larry/blob/master/config/deploy-local.yml.example](https://github.com/flogic/larry/blob/master/config/deploy-local.yml.example) and [http://github.com/flogic/larry/blob/master/lib/tasks/deploy.rake](http://github.com/flogic/larry/blob/master/lib/tasks/deploy.rake)
 
  - Here is a sample of a lib/tasks/deploy.rake from a Rails application we deployed once upon a time:
+
  
       RAILS_ENV=ENV['RAILS_ENV'] if ENV['RAILS_ENV'] and '' != ENV['RAILS_ENV']
       Rake::Task['environment'].invoke
