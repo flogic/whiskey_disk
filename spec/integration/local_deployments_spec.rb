@@ -14,17 +14,17 @@ integration_spec do
       end
 
       describe 'performing a setup' do
-        it 'should perform a checkout of the repository to the target path' do
+        it 'performs a checkout of the repository to the target path' do
           run_setup(@args)
           File.exists?(deployed_file('project/README')).should == true
         end
             
-        it 'should report the local setup as successful' do
+        it 'reports the local setup as successful' do
           run_setup(@args)
           File.read(integration_log).should =~ /local => succeeded/
         end
 
-        it 'should exit with a true status' do
+        it 'exits with a true status' do
           run_setup(@args).should == true
         end
       end
@@ -35,17 +35,17 @@ integration_spec do
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
         
-        it 'should update the checkout of the repository on the target path' do
+        it 'updates the checkout of the repository on the target path' do
           run_deploy(@args)
           File.exists?(deployed_file('project/README')).should == true
         end    
 
-        it 'should report the local deployment as successful' do
+        it 'reports the local deployment as successful' do
           run_deploy(@args)
           File.read(integration_log).should =~ /local => succeeded/
         end
 
-        it 'should exit with a true status' do
+        it 'exits with a true status' do
           run_deploy(@args).should == true
         end
       end
@@ -58,17 +58,17 @@ integration_spec do
       end
 
       describe 'performing a setup' do
-        it 'should perform a checkout of the repository to the target path' do
+        it 'performs a checkout of the repository to the target path' do
           run_setup(@args)
           File.exists?(deployed_file('project/README')).should == true
         end
             
-        it 'should report the local setup as successful' do
+        it 'reports the local setup as successful' do
           run_setup(@args)
           File.read(integration_log).should =~ /local => succeeded/
         end
 
-        it 'should exit with a true status' do
+        it 'exits with a true status' do
           run_setup(@args).should == true
         end
       end
@@ -79,17 +79,17 @@ integration_spec do
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
         
-        it 'should update the checkout of the repository on the target path' do
+        it 'updates the checkout of the repository on the target path' do
           run_deploy(@args)
           File.exists?(deployed_file('project/README')).should == true
         end    
 
-        it 'should report the local deployment as successful' do
+        it 'reports the local deployment as successful' do
           run_deploy(@args)
           File.read(integration_log).should =~ /local => succeeded/
         end
 
-        it 'should exit with a true status' do
+        it 'exits with a true status' do
           run_deploy(@args).should == true
         end
       end
@@ -102,17 +102,17 @@ integration_spec do
       end
 
       describe 'performing a setup' do
-        it 'should perform a checkout of the repository to the target path' do
+        it 'performs a checkout of the repository to the target path' do
           run_setup(@args)
           File.exists?(deployed_file('project/README')).should == true
         end
             
-        it 'should report the named domain setup as successful' do
+        it 'reports the named domain setup as successful' do
           run_setup(@args)
           File.read(integration_log).should =~ /wd-app1\.example\.com => succeeded/
         end
 
-        it 'should exit with a true status' do
+        it 'exits with a true status' do
           run_setup(@args).should == true
         end
       end
@@ -123,17 +123,17 @@ integration_spec do
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
         
-        it 'should update the checkout of the repository on the target path' do
+        it 'updates the checkout of the repository on the target path' do
           run_deploy(@args)
           File.exists?(deployed_file('project/README')).should == true
         end    
 
-        it 'should report the named domain deployment as successful' do
+        it 'reports the named domain deployment as successful' do
           run_deploy(@args)
           File.read(integration_log).should =~ /wd-app1\.example\.com => succeeded/
         end
 
-        it 'should exit with a true status' do
+        it 'exits with a true status' do
           run_deploy(@args).should == true
         end
       end
@@ -146,17 +146,17 @@ integration_spec do
       end
 
       describe 'performing a setup' do
-        it 'should perform a checkout of the repository to the target path' do
+        it 'performs a checkout of the repository to the target path' do
           run_setup(@args)
           File.exists?(deployed_file('project/README')).should == true
         end
             
-        it 'should report the named domain setup as successful' do
+        it 'reports the named domain setup as successful' do
           run_setup(@args)
           File.read(integration_log).should =~ /wd-app1\.example\.com => succeeded/
         end
 
-        it 'should exit with a true status' do
+        it 'exits with a true status' do
           run_setup(@args).should == true
         end
       end
@@ -167,17 +167,17 @@ integration_spec do
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
         
-        it 'should update the checkout of the repository on the target path' do
+        it 'updates the checkout of the repository on the target path' do
           run_deploy(@args)
           File.exists?(deployed_file('project/README')).should == true
         end    
 
-        it 'should report the named domain deployment as successful' do
+        it 'reports the named domain deployment as successful' do
           run_deploy(@args)
           File.read(integration_log).should =~ /wd-app1\.example\.com => succeeded/
         end
 
-        it 'should exit with a true status' do
+        it 'exits with a true status' do
           run_deploy(@args).should == true
         end
       end
@@ -190,17 +190,17 @@ integration_spec do
       end
 
       describe 'performing a setup' do
-        it 'should not perform a checkout of the repository to the target path' do
+        it 'does not perform a checkout of the repository to the target path' do
           run_setup(@args)
           File.exists?(deployed_file('project/README')).should == false
         end
             
-        it 'should report that there were no deployments' do
+        it 'reports that there were no deployments' do
           run_setup(@args)
           File.read(integration_log).should =~ /No deployments/
         end
 
-        it 'should exit with a true status' do
+        it 'exits with a true status' do
           run_setup(@args).should == true
         end
       end
@@ -211,17 +211,17 @@ integration_spec do
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
         
-        it 'should not update the checkout of the repository on the target path' do
+        it 'does not update the checkout of the repository on the target path' do
           run_deploy(@args)
           File.exists?(deployed_file('project/README')).should == false
         end    
 
-        it 'should report that there were no deployments' do
+        it 'reports that there were no deployments' do
           run_deploy(@args)
           File.read(integration_log).should =~ /No deployments/
         end
 
-        it 'should exit with a true status' do
+        it 'exits with a true status' do
           run_deploy(@args).should == true
         end
       end

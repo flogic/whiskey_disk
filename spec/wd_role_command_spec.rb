@@ -15,7 +15,7 @@ describe 'wd role command' do
       ARGV = []
     end  
     
-    it 'should fail' do
+    it 'fails' do
       lambda { run_command }.should.raise(SystemExit)
     end
   end
@@ -26,22 +26,22 @@ describe 'wd role command' do
       ARGV = ['app']
     end  
 
-    it 'should fail when no WD_ROLES environment setting is present' do
+    it 'fails when no WD_ROLES environment setting is present' do
       ENV['WD_ROLES'] = nil
       lambda { run_command }.should.raise(SystemExit)
     end
     
-    it 'should fail when an empty WD_ROLES environment setting is present' do
+    it 'fails when an empty WD_ROLES environment setting is present' do
       ENV['WD_ROLES'] = ''
       lambda { run_command }.should.raise(SystemExit)
     end
     
-    it 'should fail when the WD_ROLES environment setting does not contain that role' do
+    it 'fails when the WD_ROLES environment setting does not contain that role' do
       ENV['WD_ROLES'] = 'web:nonapp:db'
       lambda { run_command }.should.raise(SystemExit)
     end
     
-    it 'should succeed when the WD_ROLES environment setting contains that role' do
+    it 'succeeds when the WD_ROLES environment setting contains that role' do
       ENV['WD_ROLES'] = 'web:app:db'
       lambda { run_command }.should.not.raise
     end    
