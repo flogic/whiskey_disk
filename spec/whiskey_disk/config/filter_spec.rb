@@ -56,14 +56,14 @@ describe WhiskeyDisk::Config::Filter, 'filtering configuration data' do
   
   it 'should apply all available filters' do
     @filter.filter_data(@data).should == {
-      "repository" => "x", 
-      "project" => "foo", 
-      "config_target" => "erl", 
-      "environment" => "erl",
-      "domain"     => [ 
-        { :name => "bar@example.com" }, 
-        { :name => "baz@domain.com" }, 
-        { :name => "aok@domain.com" }
+      'repository'    => "x", 
+      'project'       => "foo", 
+      'config_target' => "erl", 
+      'environment'   => "erl",
+      'domain'        => [ 
+        { 'name' => "bar@example.com" }, 
+        { 'name' => "baz@domain.com" }, 
+        { 'name' => "aok@domain.com" }
       ]
     }
   end

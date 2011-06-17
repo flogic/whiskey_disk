@@ -665,9 +665,9 @@ describe WhiskeyDisk::Config do
         "config_target" => "erl", 
         "environment" => "erl",
         "domain"     => [ 
-          { :name => "bar@example.com" }, 
-          { :name => "baz@domain.com" }, 
-          { :name => "aok@domain.com" }
+          { 'name' => "bar@example.com" }, 
+          { 'name' => "baz@domain.com" }, 
+          { 'name' => "aok@domain.com" }
         ]
       }
     end

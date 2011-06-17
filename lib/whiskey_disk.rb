@@ -129,7 +129,7 @@ class WhiskeyDisk
   end
 
   def build_command(domain, cmd)
-    "#{'set -x; ' if debugging?}" + encode_roles(domain[:roles]) + cmd
+    "#{'set -x; ' if debugging?}" + encode_roles(domain['roles']) + cmd
   end
   
   def run(domain, cmd)
@@ -138,7 +138,7 @@ class WhiskeyDisk
 
   def ssh(domain, cmd)
     puts "Running command on [#{domain}]: [#{cmd}]" if debugging?
-    args = [domain[:name], build_command(domain, cmd)]
+    args = [domain['name'], build_command(domain, cmd)]
     args.unshift '-v' if debugging?
     system('ssh', *args)
   end
@@ -151,23 +151,23 @@ class WhiskeyDisk
   def flush
     needs(:domain)
     setting(:domain).each do |domain|
-      next unless domain_of_interest?(domain[:name])
-      puts "Deploying #{domain[:name]}..."
-      status = remote?(domain[:name]) ? run(domain, bundle) : shell(domain, bundle)
-      record_result(domain[:name], status)
+      next unless domain_of_interest?(domain['name'])
+      puts "Deploying #{domain['name']}..."
+      status = remote?(domain['name']) ? run(domain, bundle) : shell(domain, bundle)
+      record_result(domain['name'], status)
     end
   end
   
   def record_result(domain, status)
     @results ||= []
-    @results << { :domain => domain, :status => status }
+    @results << { 'domain' => domain, 'status' => status }
   end
 
   def summarize_results(results)
     successes = failures = 0
     results.each do |result|
-      puts "#{result[:domain]} => #{result[:status] ? 'succeeded' : 'failed'}."
-      if result[:status]
+      puts "#{result['domain']} => #{result['status'] ? 'succeeded' : 'failed'}."
+      if result['status']
         successes += 1 
       else
         failures += 1
@@ -190,7 +190,7 @@ class WhiskeyDisk
   
   def success?
     return true if !results or results.empty?
-    results.all? {|result| result[:status] }
+    results.all? {|result| result['status'] }
   end
   
   def if_file_present(path, cmd)

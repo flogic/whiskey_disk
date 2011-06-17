@@ -10,8 +10,8 @@ describe 'filtering configuration data by normalizing domains' do
   
   it 'should return the suuplied data if no domains appear more than once in a target' do
     @data = { 
-      :repository => 'x', :domain => [ { :name => 'bar@example.com', :roles => nil }, 
-                                       { :name => 'baz@domain.com',  :roles => '' } ]
+      'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => nil }, 
+                                         { 'name' => 'baz@domain.com',  'roles' => '' } ]
     }
     
     @filter.filter(@data).should == @data
@@ -19,9 +19,9 @@ describe 'filtering configuration data by normalizing domains' do
   
   it 'raises an exception if a domain appears more than once in a target' do
     @data = { 
-      :repository => 'x', :domain => [ { :name => 'bar@example.com', :roles => nil }, 
-                                       { :name => 'baz@domain.com',  :roles => '' },
-                                       { :name => 'bar@example.com', :roles => [] } ]
+      'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => nil }, 
+                                         { 'name' => 'baz@domain.com',  'roles' => '' },
+                                         { 'name' => 'bar@example.com', 'roles' => [] } ]
     }
     
     lambda { @filter.filter(@data) }.should.raise

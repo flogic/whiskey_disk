@@ -959,7 +959,7 @@ describe '@whiskey_disk' do
   describe 'flushing changes' do
     before do
       @cmd = 'ls'
-      @domains = [ { :name => 'ogc@ogtastic.com' }, { :name => 'foo@example.com' }, { :name => 'local' } ]
+      @domains = [ { 'name' => 'ogc@ogtastic.com' }, { 'name' => 'foo@example.com' }, { 'name' => 'local' } ]
       @whiskey_disk.configuration = { 'domain' => @domains }
       @whiskey_disk.stub!(:domain_of_interest?).and_return(true)
       @whiskey_disk.stub!(:bundle).and_return(@cmd)
@@ -973,25 +973,25 @@ describe '@whiskey_disk' do
     end
 
     it 'uses "run" to issue commands for all remote domains' do
-      @whiskey_disk.should.receive(:run).with({ :name => 'ogc@ogtastic.com' }, @cmd)
-      @whiskey_disk.should.receive(:run).with({ :name => 'foo@example.com' }, @cmd)
+      @whiskey_disk.should.receive(:run).with({ 'name' => 'ogc@ogtastic.com' }, @cmd)
+      @whiskey_disk.should.receive(:run).with({ 'name' => 'foo@example.com' }, @cmd)
       @whiskey_disk.flush
     end
     
     it 'uses "shell" to issue commands for any local domains' do
-      @whiskey_disk.should.receive(:shell).with({ :name => 'local' }, @cmd)
+      @whiskey_disk.should.receive(:shell).with({ 'name' => 'local' }, @cmd)
       @whiskey_disk.flush      
     end    
 
     it 'does not issue a command via run for a remote domain which is not of interest' do
       @whiskey_disk.stub!(:domain_of_interest?).with('ogc@ogtastic.com').and_return(false)
-      @whiskey_disk.should.not.receive(:run).with({ :name => 'ogc@ogtastic.com' }, @cmd)
+      @whiskey_disk.should.not.receive(:run).with({ 'name' => 'ogc@ogtastic.com' }, @cmd)
       @whiskey_disk.flush
     end
 
     it 'does not issue a command via shell for a local domain which is not of interest' do
       @whiskey_disk.stub!(:domain_of_interest?).with('local').and_return(false)
-      @whiskey_disk.should.not.receive(:shell).with({ :name => 'local' }, @cmd)
+      @whiskey_disk.should.not.receive(:shell).with({ 'name' => 'local' }, @cmd)
       @whiskey_disk.flush
     end
   end
@@ -999,7 +999,7 @@ describe '@whiskey_disk' do
   describe 'when running a command string locally' do
     before do
       @domain_name = 'local'
-      @domain = { :name => @domain_name }
+      @domain = { 'name' => @domain_name }
       @whiskey_disk.configuration = { 'domain' => [ @domain ] }
       @whiskey_disk.stub!(:system)
       @whiskey_disk.stub!(:puts)
@@ -1022,7 +1022,7 @@ describe '@whiskey_disk' do
       end
       
       it 'includes domain role settings when the domain has roles' do
-        @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
+        @domain = { 'name' => @domain_name, 'roles' => [ 'web', 'db' ] }
         @whiskey_disk.configuration = { 'domain' => [ @domain ] }
         @whiskey_disk.should.receive(:system).with('bash', '-c', "set -x; export WD_ROLES='web:db'; ls")
         @whiskey_disk.shell(@domain, 'ls')        
@@ -1038,7 +1038,7 @@ describe '@whiskey_disk' do
       end
       
       it 'includes domain role settings when the domain has roles' do
-        @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
+        @domain = { 'name' => @domain_name, 'roles' => [ 'web', 'db' ] }
         @whiskey_disk.configuration = { 'domain' => [ @domain ] }
         @whiskey_disk.should.receive(:system).with('bash', '-c', "export WD_ROLES='web:db'; ls")
         @whiskey_disk.shell(@domain, 'ls')        
@@ -1049,7 +1049,7 @@ describe '@whiskey_disk' do
   describe 'when running a command string remotely' do
     before do
       @domain_name = 'ogc@ogtastic.com'
-      @domain = { :name => @domain_name }
+      @domain = { 'name' => @domain_name }
       @whiskey_disk.configuration = { 'domain' => [ @domain ] }
       @whiskey_disk.stub!(:system)
       @whiskey_disk.stub!(:puts)
@@ -1065,7 +1065,7 @@ describe '@whiskey_disk' do
 
     describe "building a command" do
       it 'includes domain role settings when the domain has roles' do
-        @domain = { :name => @domain_name, :roles => [ 'web', 'db' ] }
+        @domain = { 'name' => @domain_name, 'roles' => [ 'web', 'db' ] }
         @whiskey_disk.configuration = { 'domain' => [ @domain ] }
         @whiskey_disk.build_command(@domain, 'ls').should.match /export WD_ROLES='web:db'; ls/
       end

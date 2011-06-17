@@ -1,7 +1,5 @@
 require 'whiskey_disk/config/abstract_filter'
 
-#TODO: filter to symbolize hash keys
-
 class WhiskeyDisk
   class Config
     class NormalizeDomainsFilter < AbstractFilter
@@ -19,12 +17,12 @@ class WhiskeyDisk
 
         compacted.collect do |d|
           if d.respond_to?(:keys)
-            row = { :name => (d['name'] || d[:name]) }
+            row = { 'name' => (d['name'] || d[:name]) }
             roles = compact_list(d['roles'] || d[:roles])
-            row[:roles] = roles unless roles.empty?
+            row['roles'] = roles unless roles.empty?
             row
           else
-            { :name => d }
+            { 'name' => d }
           end
         end
       end
