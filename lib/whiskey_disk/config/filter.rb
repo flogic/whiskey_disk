@@ -16,6 +16,7 @@ class WhiskeyDisk
       def initialize(config)
         @config = config
         @filters = [
+          StringifyHashKeysFilter,
           EnvironmentScopeFilter,
           ProjectScopeFilter,
           SelectProjectAndEnvironmentFilter,
@@ -23,7 +24,6 @@ class WhiskeyDisk
           AddProjectNameFilter,
           DefaultConfigTargetFilter,
           NormalizeDomainsFilter,
-          StringifyHashKeysFilter,
           CheckForDuplicateDomainsFilter
         ]
       end
