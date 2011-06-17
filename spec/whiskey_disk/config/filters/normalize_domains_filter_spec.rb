@@ -88,30 +88,6 @@ describe 'filtering configuration data by normalizing domains' do
      ]
   end
   
-  it 'replaces any nil domains with "local" domains in a domain list' do
-    @filter.filter(@data['foo']['bar'])['domain'].should == [
-      { 'name' => 'user@example.com' }, { 'name' => 'local' }, { 'name' => 'foo@domain.com' }
-     ]
-  end
-  
-  it 'handles localizing nils across all projects and targets' do
-    @filter.filter(@data['zyx']['def'])['domain'].should == [
-      { 'name' => 'user@example.com' }, { 'name' => 'local' }, { 'name' => 'foo@domain.com' }
-     ]
-  end
-  
-  it 'replaces any blank domains with "local" domains in a domain list' do
-    @filter.filter(@data['foo']['bat'])['domain'].should == [
-      { 'name' => 'user@example.com' }, { 'name' => 'foo@domain.com' }, { 'name' => 'local' }
-     ]
-  end
-  
-  it 'handles localizing blanks across all projects and targets' do
-    @filter.filter(@data['zyx']['dex'])['domain'].should == [
-      { 'name' => 'user@example.com' }, { 'name' => 'foo@domain.com' }, { 'name' => 'local' }
-     ]
-  end
-  
   it 'does not include roles when only nil, blank or empty roles lists are specified' do
     @filter.filter(@data['foo']['erl'])['domain'].should == [
       { 'name' => 'bar@example.com' }, { 'name' => 'baz@domain.com' }, { 'name' => 'aok@domain.com' }
