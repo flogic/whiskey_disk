@@ -13,6 +13,6 @@ describe 'setting empty domain entries to "local"' do
   end
 
   it 'adds a local domain entry if data does not have a domain' do
-    @filter.filter({}).should == { 'domain' => { 'name' => 'local' } }
+    @filter.filter({}).should == { 'domain' => [{ 'name' => 'local' }] }
   end
 end
