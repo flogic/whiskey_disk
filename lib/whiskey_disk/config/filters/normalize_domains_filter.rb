@@ -17,8 +17,8 @@ class WhiskeyDisk
 
         compacted.collect do |d|
           if d.respond_to?(:keys)
-            row = { 'name' => (d['name'] || d[:name]) }
-            roles = compact_list(d['roles'] || d[:roles])
+            row = { 'name' => d['name'] }
+            roles = compact_list(d['roles'])
             row['roles'] = roles unless roles.empty?
             row
           else
