@@ -11,7 +11,12 @@ class WhiskeyDisk
         needs_hashing?(domain) ? { 'name' => domain } : domain
       end
       
+      def new_domain
+        { 'name' => '' }
+      end
+      
       def hashify_domains(domain_list)
+        return new_domain unless domain_list
         domain_list.collect {|domain| hashify_domain(domain) }
       end
 

@@ -52,42 +52,6 @@ describe 'filtering configuration data by normalizing domains' do
     }
   end
 
-  it 'sets the domain to "local" when no domain is specified' do
-    @filter.filter(@data['foo']['xyz'])['domain'].should == [ { 'name' => 'local' } ]   
-  end
-  
-  it 'handles nil domains across all projects and targets' do
-    @filter.filter(@data['zyx']['xyz'])['domain'].should == [ { 'name' => 'local' } ]
-  end
-
-  it 'returns domain as "local" if a single empty domain was specified' do
-    @filter.filter(@data['foo']['eee'])['domain'].should == [ { 'name' => 'local' } ]
-  end
-  
-  it 'handles single empty specified domains across all projects and targets' do
-    @filter.filter(@data['zyx']['eee'])['domain'].should == [ { 'name' => 'local' } ]                 
-  end
-  
-  it 'returns domain as a single element list with a name if a single non-empty domain was specified' do
-    @filter.filter(@data['foo']['abc'])['domain'].should == [ { 'name' => 'what@example.com' } ]
-  end
-  
-  it 'handles single specified domains across all projects and targets' do
-    @filter.filter(@data['zyx']['abc'])['domain'].should == [ { 'name' => 'what@example.com' } ]
-  end
-
-  it 'returns the list of domain name hashes when a list of domains is specified' do
-    @filter.filter(@data['foo']['baz'])['domain'].should == [ 
-      { 'name' => 'bar@example.com' }, { 'name' => 'baz@domain.com' } 
-    ]
-  end
-
-  it 'handles lists of domains across all projects and targets' do
-    @filter.filter(@data['zyx']['hij'])['domain'].should == [ 
-      { 'name' => 'bar@example.com' }, { 'name' => 'baz@domain.com' } 
-     ]
-  end
-  
   it 'does not include roles when only nil, blank or empty roles lists are specified' do
     @filter.filter(@data['foo']['erl'])['domain'].should == [
       { 'name' => 'bar@example.com' }, { 'name' => 'baz@domain.com' }, { 'name' => 'aok@domain.com' }
@@ -112,26 +76,6 @@ describe 'filtering configuration data by normalizing domains' do
     @filter.filter(@data['zyx']['rol'])['domain'].should == [
       { 'name' => 'bar@example.com', 'roles' => [ 'web', 'db' ] }, 
       { 'name' => 'baz@domain.com',  'roles' => [ 'db' ] }, 
-      { 'name' => 'aok@domain.com',  'roles' => [ 'app' ] }
-     ]        
-  end
-  
-  it 'respects empty domains among role data' do
-    @filter.filter(@data['foo']['wow'])['domain'].should == [
-      { 'name' => 'bar@example.com', 'roles' => [ 'web', 'db' ] }, 
-      { 'name' => 'baz@domain.com',  'roles' => [ 'db' ] }, 
-      { 'name' => 'local' },
-      { 'name' => 'foo@bar.example.com' },
-      { 'name' => 'aok@domain.com',  'roles' => [ 'app' ] }
-     ]                
-  end
-  
-  it 'handles empty domain filtering among roles across all projects and targets' do
-    @filter.filter(@data['zyx']['wow'])['domain'].should == [
-      { 'name' => 'bar@example.com', 'roles' => [ 'web', 'db' ] }, 
-      { 'name' => 'baz@domain.com',  'roles' => [ 'db' ] }, 
-      { 'name' => 'local' },
-      { 'name' => 'foo@bar.example.com' },
       { 'name' => 'aok@domain.com',  'roles' => [ 'app' ] }
      ]        
   end

@@ -29,4 +29,13 @@ describe 'setting empty domain entries to "local"' do
       ]
     }
   end
+  
+  it 'handles the degenerate case of a single domain name' do
+    @data = { 'domain' => 'foo' }
+    @filter.filter(@data).should == { 'domain' => [ { 'name' => 'foo' } ] }
+  end
+  
+  it 'handles the degenerate case of no domain specified' do
+    @filter.filter({}).should == { 'domain' => { 'name' => '' } }
+  end
 end
