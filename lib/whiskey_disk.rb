@@ -4,6 +4,10 @@ class WhiskeyDisk
   attr_writer :configuration, :config
   attr_reader :results
   
+  def initialize(options = {})
+    @staleness_checks = true if options[:staleness_checks]
+  end
+  
   def buffer
     @buffer ||= []
   end
@@ -26,10 +30,6 @@ class WhiskeyDisk
   
   def check_staleness?
     config.check_staleness?
-  end
-  
-  def enable_staleness_checks
-    @staleness_checks = true
   end
   
   def staleness_checks_enabled?

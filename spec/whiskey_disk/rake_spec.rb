@@ -145,7 +145,6 @@ describe 'rake tasks' do
     before do
       @whiskey_disk.configuration = { }
       [ 
-        :enable_staleness_checks,
         :update_main_repository_checkout,
         :update_configuration_repository_checkout,
         :refresh_configuration,
@@ -160,7 +159,7 @@ describe 'rake tasks' do
     end
     
     it 'enables staleness checks' do
-      @whiskey_disk.should.receive(:enable_staleness_checks)
+      WhiskeyDisk.should.receive(:new).with(:staleness_checks => true).and_return(@whiskey_disk)      
       @rake["deploy:now"].invoke
     end
     
