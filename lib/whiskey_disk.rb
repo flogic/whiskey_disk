@@ -8,6 +8,31 @@ class WhiskeyDisk
     @staleness_checks = true if options[:staleness_checks]
   end
   
+  def setup
+    ensure_main_parent_path_is_present
+    ensure_config_parent_path_is_present      if has_config_repo?
+    checkout_main_repository
+    checkout_configuration_repository         if has_config_repo?
+    update_main_repository_checkout
+    update_configuration_repository_checkout  if has_config_repo?
+    refresh_configuration                     if has_config_repo?
+    initialize_all_changes
+    run_post_setup_hooks
+    flush
+    summarize
+    success?
+  end
+  
+  def deploy
+    update_main_repository_checkout
+    update_configuration_repository_checkout  if has_config_repo?
+    refresh_configuration                     if has_config_repo?
+    run_post_deploy_hooks
+    flush
+    summarize
+    success?
+  end
+  
   def buffer
     @buffer ||= []
   end
