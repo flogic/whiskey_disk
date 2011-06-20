@@ -13,14 +13,12 @@ namespace :deploy do
   end
   
   task :post_setup do
-    @whiskey_disk = WhiskeyDisk.new
-    env = @whiskey_disk.setting(:environment)
+    env = WhiskeyDisk.new.setting(:environment)
     Rake::Task["deploy:#{env}:post_setup"].invoke if Rake::Task.task_defined? "deploy:#{env}:post_setup"      
   end
 
   task :post_deploy do
-    @whiskey_disk = WhiskeyDisk.new
-    env = @whiskey_disk.setting(:environment)
+    env = WhiskeyDisk.new.setting(:environment)
     Rake::Task["deploy:#{env}:post_deploy"].invoke if Rake::Task.task_defined? "deploy:#{env}:post_deploy"      
   end
 end
