@@ -24,6 +24,7 @@ class WhiskeyDisk
   end
   
   def deploy
+    @staleness_checks = true
     update_main_repository_checkout
     update_configuration_repository_checkout  if has_config_repo?
     refresh_configuration                     if has_config_repo?
