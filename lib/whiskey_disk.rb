@@ -140,7 +140,7 @@ class WhiskeyDisk
     args = []
     args << domain['name']
     args << '-v' if debugging?
-    args += [ domain['ssh_options'] ].flatten if domain['ssh_options']
+    args += domain['ssh_options'] if domain['ssh_options']
     args << build_command(domain, cmd)
 
     puts "Running: ssh #{args.join(' ')}" if debugging?
