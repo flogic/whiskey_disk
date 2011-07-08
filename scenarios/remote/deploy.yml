@@ -63,10 +63,11 @@ project:
     config_repository: "git://wd-git.example.com/config.git"
     branch: "hook_with_changed"
   "with_ssh_options":
-    domain: "user@wd-app1.example.com"
+    domain: 
+    - name: "user@wd-app1.example.com"
+      ssh_options:
+      - "-t"
+      - "-v"
     deploy_to: "/tmp/wd-integration-target/destination/project"
     repository: "git://wd-git.example.com/project.git"
-    ssh_options: 
-    - "-t"
-    - "-v"
 

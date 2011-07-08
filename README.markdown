@@ -150,7 +150,6 @@ Known config file settings (if you're familiar with capistrano and vlad these sh
     post_deploy_script:  path to a shell script to run after deployment
     post_setup_script:   path to a shell script to run after setup
     rake_env:            hash of environment variables to set when running post_setup and post_deploy rake tasks
-    ssh_options:         options to pass to ssh command for remote deployments
 
 
 A simple config/deploy.yml might look like:
@@ -218,17 +217,17 @@ You can even include a local deployment along with remote deployments, simply us
         RAILS_ENV: 'production'
 
 
-If you need special flags passed to ssh when doing remote deployments, specify `ssh_options`:
+If you need special flags passed to ssh for a given domain, specify an array of `ssh_options` flags:
 
     qa:
-      domain: "ogc@qa.ogtastic.com"
+      domain: 
+      - name: "ogc@qa.ogtastic.com"
+        ssh_options: 
+        - "-t"
+        - "-vv" 
+        - "-p 443"
       deploy_to: "/var/www/www.ogtastic.com"
       repository: "git@ogtastic.com:www.ogtastic.com.git"
-      ssh_options: 
-      - "-t"
-      - "-vv" 
-      - "-p 443"
-
 
 ### Specifying domains, with or without roles ###
 
