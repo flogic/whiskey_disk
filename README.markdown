@@ -224,7 +224,10 @@ If you need special flags passed to ssh when doing remote deployments, specify `
       domain: "ogc@qa.ogtastic.com"
       deploy_to: "/var/www/www.ogtastic.com"
       repository: "git@ogtastic.com:www.ogtastic.com.git"
-      ssh_options: "-t -vv -p 443"
+      ssh_options: 
+      - "-t"
+      - "-vv" 
+      - "-p 443"
 
 
 ### Specifying domains, with or without roles ###
