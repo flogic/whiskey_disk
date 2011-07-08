@@ -6,7 +6,7 @@ integration_spec do
     before do
       setup_deployment_area
     end
-  
+
     describe 'with a single remote domain' do
       before do
         @config = scenario_config('remote/deploy.yml')
@@ -112,6 +112,55 @@ integration_spec do
           end        
         end
       end
+    end
+
+    describe 'with ssh options specified' do
+      before do
+        @config = scenario_config('remote/deploy.yml')
+        @args = "--path=#{@config} --to=project:with_ssh_options"
+      end
+
+      describe 'performing a setup' do
+        # TODO FIXME -- this spec fails due to interplay between STDOUT and file buffering in ruby system() (*WTF*)
+        #
+        # it 'uses specified ssh options when performing the setup' do
+        #   run_setup(@args)
+        #   dump_log
+        #   File.read(integration_log).should =~ /ssh.* -t /
+        # end
+            
+        it 'reports the remote setup as successful' do
+          run_setup(@args)
+          File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
+        end
+        
+        it 'exits with a true status' do
+          run_setup(@args).should == true
+        end
+      end
+    
+      describe 'performing a deployment' do
+        before do
+          checkout_repo('project')
+          File.unlink(deployed_file('project/README'))  # modify the deployed checkout
+        end
+        
+        # TODO FIXME -- this spec fails due to interplay between STDOUT and file buffering in ruby system() (*WTF*)
+        #
+        # it 'uses specified ssh options when performing the setup' do
+        #   run_deploy(@args, true)
+        #   File.read(integration_log).should =~ /ssh.* -t /
+        # end
+        
+        it 'reports the remote deployment as successful' do
+          run_deploy(@args)
+          File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
+        end
+        
+        it 'exits with a true status' do
+          run_deploy(@args).should == true
+        end
+      end      
     end
   end
 end

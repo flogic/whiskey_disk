@@ -19,9 +19,15 @@ describe WhiskeyDisk::Config::Filter, 'filtering configuration data' do
         'bat' => { 'repository' => 'x', 'domain' => [ 'user@example.com', 'foo@domain.com', '' ]},
         'hsh' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, { 'name' => 'baz@domain.com' } ]},
         'mix' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, 'baz@domain.com' ]},            
-        'erl' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => nil }, 
-                                                      { 'name' => 'baz@domain.com', 'roles' => '' },
-                                                      { 'name' => 'aok@domain.com', 'roles' => [] } ]},
+        'erl' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 
+                                                        'roles' => nil,
+                                                        'ssh_options' => ['-t', '-v' ] }, 
+                                                      { 'name' => 'baz@domain.com', 
+                                                        'ssh_options' => '-t',
+                                                        'roles' => '' },
+                                                      { 'name' => 'aok@domain.com', 
+                                                        'ssh_options' => [], 
+                                                        'roles' => [] } ]},
         'rol' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => [ 'web', 'db' ] }, 
                                                       { 'name' => 'baz@domain.com', 'roles' => [ 'db' ] },            
                                                       { 'name' => 'aok@domain.com', 'roles' => 'app' } ]},            
@@ -61,8 +67,8 @@ describe WhiskeyDisk::Config::Filter, 'filtering configuration data' do
       'config_target' => "erl", 
       'environment'   => "erl",
       'domain'        => [ 
-        { 'name' => "bar@example.com" }, 
-        { 'name' => "baz@domain.com" }, 
+        { 'name' => "bar@example.com", 'ssh_options' => [ '-t', '-v' ] }, 
+        { 'name' => "baz@domain.com", 'ssh_options' => [ '-t' ] }, 
         { 'name' => "aok@domain.com" }
       ]
     }

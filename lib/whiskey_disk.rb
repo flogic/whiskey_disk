@@ -137,9 +137,13 @@ class WhiskeyDisk
   end
 
   def ssh(domain, cmd)
-    puts "Running command on [#{domain}]: [#{cmd}]" if debugging?
-    args = [domain['name'], build_command(domain, cmd)]
-    args.unshift '-v' if debugging?
+    args = []
+    args << domain['name']
+    args << '-v' if debugging?
+    args += domain['ssh_options'] if domain['ssh_options']
+    args << build_command(domain, cmd)
+
+    puts "Running: ssh #{args.join(' ')}" if debugging?
     system('ssh', *args)
   end
   
