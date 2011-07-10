@@ -12,6 +12,7 @@ require 'whiskey_disk/config/filters/check_for_duplicate_domains_filter'
 require 'whiskey_disk/config/filters/convert_role_strings_to_list_filter'
 require 'whiskey_disk/config/filters/drop_empty_domain_roles_filter'
 require 'whiskey_disk/config/filters/normalize_ssh_options_filter'
+require 'whiskey_disk/config/filters/set_master_as_default_branch_filter'
 
 class WhiskeyDisk
   class Config
@@ -34,7 +35,8 @@ class WhiskeyDisk
           CheckForDuplicateDomainsFilter,
           ConvertRoleStringsToListFilter,
           DropEmptyDomainRolesFilter,
-          NormalizeSshOptionsFilter
+          NormalizeSshOptionsFilter,
+          SetMasterAsDefaultBranchFilter
         ]
       end
   

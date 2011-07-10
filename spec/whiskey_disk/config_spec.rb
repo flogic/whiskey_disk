@@ -661,6 +661,7 @@ describe WhiskeyDisk::Config do
     it 'should apply all available filters' do
       @config.filter_data(@data).should == {
         "repository" => "x", 
+        'branch' => 'master',
         "project" => "foo", 
         "config_target" => "erl", 
         "environment" => "erl",

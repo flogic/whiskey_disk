@@ -19,7 +19,8 @@ describe WhiskeyDisk::Config::Filter, 'filtering configuration data' do
         'bat' => { 'repository' => 'x', 'domain' => [ 'user@example.com', 'foo@domain.com', '' ]},
         'hsh' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, { 'name' => 'baz@domain.com' } ]},
         'mix' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, 'baz@domain.com' ]},            
-        'erl' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 
+        'erl' => { 'repository' => 'x', 'config_repository' => 'y', 
+                   'domain' => [ { 'name' => 'bar@example.com', 
                                                         'roles' => nil,
                                                         'ssh_options' => ['-t', '-v' ] }, 
                                                       { 'name' => 'baz@domain.com', 
@@ -62,11 +63,14 @@ describe WhiskeyDisk::Config::Filter, 'filtering configuration data' do
   
   it 'should apply all available filters' do
     @filter.filter_data(@data).should == {
-      'repository'    => "x", 
-      'project'       => "foo", 
-      'config_target' => "erl", 
-      'environment'   => "erl",
-      'domain'        => [ 
+      'repository'        => "x", 
+      'branch'            => 'master',
+      'config_repository' => 'y',
+      'config_branch'     => 'master',
+      'project'           => "foo", 
+      'config_target'     => "erl", 
+      'environment'       => "erl",
+      'domain'            => [ 
         { 'name' => "bar@example.com", 'ssh_options' => [ '-t', '-v' ] }, 
         { 'name' => "baz@domain.com", 'ssh_options' => [ '-t' ] }, 
         { 'name' => "aok@domain.com" }
