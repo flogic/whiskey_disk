@@ -367,7 +367,10 @@ describe '@whiskey_disk' do
 
   describe 'ensuring that the parent path for the main repository checkout is present' do
     before do
-      @whiskey_disk.configuration = { 'deploy_to' => '/path/to/main/repo' }
+      @whiskey_disk.configuration = { 
+        'deploy_to' => '/path/to/main/repo',
+        'repository' => 'git:something.git'
+      }
     end
     
     it 'fails if the deployment path is not specified' do
@@ -384,7 +387,10 @@ describe '@whiskey_disk' do
 
   describe 'ensuring that the parent path for the configuration repository checkout is present' do
     before do
-      @whiskey_disk.configuration = { 'deploy_config_to' => '/path/to/config/repo' }
+      @whiskey_disk.configuration = { 
+        'deploy_config_to' => '/path/to/config/repo', 
+        'config_repository' => 'git:something.git' 
+      }
     end
     
     it 'fails if the configuration deployment path is not specified' do
@@ -532,12 +538,14 @@ describe '@whiskey_disk' do
       @whiskey_disk.checkout_configuration_repository
       @whiskey_disk.buffer.join(' ').should.match(%r{\|\| git checkout production origin/production \|\| git checkout production})
     end
-    
   end
   
   describe 'updating the main repository checkout' do
     before do
-      @parameters = { 'deploy_to' => '/path/to/main/repo' }
+      @parameters = { 
+        'repository' => 'git:something.git',
+        'deploy_to' => '/path/to/main/repo' 
+      }
       @whiskey_disk.configuration = @parameters
     end
     
@@ -608,7 +616,12 @@ describe '@whiskey_disk' do
   
   describe 'updating the configuration repository checkout' do
     before do
-      @parameters = { 'deploy_config_to' => '/path/to/config/repo', 'deploy_to' => '/path/to/main/repo' }
+      @parameters = { 
+        'config_repository' => 'git:something.git', 
+        'deploy_config_to' => '/path/to/config/repo', 
+        'repository' => 'git:somethingelse.git',
+        'deploy_to' => '/path/to/main/repo' 
+      }
       @whiskey_disk.configuration = @parameters
     end
     
