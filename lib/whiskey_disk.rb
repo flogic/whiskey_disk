@@ -152,14 +152,6 @@ class WhiskeyDisk
     end
   end
   
-  def parent_path(path)
-    File.split(path).first
-  end
-  
-  def tail_path(path)
-    File.split(path).last
-  end
-  
   def needs(*keys)
     keys.each do |key|
       raise "No value for '#{key}' declared in configuration files [#{config.configuration_file}]" unless setting(key)
