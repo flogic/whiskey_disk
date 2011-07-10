@@ -2,7 +2,7 @@ require 'whiskey_disk/config/abstract_filter'
 
 class WhiskeyDisk
   class Config
-    class SetMasterAsDefaultBranchFilter < AbstractFilter
+    class SetDefaultBranchFilter < AbstractFilter
       def default_branch(data)
         return data['branch'] if data['branch'] and data['branch'].strip != ''
         'master'
