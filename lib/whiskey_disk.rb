@@ -111,12 +111,8 @@ class WhiskeyDisk
     !!@staleness_checks
   end    
 
-  def enqueue_sequence(commands)
-    commands.each {|command| enqueue command }
-  end
-
-  def enqueue(command)
-    buffer << command
+  def enqueue(commands)
+    [ commands ].flatten.each {|command| buffer << command }
   end
   
   def remote?(domain)
@@ -312,15 +308,15 @@ class WhiskeyDisk
   end
 
   def clone_repository(repo)
-    enqueue_sequence(repo.clone)
+    enqueue repo.clone
   end
   
   def refresh_checkout(repo)
-    enqueue_sequence(repo.refresh_checkout)
+    enqueue repo.refresh_checkout
   end
   
   def ensure_parent_path_is_present(repo)
-    enqueue_sequence(repo.ensure_parent_path_is_present)
+    enqueue repo.ensure_parent_path_is_present
   end
 
   def ensure_main_parent_path_is_present
