@@ -1071,11 +1071,6 @@ describe '@whiskey_disk' do
       @whiskey_disk.stub!(:system)
       @whiskey_disk.stub!(:puts)
     end
-          
-    it 'fails if the domain path is not specified' do
-      @whiskey_disk.configuration = {}
-      lambda { @whiskey_disk.flush}.should.raise
-    end
 
     it 'uses "run" to issue commands for all remote domains' do
       @whiskey_disk.should.receive(:run).with({ 'name' => 'ogc@ogtastic.com' }, @cmd)

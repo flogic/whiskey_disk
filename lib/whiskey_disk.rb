@@ -218,7 +218,6 @@ class WhiskeyDisk
   end
   
   def flush
-    needs(:domain)
     setting(:domain).each do |domain|
       next unless domain_of_interest?(domain['name'])
       puts "Deploying #{domain['name']}..."
