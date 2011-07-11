@@ -2,6 +2,32 @@ require 'yaml'
 require 'uri'
 require 'open-uri'
 require 'whiskey_disk/config/filter'
+    
+class EnvConfig  
+  def environment_name
+    return false unless has_key?('to')
+    return ENV['to'] unless ENV['to'] =~ /:/
+    ENV['to'].split(/:/)[1]
+  end
+  
+  def specified_project_name
+    return false unless has_key?('to')
+    return false unless ENV['to'] =~ /:/
+    ENV['to'].split(/:/).first
+  end
+  
+  def has_key?(key)
+    ENV[key] && ENV[key] != ''
+  end
+
+  def flag_is_true?(key)
+    !!(has_key?(key) && ENV[key] =~ /^(?:t(?:rue)?|y(?:es)?|1)$/)
+  end
+
+  def key_or_false?(key)
+    has_key?(key) ? ENV[key] : false
+  end      
+end
 
 class WhiskeyDisk
   class Config
@@ -9,7 +35,7 @@ class WhiskeyDisk
       raise "Cannot determine current environment -- try rake ... to=staging, for example." unless environment_name
       filter_data(load_data)
     end
-
+    
     def debug?
       env_flag_is_true?('debug')
     end
@@ -44,15 +70,11 @@ class WhiskeyDisk
     end
 
     def environment_name
-      return false unless env_has_key?('to')
-      return ENV['to'] unless ENV['to'] =~ /:/
-      ENV['to'].split(/:/)[1]
+      env.environment_name
     end
 
     def specified_project_name
-      return false unless env_has_key?('to')
-      return false unless ENV['to'] =~ /:/
-      ENV['to'].split(/:/).first
+      env.specified_project_name
     end
     
     def contains_rakefile?(path)
@@ -106,6 +128,10 @@ class WhiskeyDisk
       filter.filter_data(data)
     end
 
+    def env
+      @env ||= EnvConfig.new
+    end
+
   private
 
     def path
@@ -113,15 +139,15 @@ class WhiskeyDisk
     end
 
     def env_has_key?(key)
-      ENV[key] && ENV[key] != ''
+      env.has_key?(key)
     end
-
+    
     def env_flag_is_true?(key)
-      !!(env_has_key?(key) && ENV[key] =~ /^(?:t(?:rue)?|y(?:es)?|1)$/)
+      env.flag_is_true?(key)
     end
 
     def env_key_or_false?(key)
-      env_has_key?(key) ? ENV[key] : false
+      env.key_or_false?(key)
     end  
   end
 end
