@@ -60,7 +60,7 @@ class WhiskeyDisk
   end
   
   def staleness_checks_enabled?
-    !!@staleness_checks
+    !! @staleness_checks
   end    
 
   def enqueue(commands)
