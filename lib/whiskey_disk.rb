@@ -137,11 +137,11 @@ class WhiskeyDisk
   end
 
   def branch
-    (setting(:branch) and setting(:branch) != '') ? setting(:branch) : 'master'
+    setting(:branch)
   end
   
   def config_branch
-    (setting(:config_branch) and setting(:config_branch) != '') ? setting(:config_branch) : 'master'
+    setting(:config_branch)
   end
   
   def env_vars

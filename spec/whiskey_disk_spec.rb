@@ -436,34 +436,19 @@ describe '@whiskey_disk' do
       @whiskey_disk.buffer.join(' ').should.match(%r{if \[ -e #{@parameters['deploy_to']} \]; then .*; fi})
     end
     
-    it 'does a branch creation checkout of the master branch when no branch is specified' do
-      @whiskey_disk.checkout_main_repository
-      @whiskey_disk.buffer.join(' ').should.match(%r{git checkout -b master origin/master})
-    end
-    
-    it 'falls back to a regular checkout of the master branch with origin branch when no branch is specified' do
-      @whiskey_disk.checkout_main_repository
-      @whiskey_disk.buffer.join(' ').should.match(%r{\|\| git checkout master origin/master})
-    end
-    
-    it 'falls back to a regular checkout of the master branch when no branch is specified' do
-      @whiskey_disk.checkout_main_repository
-      @whiskey_disk.buffer.join(' ').should.match(%r{\|\| git checkout master origin/master \|\| git checkout master})
-    end
-    
-    it 'does a branch creation checkout of the specified branch when a branch is specified' do
+    it 'does a branch creation checkout of the specified branch' do
       @whiskey_disk.configuration = @parameters.merge({'branch' => 'production'})
       @whiskey_disk.checkout_main_repository
       @whiskey_disk.buffer.join(' ').should.match(%r{git checkout -b production origin/production})
     end
 
-    it 'falls back to a regular checkout of the specified branch with origin branch when a branch is specified' do
+    it 'falls back to a regular checkout of the specified branch with origin branch' do
       @whiskey_disk.configuration = @parameters.merge({'branch' => 'production'})
       @whiskey_disk.checkout_main_repository
       @whiskey_disk.buffer.join(' ').should.match(%r{\|\| git checkout production origin/production})
     end
 
-    it 'falls back to a regular checkout of the specified branch when a branch is specified' do
+    it 'falls back to a regular checkout of the specified branch' do
       @whiskey_disk.configuration = @parameters.merge({'branch' => 'production'})
       @whiskey_disk.checkout_main_repository
       @whiskey_disk.buffer.join(' ').should.match(%r{\|\| git checkout production origin/production \|\| git checkout production})
@@ -506,34 +491,19 @@ describe '@whiskey_disk' do
       @whiskey_disk.buffer.join(' ').should.match(%r{if \[ -e #{@parameters['deploy_config_to']} \]; then .*; fi})
     end
 
-    it 'does a branch creation checkout of the master branch when no branch is specified' do
-      @whiskey_disk.checkout_configuration_repository
-      @whiskey_disk.buffer.join(' ').should.match(%r{git checkout -b master origin/master})
-    end
-    
-    it 'falls back to a regular checkout of the master branch with origin branch when no branch is specified' do
-      @whiskey_disk.checkout_configuration_repository
-      @whiskey_disk.buffer.join(' ').should.match(%r{\|\| git checkout master origin/master})
-    end
-    
-    it 'falls back to a regular checkout of the master branch when no branch is specified' do
-      @whiskey_disk.checkout_configuration_repository
-      @whiskey_disk.buffer.join(' ').should.match(%r{\|\| git checkout master origin/master \|\| git checkout master})
-    end
-    
-    it 'does a branch creation checkout of the specified branch when a branch is specified' do
+    it 'does a branch creation checkout of the configuration branch' do
       @whiskey_disk.configuration = @parameters.merge({'config_branch' => 'production'})
       @whiskey_disk.checkout_configuration_repository
       @whiskey_disk.buffer.join(' ').should.match(%r{git checkout -b production origin/production})
     end
 
-    it 'falls back to a regular checkout of the specified branch with origin branch when a branch is specified' do
+    it 'falls back to a regular checkout of the specified branch with origin branch ' do
       @whiskey_disk.configuration = @parameters.merge({'config_branch' => 'production'})
       @whiskey_disk.checkout_configuration_repository
       @whiskey_disk.buffer.join(' ').should.match(%r{\|\| git checkout production origin/production})
     end
     
-    it 'falls back to a regular checkout of the specified branch when a branch is specified' do
+    it 'falls back to a regular checkout of the specified branch' do
       @whiskey_disk.configuration = @parameters.merge({'config_branch' => 'production'})
       @whiskey_disk.checkout_configuration_repository
       @whiskey_disk.buffer.join(' ').should.match(%r{\|\| git checkout production origin/production \|\| git checkout production})
@@ -569,40 +539,20 @@ describe '@whiskey_disk' do
       @whiskey_disk.update_main_repository_checkout
       @whiskey_disk.buffer.join(' ').should.match(%r{ml=\`git log -1 --pretty=format:%H\`})
     end
-    
-    it 'captures the current git HEAD ref for the current branch if no branch is specified' do
-      @whiskey_disk.update_main_repository_checkout
-      @whiskey_disk.buffer.join(' ').should.match(%r{ml=\`git log -1 --pretty=format:%H\`})
-    end
-    
-    it 'attempts to fetch only the master branch from the origin if no branch is specified' do
-      @whiskey_disk.update_main_repository_checkout
-      @whiskey_disk.buffer.join(' ').should.match(%r{git fetch origin \+refs/heads/master:refs/remotes/origin/master})
-    end
-    
-    it 'attempts to fetch the specified branch from the origin if a branch is specified' do
+
+    it 'attempts to fetch the branch from the origin' do
       @whiskey_disk.configuration = @parameters.merge({'branch' => 'production'})
       @whiskey_disk.update_main_repository_checkout
       @whiskey_disk.buffer.join(' ').should.match(%r{git fetch origin \+refs/heads/production:refs/remotes/origin/production})
     end
 
-    it 'works from the default branch if no branch is specified' do
-      @whiskey_disk.update_main_repository_checkout
-      @whiskey_disk.buffer.join(' ').should.match(%r{git checkout master})
-    end
-
-    it 'works from the specified branch if one is specified' do
+    it 'works from the specified branch' do
       @whiskey_disk.configuration = @parameters.merge({'branch' => 'production'})
       @whiskey_disk.update_main_repository_checkout
       @whiskey_disk.buffer.join(' ').should.match(%r{git checkout production})
     end
 
-    it 'attempts to reset the master branch from the origin if no branch is specified' do
-      @whiskey_disk.update_main_repository_checkout
-      @whiskey_disk.buffer.join(' ').should.match(%r{git reset --hard origin/master})
-    end
-    
-    it 'attempts to reset the specified branch from the origin if a branch is specified' do
+    it 'attempts to reset the branch from the origin' do
       @whiskey_disk.configuration = @parameters.merge({'branch' => 'production'})
       @whiskey_disk.update_main_repository_checkout
       @whiskey_disk.buffer.join(' ').should.match(%r{git reset --hard origin/production})
@@ -640,23 +590,13 @@ describe '@whiskey_disk' do
       @whiskey_disk.buffer.join(' ').should.match(%r{rm -f /path/to/main/repo/.whiskey_disk_rsync_changes})
     end
     
-    it 'attempts to fetch only the master branch from the origin if no configuration branch is specified' do
-      @whiskey_disk.update_configuration_repository_checkout
-      @whiskey_disk.buffer.join(' ').should.match(%r{git fetch origin \+refs/heads/master:refs/remotes/origin/master})
-    end
-    
-    it 'attempts to fetch the specified branch from the origin if a configuration branch is specified' do
+    it 'attempts to fetch the configuration branch from the origin' do
       @whiskey_disk.configuration = @parameters.merge({'config_branch' => 'production'})
       @whiskey_disk.update_configuration_repository_checkout
       @whiskey_disk.buffer.join(' ').should.match(%r{git fetch origin \+refs/heads/production:refs/remotes/origin/production})
     end
     
-    it 'attempts to reset the master branch from the origin if no configuration branch is specified' do
-      @whiskey_disk.update_configuration_repository_checkout
-      @whiskey_disk.buffer.join(' ').should.match(%r{git reset --hard origin/master})
-    end
-
-    it 'attempts to reset the master branch from the origin if no configuration branch is specified' do
+    it 'attempts to reset the the configuration branch from the origin' do
       @whiskey_disk.configuration = @parameters.merge({'config_branch' => 'production'})
       @whiskey_disk.update_configuration_repository_checkout
       @whiskey_disk.buffer.join(' ').should.match(%r{git reset --hard origin/production})
@@ -1037,11 +977,6 @@ describe '@whiskey_disk' do
             @whiskey_disk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`git log -1 --pretty=format:%H\`;")))
           end
           
-          it "queries the head on the main repository's master branch if no branch is specified" do            
-            @whiskey_disk.enqueue("COMMAND")
-            @whiskey_disk.bundle.should.match(Regexp.new(Regexp.escape("mr=\`git ls-remote #{@repository} refs/heads/master\`;")))
-          end
-          
           it "queries the head of the main repository's specified branch if a branch is specified" do
             @whiskey_disk.configuration = @parameters.merge({'branch' => 'production'})
             @whiskey_disk.enqueue("COMMAND")
@@ -1098,12 +1033,7 @@ describe '@whiskey_disk' do
             @whiskey_disk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`git log -1 --pretty=format:%H\`;")))
           end
           
-          it "queries the head on the main repository's master branch if no branch is specified" do            
-            @whiskey_disk.enqueue("COMMAND")
-            @whiskey_disk.bundle.should.match(Regexp.new(Regexp.escape("mr=\`git ls-remote #{@repository} refs/heads/master\`;")))
-          end
-          
-          it "queries the head of the main repository's specified branch if a branch is specified" do
+          it "queries the head of the main repository's branch" do
             @whiskey_disk.configuration = @parameters.merge({'branch' => 'production'})
             @whiskey_disk.enqueue("COMMAND")
             @whiskey_disk.bundle.should.match(Regexp.new(Regexp.escape("mr=\`git ls-remote #{@repository} refs/heads/production\`;")))
@@ -1114,18 +1044,13 @@ describe '@whiskey_disk' do
             @whiskey_disk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_config_to}; cl=\`git log -1 --pretty=format:%H\`;")))
           end
           
-          it "queries the head of the config checkout's current branch if a branch is specified" do
+          it "queries the head of the config checkout's current branch" do
             @whiskey_disk.configuration = @parameters.merge({'config_branch' => 'production'})
             @whiskey_disk.enqueue("COMMAND")
             @whiskey_disk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_config_to}; cl=\`git log -1 --pretty=format:%H\`;")))
           end
           
-          it "queries the head on the config repository's master branch if no branch is specified" do            
-            @whiskey_disk.enqueue("COMMAND")
-            @whiskey_disk.bundle.should.match(Regexp.new(Regexp.escape("cr=\`git ls-remote #{@config_repository} refs/heads/master\`;")))
-          end
-          
-          it "queries the head of the config repository's specified branch if a branch is specified" do
+          it "queries the head of the config repository's specified branch" do
             @whiskey_disk.configuration = @parameters.merge({'config_branch' => 'production'})
             @whiskey_disk.enqueue("COMMAND")
             @whiskey_disk.bundle.should.match(Regexp.new(Regexp.escape("cr=\`git ls-remote #{@config_repository} refs/heads/production\`;")))
