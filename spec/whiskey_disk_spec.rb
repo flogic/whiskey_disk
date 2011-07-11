@@ -388,11 +388,6 @@ describe '@whiskey_disk' do
       }
     end
     
-    it 'fails if the configuration deployment path is not specified' do
-      @whiskey_disk.configuration = {}
-      lambda { @whiskey_disk.ensure_config_parent_path_is_present }.should.raise
-    end
-    
     it 'attempts to create the parent path for the repository' do
       @whiskey_disk.ensure_config_parent_path_is_present
       @whiskey_disk.buffer.last.should.match(%r{mkdir -p /path/to/config})
@@ -449,16 +444,6 @@ describe '@whiskey_disk' do
     before do
       @parameters = { 'deploy_config_to' => '/path/to/config/repo', 'config_repository' => 'git@ogtastic.com:config.git' }
       @whiskey_disk.configuration = @parameters
-    end
-
-    it 'fails if the configuration deployment path is not specified' do
-      @whiskey_disk.configuration = @parameters.merge('deploy_config_to' => nil)
-      lambda { @whiskey_disk.checkout_configuration_repository }.should.raise
-    end
-
-    it 'fails if the configuration repository is not specified' do
-      @whiskey_disk.configuration = @parameters.merge('config_repository' => nil)
-      lambda { @whiskey_disk.checkout_configuration_repository }.should.raise
     end
 
     it 'works from the configuration repository checkout parent path' do
@@ -553,11 +538,6 @@ describe '@whiskey_disk' do
         'deploy_to' => '/path/to/main/repo' 
       }
       @whiskey_disk.configuration = @parameters
-    end
-    
-    it 'fails if the configuration deployment path is not specified' do
-      @whiskey_disk.configuration = @parameters.merge('deploy_config_to' => nil)
-      lambda { @whiskey_disk.update_configuration_repository_checkout }.should.raise
     end
     
     it 'works from the main repository checkout path' do
