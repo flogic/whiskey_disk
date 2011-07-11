@@ -19,7 +19,7 @@ describe WhiskeyDisk::Config::Filter, 'filtering configuration data' do
         'bat' => { 'repository' => 'x', 'domain' => [ 'user@example.com', 'foo@domain.com', '' ]},
         'hsh' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, { 'name' => 'baz@domain.com' } ]},
         'mix' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, 'baz@domain.com' ]},            
-        'erl' => { 'repository' => 'x', 'config_repository' => 'y', 
+        'erl' => { 'repository' => 'x', 'deploy_to' => 'foo', 'config_repository' => 'y', 
                    'domain' => [ { 'name' => 'bar@example.com', 
                                                         'roles' => nil,
                                                         'ssh_options' => ['-t', '-v' ] }, 
@@ -64,6 +64,7 @@ describe WhiskeyDisk::Config::Filter, 'filtering configuration data' do
   it 'should apply all available filters' do
     @filter.filter_data(@data).should == {
       'repository'        => "x", 
+      'deploy_to'         => 'foo',
       'branch'            => 'master',
       'config_repository' => 'y',
       'config_branch'     => 'master',

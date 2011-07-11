@@ -177,7 +177,7 @@ describe WhiskeyDisk::Config do
       end
 
       it 'returns the retrieved configuration yaml data for this environment as a hash' do
-        staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'deploy_to' => 'foo' }
         @config.set_response('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         result = @config.fetch
         staging.each_pair do |k,v|
@@ -186,50 +186,50 @@ describe WhiskeyDisk::Config do
       end
     
       it 'does not include configuration information for other environments in the returned hash' do
-        staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
+        staging = { 'foo' => 'bar', 'baz' => 'xyzzy', 'deploy_to' => 'foo', 'repository' => 'x' }
         @config.set_response('production' => { 'repository' => 'c', 'a' => 'b'}, 'staging' => staging)
         @config.fetch['a'].should.be.nil
       end
 
       it 'includes the environment in the hash' do
-        staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
+        staging = { 'foo' => 'bar', 'baz' => 'xyzzy', 'deploy_to' => 'foo', 'repository' => 'x' }
         @config.set_response('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         @config.fetch['environment'].should == 'staging'
       end
 
       it 'does not allow overriding the environment in the configuration file' do
-        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'environment' => 'production' }
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'deploy_to' => 'foo', 'environment' => 'production' }
         @config.set_response('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         @config.fetch['environment'].should == 'staging'
       end
 
       it 'includes the project handle in the hash' do
-        staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'deploy_to' => 'foo' }
         @config.set_response('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         @config.fetch['project'].should == 'foo'
       end
 
       it 'does not allow overriding the project handle in the configuration file when a project root is specified' do
-        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk', 'deploy_to' => 'foo' }
         @config.set_response('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         @config.fetch['project'].should == 'foo'
       end
 
       it 'allows overriding the project handle in the configuration file when a project root is not specified' do
         ENV['to'] = @env = 'staging'
-        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'deploy_to' => 'foo', 'project' => 'diskey_whisk' }
         @config.set_response('production' => { 'repository' => 'b'}, 'staging' => staging)
         @config.fetch['project'].should == 'diskey_whisk'
       end
     
       it 'includes the environment name as the config_target setting when no config_target is specified' do
-        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'deploy_to' => 'foo', 'project' => 'diskey_whisk' }
         @config.set_response('production' => { 'repository' => 'b'}, 'staging' => staging)
         @config.fetch['config_target'].should == 'staging'
       end
     
       it 'includes the config_target setting when a config_target is specified' do
-        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk', 'config_target' => 'testing' }
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'deploy_to' => 'foo', 'project' => 'diskey_whisk', 'config_target' => 'testing' }
         @config.set_response('production' => { 'repository' => 'b'}, 'staging' => staging)
         @config.fetch['config_target'].should == 'testing'
       end
@@ -276,7 +276,7 @@ describe WhiskeyDisk::Config do
       end
 
       it 'returns the configuration yaml file data for this environment as a hash' do
-        staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'repository' => 'x', 'deploy_to' => 'foo' }
         write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         result = @config.fetch
         staging.each_pair do |k,v|
@@ -285,50 +285,50 @@ describe WhiskeyDisk::Config do
       end
     
       it 'does not include configuration information for other environments in the returned hash' do
-        staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
+        staging = { 'foo' => 'bar', 'baz' => 'xyzzy', 'repository' => 'x', 'deploy_to' => 'foo' }
         write_config_file('production' => { 'repository' => 'c', 'a' => 'b'}, 'staging' => staging)
         @config.fetch['a'].should.be.nil
       end
 
       it 'includes the environment in the hash' do
-        staging = { 'foo' => 'bar', 'baz' => 'xyzzy' }
+        staging = { 'foo' => 'bar', 'baz' => 'xyzzy', 'repository' => 'x', 'deploy_to' => 'foo' }
         write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         @config.fetch['environment'].should == 'staging'
       end
 
       it 'does not allow overriding the environment in the configuration file' do
-        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'environment' => 'production' }
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'deploy_to' => 'foo', 'environment' => 'production' }
         write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         @config.fetch['environment'].should == 'staging'
       end
 
       it 'includes the project handle in the hash' do
-        staging = { 'foo' => 'bar', 'repository' => 'xyzzy' }
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'deploy_to' => 'foo' }
         write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         @config.fetch['project'].should == 'foo'
       end
 
       it 'does not allow overriding the project handle in the configuration file when a project root is specified' do
-        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'deploy_to' => 'foo', 'project' => 'diskey_whisk' }
         write_config_file('foo' => { 'production' => { 'repository' => 'b'}, 'staging' => staging })
         @config.fetch['project'].should == 'foo'
       end
 
       it 'allows overriding the project handle in the configuration file when a project root is not specified' do
         ENV['to'] = @env = 'staging'
-        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'deploy_to' => 'foo', 'project' => 'diskey_whisk' }
         write_config_file('production' => { 'repository' => 'b'}, 'staging' => staging)
         @config.fetch['project'].should == 'diskey_whisk'
       end
     
       it 'includes the environment name as the config_target setting when no config_target is specified' do
-        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk' }
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'deploy_to' => 'foo', 'project' => 'diskey_whisk' }
         write_config_file('production' => { 'repository' => 'b'}, 'staging' => staging)
         @config.fetch['config_target'].should == 'staging'
       end
     
       it 'includes the config_target setting when a config_target is specified' do
-        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'project' => 'diskey_whisk', 'config_target' => 'testing' }
+        staging = { 'foo' => 'bar', 'repository' => 'xyzzy', 'deploy_to' => 'foo', 'project' => 'diskey_whisk', 'config_target' => 'testing' }
         write_config_file('production' => { 'repository' => 'b'}, 'staging' => staging)
         @config.fetch['config_target'].should == 'testing'
       end
@@ -623,7 +623,7 @@ describe WhiskeyDisk::Config do
           'bat' => { 'repository' => 'x', 'domain' => [ 'user@example.com', 'foo@domain.com', '' ]},
           'hsh' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, { 'name' => 'baz@domain.com' } ]},
           'mix' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com' }, 'baz@domain.com' ]},            
-          'erl' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => nil }, 
+          'erl' => { 'repository' => 'x', 'deploy_to' => 'foo',   'domain' => [ { 'name' => 'bar@example.com', 'roles' => nil }, 
                                                         { 'name' => 'baz@domain.com', 'roles' => '' },
                                                         { 'name' => 'aok@domain.com', 'roles' => [] } ]},
           'rol' => { 'repository' => 'x', 'domain' => [ { 'name' => 'bar@example.com', 'roles' => [ 'web', 'db' ] }, 
@@ -661,6 +661,7 @@ describe WhiskeyDisk::Config do
     it 'should apply all available filters' do
       @config.filter_data(@data).should == {
         "repository" => "x", 
+        'deploy_to' => 'foo',
         'branch' => 'master',
         "project" => "foo", 
         "config_target" => "erl", 
