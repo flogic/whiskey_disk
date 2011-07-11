@@ -3,7 +3,23 @@ require 'uri'
 require 'open-uri'
 require 'whiskey_disk/config/filter'
     
-class EnvConfig  
+class EnvConfig
+  def debug?
+    flag_is_true?('debug')
+  end
+  
+  def domain_limit
+    key_or_false?('only')
+  end
+  
+  def check_staleness?
+    flag_is_true?('check')
+  end
+
+  def path
+    key_or_false?('path')
+  end
+
   def environment_name
     return false unless has_key?('to')
     return ENV['to'] unless ENV['to'] =~ /:/
@@ -37,15 +53,27 @@ class WhiskeyDisk
     end
     
     def debug?
-      env_flag_is_true?('debug')
+      env.debug?
     end
     
     def domain_limit
-      env_key_or_false?('only')
+      env.domain_limit
     end
     
     def check_staleness?
-      env_flag_is_true?('check')
+      env.check_staleness?
+    end
+
+    def environment_name
+      env.environment_name
+    end
+
+    def specified_project_name
+      env.specified_project_name
+    end
+    
+    def path
+      env.path
     end
     
     def configuration_file
@@ -69,14 +97,6 @@ class WhiskeyDisk
       raise "Could not locate configuration file in path [#{base_path}]"
     end
 
-    def environment_name
-      env.environment_name
-    end
-
-    def specified_project_name
-      env.specified_project_name
-    end
-    
     def contains_rakefile?(path)
       File.exists?(File.expand_path(File.join(path, 'Rakefile')))
     end
@@ -131,23 +151,5 @@ class WhiskeyDisk
     def env
       @env ||= EnvConfig.new
     end
-
-  private
-
-    def path
-      env_key_or_false?('path')
-    end
-
-    def env_has_key?(key)
-      env.has_key?(key)
-    end
-    
-    def env_flag_is_true?(key)
-      env.flag_is_true?(key)
-    end
-
-    def env_key_or_false?(key)
-      env.key_or_false?(key)
-    end  
   end
 end
