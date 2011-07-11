@@ -24,9 +24,9 @@ describe WhiskeyDisk::Config do
       WhiskeyDisk::Config::Environment.stub!(:new).and_return(@environment)
     end
     
-    it 'returns the value set in the environment' do
+    it 'returns the value returned by fetching the configuration' do
       environment_name = 'fake env name'
-      @environment.stub!(:environment_name).and_return(environment_name)
+      @config.stub!(:fetch).and_return({ 'environment' => environment_name })
       @config.environment_name.should == environment_name
     end
   end
@@ -37,9 +37,9 @@ describe WhiskeyDisk::Config do
       WhiskeyDisk::Config::Environment.stub!(:new).and_return(@environment)
     end
     
-    it 'returns the value set in the environment' do
+    it 'returns the value returned by fetching the configuration' do
       project_name = 'fake project name'
-      @environment.stub!(:project_name).and_return(project_name)
+      @config.stub!(:fetch).and_return({ 'project' => project_name })
       @config.project_name.should == project_name
     end
   end

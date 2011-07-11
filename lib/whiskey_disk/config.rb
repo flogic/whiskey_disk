@@ -8,8 +8,7 @@ require 'whiskey_disk/config/locator'
 class WhiskeyDisk
   class Config
     def fetch
-      raise "Cannot determine current environment -- try rake ... to=staging, for example." unless environment_name
-      filter_data(load_data)
+      @fetch ||= filter_data(load_data)
     end
     
     def filter
@@ -38,11 +37,11 @@ class WhiskeyDisk
     end
 
     def environment_name
-      env.environment_name
+      fetch['environment']
     end
 
     def project_name
-      env.project_name
+      fetch['project']
     end
     
     def configuration_file

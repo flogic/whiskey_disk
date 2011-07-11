@@ -16,7 +16,8 @@ class WhiskeyDisk
           HashifyDomainEntriesFilter, LocalizeDomainsFilter, CheckForDuplicateDomainsFilter,
           ConvertRoleStringsToListFilter, DropEmptyDomainRolesFilter,
           NormalizeSshOptionsFilter,
-          SetDefaultBranchFilter, SetDefaultConfigBranchFilter
+          SetDefaultBranchFilter, SetDefaultConfigBranchFilter,
+          CheckBasicRequirementsFilter
         ]
       end
   
