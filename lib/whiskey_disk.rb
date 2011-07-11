@@ -77,7 +77,7 @@ class WhiskeyDisk
   end
   
   def has_config_repo?
-    ! (setting(:config_repository).nil? or setting(:config_repository) == '')
+    !! setting(:config_repository)
   end
   
   def project_name_specified?

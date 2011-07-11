@@ -326,7 +326,7 @@ describe '@whiskey_disk' do
   
   describe 'determining if the deployment has a configuration repository' do
     before do
-      @parameters = { 'deploy_to' => '/path/to/main/repo' }
+      @parameters = { 'deploy_config_to' => '/path/to/main/repo' }
       @whiskey_disk.configuration = @parameters
     end
     
@@ -341,16 +341,6 @@ describe '@whiskey_disk' do
     it 'returns true if the configuration includes a non-empty config_repository setting' do
       @parameters['config_repository'] = 'git://foo.git'
       @whiskey_disk.has_config_repo?.should == true
-    end
-    
-    it 'returns false if the configuration includes a nil config_repository setting' do
-      @parameters['config_repository'] = nil
-      @whiskey_disk.has_config_repo?.should == false
-    end
-    
-    it 'returns false if the configuration includes a blank config_repository setting' do
-      @parameters['config_repository'] = ''
-      @whiskey_disk.has_config_repo?.should == false
     end
   end
   
