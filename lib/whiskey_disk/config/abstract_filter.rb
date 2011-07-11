@@ -16,7 +16,7 @@ class WhiskeyDisk
       end
   
       def environment_name
-        config.environment_name
+        env.environment_name
       end
     end
   end
