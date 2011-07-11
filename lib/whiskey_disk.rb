@@ -155,8 +155,6 @@ class WhiskeyDisk
   end
 
   def apply_staleness_check(commands)
-    needs(:deploy_to, :repository)
-    
     check = "cd #{setting(:deploy_to)}; " +
             "ml=\`git log -1 --pretty=format:%H\`; " +
             "mr=\`git ls-remote #{setting(:repository)} refs/heads/#{branch}\`; "
@@ -299,7 +297,6 @@ class WhiskeyDisk
   end
   
   def main_repo
-    needs(:deploy_to, :repository)
     @main_repo ||= 
       Repository.new(self, 
         'url'    => setting(:repository),
@@ -336,30 +333,25 @@ class WhiskeyDisk
   end
   
   def snapshot_git_revision
-    needs(:deploy_to)
     enqueue "cd #{setting(:deploy_to)}"
     enqueue %Q{ml=\`git log -1 --pretty=format:%H\`}
   end
   
   def initialize_git_changes
-    needs(:deploy_to)
     enqueue "rm -f #{setting(:deploy_to)}/.whiskey_disk_git_changes"
     snapshot_git_revision
   end
   
   def initialize_rsync_changes
-    needs(:deploy_to)
     enqueue "rm -f #{setting(:deploy_to)}/.whiskey_disk_rsync_changes"
   end
   
   def initialize_all_changes
-    needs(:deploy_to)
     initialize_git_changes
     initialize_rsync_changes
   end
   
   def capture_git_changes
-    needs(:deploy_to)
     enqueue "git diff --name-only ${ml}..HEAD > #{setting(:deploy_to)}/.whiskey_disk_git_changes"
   end
   
@@ -375,7 +367,7 @@ class WhiskeyDisk
   end
   
   def refresh_configuration
-    needs(:deploy_to, :deploy_config_to)
+    needs(:deploy_config_to)
     raise "Must specify project name when using a configuration repository." unless project_name_specified?
     enqueue "echo Rsyncing configuration..."
     enqueue("rsync -a#{'v --progress' if debugging?} " + '--log-format="%t [%p] %i %n" ' +
@@ -384,13 +376,11 @@ class WhiskeyDisk
   end
   
   def run_post_setup_hooks
-    needs(:deploy_to)
     run_script(setting(:post_setup_script))
     run_rake_task(setting(:deploy_to), "deploy:post_setup")
   end
   
   def run_post_deploy_hooks
-    needs(:deploy_to)
     run_script(setting(:post_deploy_script))
     run_rake_task(setting(:deploy_to), "deploy:post_deploy")
   end

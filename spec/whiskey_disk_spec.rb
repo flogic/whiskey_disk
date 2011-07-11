@@ -373,11 +373,6 @@ describe '@whiskey_disk' do
       }
     end
     
-    it 'fails if the deployment path is not specified' do
-      @whiskey_disk.configuration = {}
-      lambda { @whiskey_disk.ensure_main_parent_path_is_present }.should.raise
-    end
-    
     it 'attempts to create the parent path for the repository' do
       @whiskey_disk.ensure_main_parent_path_is_present
       @whiskey_disk.buffer.last.should.match(%r{mkdir -p /path/to/main})
@@ -409,16 +404,6 @@ describe '@whiskey_disk' do
     before do
       @parameters = { 'deploy_to' => '/path/to/main/repo', 'repository' => 'git@ogtastic.com:whiskey_disk.git' }
       @whiskey_disk.configuration = @parameters
-    end
-    
-    it 'fails if the deployment path is not specified' do
-      @whiskey_disk.configuration = @parameters.merge('deploy_to' => nil)
-      lambda { @whiskey_disk.checkout_main_repository }.should.raise
-    end
-    
-    it 'fails if the repository is not specified' do
-      @whiskey_disk.configuration = @parameters.merge('repository' => nil)
-      lambda { @whiskey_disk.checkout_main_repository }.should.raise
     end
     
     it 'works from the main repository checkout parent path' do
@@ -519,11 +504,6 @@ describe '@whiskey_disk' do
       @whiskey_disk.configuration = @parameters
     end
     
-    it 'fails if the deployment path is not specified' do
-      @whiskey_disk.configuration = @parameters.merge('deploy_to' => nil)
-      lambda { @whiskey_disk.update_main_repository_checkout }.should.raise
-    end
-    
     it 'works from the main repository checkout path' do
       @whiskey_disk.update_main_repository_checkout
       @whiskey_disk.buffer.join(' ').should.match(%r{cd /path/to/main/repo})
@@ -615,11 +595,6 @@ describe '@whiskey_disk' do
       @whiskey_disk.configuration = @parameters
     end
 
-    it 'fails if the main deployment path is not specified' do
-      @whiskey_disk.configuration = @parameters.merge('deploy_to' => nil)
-      lambda { @whiskey_disk.refresh_configuration }.should.raise
-    end
-  
     it 'fails if the configuration deployment path is not specified' do
       @whiskey_disk.configuration = @parameters.merge('deploy_config_to' => nil)
       lambda { @whiskey_disk.refresh_configuration }.should.raise
@@ -645,11 +620,6 @@ describe '@whiskey_disk' do
     before do
       @whiskey_disk.configuration = { 'deploy_to' => '/path/to/main/repo' }
       ENV['debug'] = nil
-    end
-    
-    it 'fails if the deployment path is not specified' do
-      @whiskey_disk.configuration = {}
-      lambda { @whiskey_disk.run_post_setup_hooks }.should.raise
     end
     
     it 'works from the main checkout directory' do
@@ -768,11 +738,6 @@ describe '@whiskey_disk' do
     before do
       @whiskey_disk.configuration = { 'deploy_to' => '/path/to/main/repo' }
       ENV['debug'] = nil
-    end
-    
-    it 'fails if the deployment path is not specified' do
-      @whiskey_disk.configuration = {}
-      lambda { @whiskey_disk.run_post_deploy_hooks }.should.raise
     end
     
     it 'works from the main checkout directory' do
