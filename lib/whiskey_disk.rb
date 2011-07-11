@@ -148,12 +148,6 @@ class WhiskeyDisk
     end
   end
   
-  def needs(*keys)
-    keys.each do |key|
-      raise "No value for '#{key}' declared in configuration files [#{config.configuration_file}]" unless setting(key)
-    end
-  end
-
   def apply_staleness_check(commands)
     check = "cd #{setting(:deploy_to)}; " +
             "ml=\`git log -1 --pretty=format:%H\`; " +
@@ -287,7 +281,6 @@ class WhiskeyDisk
   end
 
   def config_repo
-    needs(:deploy_config_to, :config_repository)
     @config_repo ||= 
       Repository.new(self, 
         'url'    => setting(:config_repository),
