@@ -9,11 +9,27 @@ describe 'filtering configuration data by adding the project name' do
     ENV['to'] = 'project:environment'
   end
   
-  it 'adds an environment value when none is present' do
-    @filter.filter('foo' => 'bar').should == { 'project' => 'project', 'foo' => 'bar' }
+  describe 'when there is a project set in the ENVironment' do
+    it 'adds an environment value when none is present' do
+      @filter.filter('foo' => 'bar').should == { 'project' => 'project', 'foo' => 'bar' }
+    end
+  
+    it 'overwrites an environment value when one is present' do
+      @filter.filter('project' => 'baz', 'foo' => 'bar').should == { 'project' => 'project', 'foo' => 'bar' }      
+    end
   end
   
-  it 'overwrites an environment value when one is present' do
-    @filter.filter('project' => 'baz', 'foo' => 'bar').should == { 'project' => 'project', 'foo' => 'bar' }      
-  end  
+  describe 'when there is no project set in the ENVironment' do
+    before do
+      ENV['to'] = ''
+    end
+    
+    it 'adds an "unnamed project" value when no project is present' do
+      @filter.filter('foo' => 'bar').should == { 'project' => 'unnamed_project', 'foo' => 'bar' }
+    end
+  
+    it 'overwrites an environment value when one is present' do
+      @filter.filter('project' => 'baz', 'foo' => 'bar').should == { 'project' => 'unnamed_project', 'foo' => 'bar' }      
+    end
+  end
 end
