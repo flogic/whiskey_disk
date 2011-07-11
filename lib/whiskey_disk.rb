@@ -366,7 +366,6 @@ class WhiskeyDisk
   end
   
   def refresh_configuration
-    needs(:deploy_config_to)
     raise "Must specify project name when using a configuration repository." unless project_name_specified?
     enqueue "echo Rsyncing configuration..."
     enqueue("rsync -a#{'v --progress' if debugging?} " + '--log-format="%t [%p] %i %n" ' +

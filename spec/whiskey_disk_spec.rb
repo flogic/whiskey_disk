@@ -595,11 +595,6 @@ describe '@whiskey_disk' do
       @whiskey_disk.configuration = @parameters
     end
 
-    it 'fails if the configuration deployment path is not specified' do
-      @whiskey_disk.configuration = @parameters.merge('deploy_config_to' => nil)
-      lambda { @whiskey_disk.refresh_configuration }.should.raise
-    end
-  
     it 'fails if no project name was specified' do
       @whiskey_disk.configuration = @parameters.merge('project' => 'unnamed_project')
       lambda { @whiskey_disk.refresh_configuration }.should.raise      
