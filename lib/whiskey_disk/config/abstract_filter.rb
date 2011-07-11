@@ -7,8 +7,12 @@ class WhiskeyDisk
         @config = config
       end
   
+      def env
+        config.env
+      end
+  
       def project_name
-        config.project_name
+        env.project_name
       end
   
       def environment_name
