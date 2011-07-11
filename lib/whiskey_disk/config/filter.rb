@@ -3,6 +3,7 @@ require 'whiskey_disk/config/filters/environment_scope_filter'
 require 'whiskey_disk/config/filters/project_scope_filter'
 require 'whiskey_disk/config/filters/select_project_and_environment_filter'
 require 'whiskey_disk/config/filters/check_repository_requirements_filter'
+require 'whiskey_disk/config/filters/check_config_repository_requirements_filter'
 require 'whiskey_disk/config/filters/add_environment_name_filter'
 require 'whiskey_disk/config/filters/add_project_name_filter'
 require 'whiskey_disk/config/filters/default_config_target_filter'
@@ -29,6 +30,7 @@ class WhiskeyDisk
           ProjectScopeFilter,
           SelectProjectAndEnvironmentFilter,
           CheckRepositoryRequirementsFilter,
+          CheckConfigRepositoryRequirementsFilter,
           AddEnvironmentNameFilter,
           AddProjectNameFilter,
           DefaultConfigTargetFilter,
