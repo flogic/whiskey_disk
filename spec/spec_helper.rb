@@ -4,6 +4,7 @@ require 'facon'
 require 'fileutils'
 require 'tempfile'
 require 'erb'
+require 'tmpdir'
 
 if ENV['DEBUG'] and ENV['DEBUG'] != ''
   STDERR.puts "Enabling debugger for spec runs..."
@@ -13,6 +14,21 @@ if ENV['DEBUG'] and ENV['DEBUG'] != ''
 end
 
 $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib')))
+
+# create a file at the specified path
+def make(path)
+  FileUtils.mkdir_p(File.dirname(path))
+  FileUtils.touch(path)
+end
+
+def build_temp_dir
+  return Dir.mktmpdir(nil, '/private/tmp') if File.exists?('/private/tmp')
+  Dir.mktmpdir
+end
+
+def write_config_file(data)
+  File.open(@config_file, 'w') { |f| f.puts YAML.dump(data) }
+end
 
 # local target directory, integration spec workspace
 def deployment_root

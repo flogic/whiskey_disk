@@ -29,6 +29,10 @@ class WhiskeyDisk
         ENV['to'].split(/:/).first
       end
 
+      def project_name
+        specified_project_name || 'unnamed_project'
+      end
+
       def has_key?(key)
         ENV[key] && ENV[key] != ''
       end
