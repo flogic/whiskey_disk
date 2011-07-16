@@ -5,6 +5,7 @@ require 'fileutils'
 require 'tempfile'
 require 'erb'
 require 'tmpdir'
+require 'yaml'
 
 if ENV['DEBUG'] and ENV['DEBUG'] != ''
   STDERR.puts "Enabling debugger for spec runs..."
@@ -24,10 +25,6 @@ end
 def build_temp_dir
   return Dir.mktmpdir(nil, '/private/tmp') if File.exists?('/private/tmp')
   Dir.mktmpdir
-end
-
-def write_config_file(data)
-  File.open(@config_file, 'w') { |f| f.puts YAML.dump(data) }
 end
 
 # local target directory, integration spec workspace

@@ -1,3 +1,5 @@
+require 'uri'
+
 class WhiskeyDisk
   class Config
     class Locator
@@ -40,8 +42,19 @@ class WhiskeyDisk
         raise "Could not locate configuration file in path [#{base_path}]"
       end
 
+      def valid_path?(path)
+        return false unless path
+        uri = URI.parse(path)
+        return path if uri.scheme
+        return path if File.file?(path)
+      end
+
       def contains_rakefile?(path)
         File.exists?(File.expand_path(File.join(path, 'Rakefile')))
+      end
+
+      def base_path
+        path || find_rakefile_from_current_path
       end
 
       def find_rakefile_from_current_path
@@ -53,17 +66,6 @@ class WhiskeyDisk
         File.join(Dir.pwd, 'config')
       ensure
         Dir.chdir(original_path)
-      end
-
-      def base_path
-        path || find_rakefile_from_current_path
-      end
-
-      def valid_path?(path)
-        return false unless path
-        uri = URI.parse(path)
-        return path if uri.scheme
-        return path if File.file?(path)
       end
     end
   end
