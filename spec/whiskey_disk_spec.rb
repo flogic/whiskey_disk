@@ -718,6 +718,15 @@ describe 'WhiskeyDisk' do
         WhiskeyDisk.buffer.join(' ').should.match(%r{#{k}='#{v}' })
       end
     end
+
+    it "should use the configured rake executable if one is specified in the conf" do
+      @parameters = { 'deploy_to' => '/path/to/main/repo', 'rake_exec' => 'weird_exec' }
+      WhiskeyDisk.configuration = @parameters
+      WhiskeyDisk.run_post_deploy_hooks
+      WhiskeyDisk.buffer.join(' ').should =~ %r{weird_exec.*deploy:post_deploy}
+      WhiskeyDisk.buffer.join(' ').should =~ %r{rakep=\`.*weird_exec -P\` && if \[\[ \`echo "\$\{rakep\}" \| grep deploy:post_deploy\` != "" \]\];}
+      puts WhiskeyDisk.buffer.join(' ')
+    end
   end
   
   describe 'bundling up buffered commands for execution' do
