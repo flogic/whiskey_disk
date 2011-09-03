@@ -14,7 +14,7 @@ $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib')))
 
 # local target directory, integration spec workspace
 def deployment_root
-  '/tmp/wd-integration-target/destination/'
+  File.expand_path(File.join(File.dirname(__FILE__), '..', 'scenarios', 'setup', 'vagrant', 'deployed', 'target'))
 end
 
 # allow defining an integration spec block

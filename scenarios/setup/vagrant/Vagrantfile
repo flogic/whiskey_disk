@@ -1,0 +1,9 @@
+Vagrant::Config.run do |config|
+  config.vm.box = "base"
+  config.vm.share_folder "deployment", "/opt/deploy", "deployed"
+
+  config.vm.provision :puppet do |puppet|
+    puppet.manifests_path = "manifests"
+    puppet.manifest_file = "integration.pp"
+  end
+end
