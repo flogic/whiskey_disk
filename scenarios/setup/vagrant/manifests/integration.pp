@@ -11,14 +11,6 @@ file { '/opt/deploy/target':
 
 host {'host':
   ensure       => 'present',
+  host_aliases => 'wd-git.example.com',
   ip           => '10.0.2.2',
 }
-
-# TODO: we need to be able to get the *development* version of the library built and installed on the integration host
-#
-# package { 'whiskey_disk':
-#   name => 'whiskey_disk',
-#   ensure => installed,
-#   provider => 'gem',
-# }
-
