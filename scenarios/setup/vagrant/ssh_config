@@ -1,9 +1,0 @@
-Host vagrant
-  HostName 127.0.0.1
-  User vagrant
-  Port 2222
-  UserKnownHostsFile /dev/null
-  StrictHostKeyChecking no
-  PasswordAuthentication no
-  IdentityFile /Users/rick/.rvm/gems/ruby-1.8.7-p302/gems/vagrant-0.7.5/keys/vagrant
-  IdentitiesOnly yes
