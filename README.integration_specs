@@ -1,36 +1,24 @@
-It is possible to run an integration spec suite which attempts to exercise the
-full whiskey_disk stack.  I want this to be able to work on a single machine
-(especially since I like to work on whiskey_disk on airplanes and in foreign 
-countries with questionable bandwidth/infrastructure).  So, here's how I set my
-environment up to make this possible
+Running Integration Specs
+-------------------------
+
+To run the integration spec suite you need to be able to run a Vagrant virtual machine (see: http://vagrantup.com/), which means you will have to have VirtualBox installed.  The Vagrant/VirtualBox setup is currently out of the scope of this document.
+
+Once you are set up to be able to run Vagrant, you can create and start up an integration environment by running the following rake task:
+
+% rake integration:up
+
+This will create a vagrant VM, and so may take a few minutes to complete.
 
 
-     - need the following /etc/hosts entry:
-       127.0.0.1       localhost wd-git.example.com wd-app1.example.com wd-app2.example.com
+To run the integration specs once the integration environment is up:
 
-     - enable sshd logins
-     
-     - create a local user named 'user', then:
-     
-     user% mkdir wd-integration-target
-     user% chmod 777 wd-integration-target
-     user% ln -s ~/wd-integration-target /tmp/wd-integration-target
-     
-     user% ssh-keygen  (specify no passphrase)
-     user% cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-     user% chmod 700 ~/.ssh/; chmod 600 ~/.ssh/authorized_keys
-     
-     user% ssh user@wd-app1.example.com  (answer 'yes' to the trust host prompt)
-     ^D
-     user% ssh user@wd-app2.example.com  ( ditto )
-     ^D
+    % export INTEGRATION=true
+    % rake
 
-     then, as user, git clone whiskey_disk from github or ln -s to an already checked out version
-     (which is what I usually do)
-     
-     - run git-daemon:
-       user% cd git/whiskey_disk
-       user% git daemon --base-path=`pwd`/scenarios/git_repositories/ --reuseaddr --verbose &
+To shut down the integration VM and the integration git-daemon server:
 
-     user% export INTEGRATION=true
-     user% rake   
+    % rake integration:down
+
+To completely remove the integration spec VM (which can take up a good bit of space on disk), do:
+
+    % rake integration:destroy
