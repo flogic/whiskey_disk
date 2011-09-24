@@ -1,38 +1,70 @@
 project:
   "remote":
-    domain: "vagrant@vagrant"
+    domain:
+    - name: "vagrant@vagrant"
+      ssh_options:
+      - "-F"
+      - "scenarios/setup/vagrant/ssh_config"
     deploy_to: "/opt/deploy/target/project"
     repository: "git://wd-git.example.com/project.git"
   "remote-on-other-branch":
-    domain: "vagrant@vagrant"
+    domain:
+    - name: "vagrant@vagrant"
+      ssh_options:
+      - "-F"
+      - "scenarios/setup/vagrant/ssh_config"
     deploy_to: "/opt/deploy/target/project"
     repository: "git://wd-git.example.com/project.git"
     branch: "no_rake_hooks"
   "no_rakefile":
-    domain: "vagrant@vagrant"
+    domain:
+    - name: "vagrant@vagrant"
+      ssh_options:
+      - "-F"
+      - "scenarios/setup/vagrant/ssh_config"
     deploy_to: "/opt/deploy/target/project"
     repository: "git://wd-git.example.com/project.git"
   "bad_rakefile":
-    domain: "vagrant@vagrant"
+    domain:
+    - name: "vagrant@vagrant"
+      ssh_options:
+      - "-F"
+      - "scenarios/setup/vagrant/ssh_config"
     deploy_to: "/opt/deploy/target/project"
     repository: "git://wd-git.example.com/project.git"
     branch: "bad_rakefile"
   "no_rake_hooks":
-    domain: "vagrant@vagrant"
+    domain:
+    - name: "vagrant@vagrant"
+      ssh_options:
+      - "-F"
+      - "scenarios/setup/vagrant/ssh_config"
     deploy_to: "/opt/deploy/target/project"
     repository: "git://wd-git.example.com/project.git"
     branch: "no_rake_hooks"
   "with_rake_hooks":
-    domain: "vagrant@vagrant"
+    domain:
+    - name: "vagrant@vagrant"
+      ssh_options:
+      - "-F"
+      - "scenarios/setup/vagrant/ssh_config"
     deploy_to: "/opt/deploy/target/project"
     repository: "git://wd-git.example.com/project.git"
     branch: "post_rake_tasks"
   "no_post_scripts":
-    domain: "vagrant@vagrant"
+    domain:
+    - name: "vagrant@vagrant"
+      ssh_options:
+      - "-F"
+      - "scenarios/setup/vagrant/ssh_config"
     deploy_to: "/opt/deploy/target/project"
     repository: "git://wd-git.example.com/project.git"
   "missing_post_scripts":
-    domain: "vagrant@vagrant"
+    domain:
+    - name: "vagrant@vagrant"
+      ssh_options:
+      - "-F"
+      - "scenarios/setup/vagrant/ssh_config"
     deploy_to: "/opt/deploy/target/project"
     repository: "git://wd-git.example.com/project.git"
     post_setup_script: "bin/missing.sh"
@@ -40,7 +72,11 @@ project:
     rake_env:
       FOO: "BAR"
   "with_post_scripts":
-    domain: "vagrant@vagrant"
+    domain:
+    - name: "vagrant@vagrant"
+      ssh_options:
+      - "-F"
+      - "scenarios/setup/vagrant/ssh_config"
     deploy_to: "/opt/deploy/target/project"
     repository: "git://wd-git.example.com/project.git"
     post_setup_script: "bin/post_setup_script.sh"
@@ -48,7 +84,11 @@ project:
     rake_env:
       FOO: "BAR"
   "with_failing_post_scripts":
-    domain: "vagrant@vagrant"
+    domain:
+    - name: "vagrant@vagrant"
+      ssh_options:
+      - "-F"
+      - "scenarios/setup/vagrant/ssh_config"
     deploy_to: "/opt/deploy/target/project"
     repository: "git://wd-git.example.com/project.git"
     post_setup_script: "bin/failing_post_setup_script.sh"
@@ -56,16 +96,22 @@ project:
     rake_env:
       FOO: "BAR"
   "hook_with_changed":
-    domain: "vagrant@vagrant"
+    domain:
+    - name: "vagrant@vagrant"
+      ssh_options:
+      - "-F"
+      - "scenarios/setup/vagrant/ssh_config"
     deploy_to: "/opt/deploy/target/project"
     repository: "git://wd-git.example.com/project.git"
     deploy_config_to: "/opt/deploy/target/config"
     config_repository: "git://wd-git.example.com/config.git"
     branch: "hook_with_changed"
   "with_ssh_options":
-    domain: 
-    - name: "user@wd-app1.example.com"
+    domain:
+    - name: "vagrant@vagrant"
       ssh_options:
+      - "-F"
+      - "scenarios/setup/vagrant/ssh_config"
       - "-t"
       - "-v"
     deploy_to: "/tmp/wd-integration-target/destination/project"
