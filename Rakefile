@@ -95,8 +95,9 @@ begin
     gemspec.add_dependency('rake')
 
     # I've decided that the integration spec shizzle shouldn't go into the gem
-    gemspec.files.exclude 'scenarios', 'spec/integration'
-    gemspec.test_files.exclude 'scenarios', 'spec/integration'
+    rejected = %w(scenarios spec/integration)
+    gemspec.files.reject {|f| rejected.include?(f) }
+    gemspec.test_files.reject {|f| rejected.include?(f) }
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
