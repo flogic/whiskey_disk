@@ -39,6 +39,31 @@ describe 'requiring the main library' do
 end
 
 describe '@whiskey_disk' do
+  describe 'when initializing' do
+    it 'works without arguments' do
+      lambda { WhiskeyDisk.new }.should.not.raise(ArgumentError)
+    end
+    
+    it 'works with an options hash' do
+      lambda { WhiskeyDisk.new(:foo => 'bar') }.should.not.raise(ArgumentError)
+    end
+    
+    it 'saves the staleness checks state if enabled via the options hash' do
+      @whiskey_disk = WhiskeyDisk.new(:staleness_checks => true)
+      @whiskey_disk.staleness_checks_enabled?.should == true
+    end
+
+    it 'leaves staleness checks disabled if not enabled via the options hash' do
+      @whiskey_disk = WhiskeyDisk.new
+      @whiskey_disk.staleness_checks_enabled?.should == false
+    end
+
+    it 'leaves staleness checks disabled if disabled via the options hash' do
+      @whiskey_disk = WhiskeyDisk.new(:staleness_checks => false)
+      @whiskey_disk.staleness_checks_enabled?.should == false
+    end
+  end
+  
   before do
     @whiskey_disk = WhiskeyDisk.new
   end
@@ -137,20 +162,13 @@ describe '@whiskey_disk' do
     end
   end
   
-  describe 'enabling staleness checks' do
-    it 'ensures that staleness checks are activated' do
-      @whiskey_disk.enable_staleness_checks
-      @whiskey_disk.staleness_checks_enabled?.should == true      
-    end
-  end
-  
   describe 'when checking staleness checks' do
     it 'returns false if staleness checks have not been enabled' do
       @whiskey_disk.staleness_checks_enabled?.should == false
     end
     
     it 'returns true if staleness checks have been enabled' do
-      @whiskey_disk.enable_staleness_checks
+      @whiskey_disk = WhiskeyDisk.new(:staleness_checks => true)
       @whiskey_disk.staleness_checks_enabled?.should == true
     end
   end
@@ -745,7 +763,7 @@ describe '@whiskey_disk' do
 
     describe 'when staleness checks are enabled' do
       before do
-        @whiskey_disk.enable_staleness_checks
+        @whiskey_disk = WhiskeyDisk.new(:staleness_checks => true)
       end
       
       describe 'but not we are not configured for staleness checks on this deployment' do
@@ -781,7 +799,6 @@ describe '@whiskey_disk' do
             @repository = 'git@git://foo.bar.git'
             @parameters = { 'deploy_to' => @deploy_to, 'repository' => @repository }
             @whiskey_disk.configuration = @parameters
-            @whiskey_disk.enable_staleness_checks
           end
           
           it 'returns an empty string if there are no commands' do
@@ -811,7 +828,6 @@ describe '@whiskey_disk' do
           
           it "queries the head of the main checkout's current branch if a branch is specified" do
             @whiskey_disk.configuration = @parameters.merge({'branch' => 'production'})
-            @whiskey_disk.enable_staleness_checks
             @whiskey_disk.enqueue("COMMAND")
             @whiskey_disk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`git log -1 --pretty=format:%H\`;")))
           end
@@ -823,7 +839,6 @@ describe '@whiskey_disk' do
           
           it "queries the head of the main repository's specified branch if a branch is specified" do
             @whiskey_disk.configuration = @parameters.merge({'branch' => 'production'})
-            @whiskey_disk.enable_staleness_checks
             @whiskey_disk.enqueue("COMMAND")
             @whiskey_disk.bundle.should.match(Regexp.new(Regexp.escape("mr=\`git ls-remote #{@repository} refs/heads/production\`;")))
           end
@@ -845,7 +860,6 @@ describe '@whiskey_disk' do
               'deploy_config_to' => @deploy_config_to, 'config_repository' => @config_repository
             }
             @whiskey_disk.configuration = @parameters
-            @whiskey_disk.enable_staleness_checks
           end
           
           it 'returns an empty string if there are no commands' do
@@ -875,7 +889,6 @@ describe '@whiskey_disk' do
           
           it "queries the head of the main checkout's current branch if a branch is specified" do
             @whiskey_disk.configuration = @parameters.merge({'branch' => 'production'})
-            @whiskey_disk.enable_staleness_checks
             @whiskey_disk.enqueue("COMMAND")
             @whiskey_disk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_to}; ml=\`git log -1 --pretty=format:%H\`;")))
           end
@@ -887,7 +900,6 @@ describe '@whiskey_disk' do
           
           it "queries the head of the main repository's specified branch if a branch is specified" do
             @whiskey_disk.configuration = @parameters.merge({'branch' => 'production'})
-            @whiskey_disk.enable_staleness_checks
             @whiskey_disk.enqueue("COMMAND")
             @whiskey_disk.bundle.should.match(Regexp.new(Regexp.escape("mr=\`git ls-remote #{@repository} refs/heads/production\`;")))
           end
@@ -899,7 +911,6 @@ describe '@whiskey_disk' do
           
           it "queries the head of the config checkout's current branch if a branch is specified" do
             @whiskey_disk.configuration = @parameters.merge({'config_branch' => 'production'})
-            @whiskey_disk.enable_staleness_checks
             @whiskey_disk.enqueue("COMMAND")
             @whiskey_disk.bundle.should.match(Regexp.new(Regexp.escape("cd #{@deploy_config_to}; cl=\`git log -1 --pretty=format:%H\`;")))
           end
@@ -911,7 +922,6 @@ describe '@whiskey_disk' do
           
           it "queries the head of the config repository's specified branch if a branch is specified" do
             @whiskey_disk.configuration = @parameters.merge({'config_branch' => 'production'})
-            @whiskey_disk.enable_staleness_checks
             @whiskey_disk.enqueue("COMMAND")
             @whiskey_disk.bundle.should.match(Regexp.new(Regexp.escape("cr=\`git ls-remote #{@config_repository} refs/heads/production\`;")))
           end
@@ -1075,7 +1085,7 @@ describe '@whiskey_disk' do
       before { ENV['debug'] = 'true' }
 
       it 'passes the string to ssh for the domain, with verbosity enabled' do
-        @whiskey_disk.should.receive(:system).with('ssh', '-v', @domain_name, "set -x; ls")
+        @whiskey_disk.should.receive(:system).with('ssh', @domain_name, '-v', "set -x; ls")
         @whiskey_disk.run(@domain, 'ls')
       end
     end
@@ -1085,6 +1095,19 @@ describe '@whiskey_disk' do
 
       it 'passes the string to ssh for the domain, with verbosity disabled' do
         @whiskey_disk.should.receive(:system).with('ssh', @domain_name, "ls")
+        @whiskey_disk.run(@domain, 'ls')
+      end
+    end
+    
+    describe 'when ssh_options are specified in the configuration' do
+      before do
+        @domain = { 'name' => @domain_name, 'ssh_options' => [ '-t', '-p 12345' ] }
+        
+        @whiskey_disk.configuration = { 'domain' => [ @domain ] }
+      end
+      
+      it 'includes the ssh options when running ssh' do
+        @whiskey_disk.should.receive(:system).with('ssh', @domain_name, '-t', '-p 12345', 'ls')
         @whiskey_disk.run(@domain, 'ls')
       end
     end

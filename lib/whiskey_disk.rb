@@ -4,6 +4,10 @@ class WhiskeyDisk
   attr_writer :configuration, :config
   attr_reader :results
   
+  def initialize(options = {})
+    @staleness_checks = true if options[:staleness_checks]
+  end
+  
   def buffer
     @buffer ||= []
   end
@@ -26,10 +30,6 @@ class WhiskeyDisk
   
   def check_staleness?
     config.check_staleness?
-  end
-  
-  def enable_staleness_checks
-    @staleness_checks = true
   end
   
   def staleness_checks_enabled?
@@ -137,9 +137,13 @@ class WhiskeyDisk
   end
 
   def ssh(domain, cmd)
-    puts "Running command on [#{domain}]: [#{cmd}]" if debugging?
-    args = [domain['name'], build_command(domain, cmd)]
-    args.unshift '-v' if debugging?
+    args = []
+    args << domain['name']
+    args << '-v' if debugging?
+    args += domain['ssh_options'] if domain['ssh_options']
+    args << build_command(domain, cmd)
+
+    puts "Running: ssh #{args.join(' ')}" if debugging?
     system('ssh', *args)
   end
   

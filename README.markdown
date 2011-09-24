@@ -217,6 +217,18 @@ You can even include a local deployment along with remote deployments, simply us
         RAILS_ENV: 'production'
 
 
+If you need special flags passed to ssh for a given domain, specify an array of `ssh_options` flags:
+
+    qa:
+      domain: 
+      - name: "ogc@qa.ogtastic.com"
+        ssh_options: 
+        - "-t"
+        - "-vv" 
+        - "-p 443"
+      deploy_to: "/var/www/www.ogtastic.com"
+      repository: "git@ogtastic.com:www.ogtastic.com.git"
+
 ### Specifying domains, with or without roles ###
 
 There are a number of ways to specify domains (the ssh connection strings denoting the hosts
