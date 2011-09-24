@@ -98,7 +98,7 @@ integration_spec do
     describe 'when the configuration specifies a single domain specified as user@domain, using --only=domain' do
       before do
         @config = scenario_config('local/deploy.yml')
-        @args = "--path=#{@config} --to=project:local-user-domain --only=wd-app1.example.com"
+        @args = "--path=#{@config} --to=project:local-user-domain --only=localhost"
       end
 
       describe 'performing a setup' do
@@ -142,7 +142,7 @@ integration_spec do
     describe 'when the configuration specifies a single domain without username, using --only=domain' do
       before do
         @config = scenario_config('local/deploy.yml')
-        @args = "--path=#{@config} --to=project:local-domain --only=wd-app1.example.com"
+        @args = "--path=#{@config} --to=project:local-domain --only=localhost"
       end
 
       describe 'performing a setup' do

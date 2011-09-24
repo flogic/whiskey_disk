@@ -1,16 +1,16 @@
 project:
   "local-default":
     deploy_to: "/opt/deploy/target/project"
-    repository: "git://wd-git.example.com/project.git"
+    repository: "git://localhost/project.git"
   "local-keyword":
     domain: "local"
     deploy_to: "/opt/deploy/target/project"
-    repository: "git://wd-git.example.com/project.git"
+    repository: "git://localhost/project.git"
   "local-user-domain":
-    domain: "user@wd-app1.example.com"
+    domain: "user@localhost"
     deploy_to: "/opt/deploy/target/project"
-    repository: "git://wd-git.example.com/project.git"
+    repository: "git://localhost/project.git"
   "local-domain":
-    domain: "wd-app1.example.com"
+    domain: "localhost"
     deploy_to: "/opt/deploy/target/project"
-    repository: "git://wd-git.example.com/project.git"
+    repository: "git://localhost/project.git"
