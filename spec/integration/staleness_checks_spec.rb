@@ -19,17 +19,17 @@ integration_spec do
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
         
-        it 'should not update the checkout of the repository on the target path' do
+        it 'does not update the checkout of the repository on the target path' do
           run_deploy(@args)
           File.exists?(deployed_file('project/README')).should == false
         end    
 
-        it 'should report the local deployment as successful' do
+        it 'reports the local deployment as successful' do
           run_deploy(@args)
           File.read(integration_log).should =~ /local => succeeded/
         end
 
-        it 'should exit with a true status' do
+        it 'exits with a true status' do
           run_deploy(@args).should == true
         end
       end
@@ -53,17 +53,17 @@ integration_spec do
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
         
-        it 'should not update the checkout of the repository on the target path' do
+        it 'does not update the checkout of the repository on the target path' do
           run_deploy(@args)
           File.exists?(deployed_file('project/README')).should == false
         end    
 
-        it 'should report the local deployment as successful' do
+        it 'reports the local deployment as successful' do
           run_deploy(@args)
           File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
         end
 
-        it 'should exit with a true status' do
+        it 'exits with a true status' do
           run_deploy(@args).should == true
         end
       end

@@ -10,11 +10,11 @@ integration_spec do
     end
     
     describe 'performing a setup' do
-      it 'should exit with a false status' do
+      it 'exits with a false status' do
         run_setup(@args).should == false
       end
       
-      it 'should not create a repo checkout' do
+      it 'does not create a repo checkout' do
         run_setup(@args)
         File.exists?(deployed_file('project')).should == false
       end
@@ -26,11 +26,11 @@ integration_spec do
         File.unlink(deployed_file('project/README'))  # modify the deployed checkout
       end
 
-      it 'should exit with a false status' do
+      it 'exits with a false status' do
         run_deploy(@args).should == false
       end      
     
-      it 'should not update a repo checkout' do
+      it 'does not update a repo checkout' do
         run_deploy(@args)
         File.exists?(deployed_file('project/README')).should == false
       end
