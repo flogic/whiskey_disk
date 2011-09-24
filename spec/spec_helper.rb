@@ -59,8 +59,12 @@ end
 # clone a git repository locally (as if a "wd setup" had been deployed)
 def checkout_repo(repo_name, branch = nil)
   repo_path = File.expand_path(File.join(File.dirname(__FILE__), '..', 'scenarios', 'git_repositories', "#{repo_name}.git"))
-  system("cd #{deployment_root} && git clone #{repo_path} >/dev/null 2>/dev/null")
+  system("cd #{deployment_root} && git clone #{repo_path} >/dev/null 2>/dev/null && cd #{repo_name} && git remote set-url origin #{remote_url(repo_name)}")
   checkout_branch(repo_name, branch)
+end
+
+def remote_url(repo)
+  "git://wd-git.example.com/#{repo}.git"
 end
 
 def checkout_branch(repo_name, branch = nil)
