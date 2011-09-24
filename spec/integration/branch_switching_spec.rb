@@ -30,7 +30,7 @@ integration_spec do
 
       it 'reports the remote deployment as successful' do
         run_deploy(@args)
-        File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
+        File.read(integration_log).should =~ /vagrant => succeeded/
       end
 
       it 'exits with a true status' do

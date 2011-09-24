@@ -18,7 +18,7 @@ integration_spec do
           run_setup(@args)
           File.exists?(deployed_file('project/README')).should == true
         end
-            
+
         it 'has the working copy set to the master branch' do
           run_setup(@args)
           current_branch('project').should == 'master'
@@ -32,24 +32,24 @@ integration_spec do
 
         it 'reports the remote setup as successful' do
           run_setup(@args)
-          File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
+          File.read(integration_log).should =~ /vagrant => succeeded/
         end
-        
+
         it 'exits with a true status' do
           run_setup(@args).should == true
         end
       end
-    
+
       describe 'performing a deployment' do
         before do
           checkout_repo('project')
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
-        
+
         it 'updates the checkout of the repository on the target path' do
           run_deploy(@args)
           File.exists?(deployed_file('project/README')).should == true
-        end    
+        end
 
         it 'has the working copy set to the master branch' do
           run_deploy(@args)
@@ -60,21 +60,21 @@ integration_spec do
           @args = "--path=#{@config} --to=project:remote-on-other-branch"
           checkout_branch('project', 'no_rake_hooks')
           run_deploy(@args)
-          current_branch('project').should == 'no_rake_hooks'          
+          current_branch('project').should == 'no_rake_hooks'
         end
 
         it 'reports the remote deployment as successful' do
           run_deploy(@args)
-          File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
+          File.read(integration_log).should =~ /vagrant => succeeded/
         end
 
         it 'exits with a true status' do
           run_deploy(@args).should == true
         end
       end
-      
-      describe 'performing a deploy after a setup' do     
-        describe 'and using the master branch' do          
+
+      describe 'performing a deploy after a setup' do
+        describe 'and using the master branch' do
           before do
             run_setup(@args)
             File.unlink(deployed_file('project/README'))  # modify the deployed checkout
@@ -83,7 +83,7 @@ integration_spec do
           it 'updates the checkout of the repository on the target path' do
             run_deploy(@args)
             File.exists?(deployed_file('project/README')).should == true
-          end    
+          end
 
           it 'has the working copy set to the master branch' do
             run_deploy(@args)
@@ -99,17 +99,17 @@ integration_spec do
             File.unlink(deployed_file('project/README'))
 
             run_deploy(@args)
-            current_branch('project').should == 'no_rake_hooks'          
+            current_branch('project').should == 'no_rake_hooks'
           end
 
           it 'reports the remote deployment as successful' do
             run_deploy(@args)
-            File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
+            File.read(integration_log).should =~ /vagrant => succeeded/
           end
 
           it 'exits with a true status' do
             run_deploy(@args).should == true
-          end        
+          end
         end
       end
     end
@@ -128,39 +128,39 @@ integration_spec do
         #   dump_log
         #   File.read(integration_log).should =~ /ssh.* -t /
         # end
-            
+
         it 'reports the remote setup as successful' do
           run_setup(@args)
-          File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
+          File.read(integration_log).should =~ /vagrant => succeeded/
         end
-        
+
         it 'exits with a true status' do
           run_setup(@args).should == true
         end
       end
-    
+
       describe 'performing a deployment' do
         before do
           checkout_repo('project')
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
-        
+
         # TODO FIXME -- this spec fails due to interplay between STDOUT and file buffering in ruby system() (*WTF*)
         #
         # it 'uses specified ssh options when performing the setup' do
         #   run_deploy(@args, true)
         #   File.read(integration_log).should =~ /ssh.* -t /
         # end
-        
+
         it 'reports the remote deployment as successful' do
           run_deploy(@args)
-          File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
+          File.read(integration_log).should =~ /vagrant => succeeded/
         end
-        
+
         it 'exits with a true status' do
           run_deploy(@args).should == true
         end
-      end      
+      end
     end
   end
 end
