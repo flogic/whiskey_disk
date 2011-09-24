@@ -13,18 +13,18 @@ class WhiskeyDisk
     def debug?
       env_flag_is_true?('debug')
     end
-    
+
     def domain_limit
       env_key_or_false?('only')
     end
-    
+
     def check_staleness?
       env_flag_is_true?('check')
     end
-    
+
     def configuration_file
       return path if valid_path?(path)
-      
+
       files = []
 
       files += [
@@ -54,7 +54,7 @@ class WhiskeyDisk
       return false unless ENV['to'] =~ /:/
       ENV['to'].split(/:/).first
     end
-    
+
     def contains_rakefile?(path)
       File.exists?(File.expand_path(File.join(path, 'Rakefile')))
     end
@@ -96,11 +96,11 @@ class WhiskeyDisk
     rescue Exception => e
       raise %Q{Error reading configuration file [#{configuration_file}]: "#{e}"}
     end
-    
+
     def filter
       @filter ||= WhiskeyDisk::Config::Filter.new(self)
     end
-    
+
     # called only by #fetch
     def filter_data(data)
       filter.filter_data(data)
@@ -122,6 +122,6 @@ class WhiskeyDisk
 
     def env_key_or_false?(key)
       env_has_key?(key) ? ENV[key] : false
-    end  
+    end
   end
 end
