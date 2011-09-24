@@ -14,3 +14,11 @@ host {'host':
   host_aliases => 'wd-git.example.com',
   ip           => '10.0.2.2',
 }
+
+package {'git-core':
+  ensure       => 'latest'
+}
+
+package {'rake':
+  ensure       => 'latest'
+}
