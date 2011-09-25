@@ -28,6 +28,7 @@ namespace :deploy do
     @whiskey_disk.update_configuration_repository_checkout  if @whiskey_disk.has_config_repo?
     @whiskey_disk.refresh_configuration                     if @whiskey_disk.has_config_repo?
     @whiskey_disk.run_post_deploy_hooks
+    @whiskey_disk.snapshot_git_revision
     @whiskey_disk.flush
     @whiskey_disk.summarize
 

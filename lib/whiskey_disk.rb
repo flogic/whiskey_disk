@@ -258,7 +258,9 @@ class WhiskeyDisk
   def snapshot_git_revision
     needs(:deploy_to)
     enqueue "cd #{setting(:deploy_to)}"
-    enqueue %Q{ml=\`git log -1 --pretty=format:%H\`}
+    enqueue %Q{git config deploy.last-sha \`git log -1 --pretty=format:%H\`}
+    enqueue %Q{git config deploy.branch \`git branch|grep '^*'|awk '{print $2}'\`}
+    enqueue %Q{git config deploy.lastcommit \`git log -1 --abbrev-commit --pretty=oneline\`}
   end
 
   def initialize_git_changes
