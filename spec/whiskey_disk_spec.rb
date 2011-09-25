@@ -349,12 +349,34 @@ describe '@whiskey_disk' do
     it 'captures the current git HEAD ref for the current branch' do
       @whiskey_disk.configuration = @parameters.merge({'branch' => 'production'})
       @whiskey_disk.update_main_repository_checkout
-      @whiskey_disk.buffer.join(' ').should.match(%r{ml=\`git log -1 --pretty=format:%H\`})
+      @whiskey_disk.buffer.should.satisfy {|b| b.include?("git config deploy.last-sha \`git log -1 --pretty=format:%H\`") }
     end
     
     it 'captures the current git HEAD ref for the current branch if no branch is specified' do
       @whiskey_disk.update_main_repository_checkout
-      @whiskey_disk.buffer.join(' ').should.match(%r{ml=\`git log -1 --pretty=format:%H\`})
+      @whiskey_disk.buffer.should.satisfy {|b| b.include?("git config deploy.last-sha \`git log -1 --pretty=format:%H\`") }
+    end
+
+    it 'captures the current git branch' do
+      @whiskey_disk.configuration = @parameters.merge({'branch' => 'production'})
+      @whiskey_disk.update_main_repository_checkout
+      @whiskey_disk.buffer.should.satisfy { |b| b.include?("git config deploy.branch \`git branch|grep '^*'|awk '{print $2}'\`") }
+    end
+
+    it 'captures the current git branch if no branch is specified' do
+      @whiskey_disk.update_main_repository_checkout
+      @whiskey_disk.buffer.should.satisfy { |b| b.include?("git config deploy.branch \`git branch|grep '^*'|awk '{print $2}'\`") }
+    end
+
+    it 'captures the current git last commit ref for the current branch' do
+      @whiskey_disk.configuration = @parameters.merge({'branch' => 'production'})
+      @whiskey_disk.update_main_repository_checkout
+      @whiskey_disk.buffer.should.satisfy {|b| b.include?("git config deploy.lastcommit \`git log -1 --abbrev-commit --pretty=oneline\`") }
+    end
+
+    it 'captures the current git last commit ref if no branch is specified' do
+      @whiskey_disk.update_main_repository_checkout
+      @whiskey_disk.buffer.should.satisfy {|b| b.include?("git config deploy.lastcommit \`git log -1 --abbrev-commit --pretty=oneline\`") }
     end
     
     it 'attempts to fetch only the master branch from the origin if no branch is specified' do
