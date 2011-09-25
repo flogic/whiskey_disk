@@ -441,3 +441,29 @@ describe 'computing the path to the rsync changes file' do
     rsync_changes_path.should == File.join(Dir.pwd, '.whiskey_disk_rsync_changes')    
   end
 end
+
+describe 'returning the git config deploy namespace' do
+  before do
+    @lastsha    = "fc82a782c5f78b6f2b9c71d9d91ebc472c4b1675"
+    @branch     = "develop"
+    @lastcommit = "fc82a78 whitespace"
+    @git_mock = mock(:config)
+    @git_mock.should.receive(:config).and_return({'deploy.previous-sha' => @lastsha, 'deploy.branch' => @branch,
+                                 'deploy.previous-commit' => @lastcommit})
+
+    Git.stub!(:open).and_return(@git_mock)
+  end
+
+  it 'should return the previous sha when asked' do
+    last_deploy_sha.should == @lastsha
+  end
+
+  it 'should return the deploy when asked' do
+    current_branch.should == @branch
+  end
+
+  it 'should return the last commit message when asked' do
+    last_commit.should == @lastcommit
+  end
+
+end
