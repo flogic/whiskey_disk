@@ -19,7 +19,7 @@ namespace :deploy do
 
     exit(1) unless @whiskey_disk.success?
   end
-  
+
   desc "Deploy now."
   task :now do
     @whiskey_disk = WhiskeyDisk.new
@@ -28,21 +28,22 @@ namespace :deploy do
     @whiskey_disk.update_configuration_repository_checkout  if @whiskey_disk.has_config_repo?
     @whiskey_disk.refresh_configuration                     if @whiskey_disk.has_config_repo?
     @whiskey_disk.run_post_deploy_hooks
+    @whiskey_disk.snapshot_git_revision
     @whiskey_disk.flush
     @whiskey_disk.summarize
 
     exit(1) unless @whiskey_disk.success?
   end
-  
+
   task :post_setup do
     @whiskey_disk = WhiskeyDisk.new
     env = @whiskey_disk.setting(:environment)
-    Rake::Task["deploy:#{env}:post_setup"].invoke if Rake::Task.task_defined? "deploy:#{env}:post_setup"      
+    Rake::Task["deploy:#{env}:post_setup"].invoke if Rake::Task.task_defined? "deploy:#{env}:post_setup"
   end
 
   task :post_deploy do
     @whiskey_disk = WhiskeyDisk.new
     env = @whiskey_disk.setting(:environment)
-    Rake::Task["deploy:#{env}:post_deploy"].invoke if Rake::Task.task_defined? "deploy:#{env}:post_deploy"      
+    Rake::Task["deploy:#{env}:post_deploy"].invoke if Rake::Task.task_defined? "deploy:#{env}:post_deploy"
   end
 end

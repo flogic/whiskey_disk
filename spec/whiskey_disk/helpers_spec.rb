@@ -5,7 +5,7 @@ describe 'when checking for a role during setup or deployment' do
   it 'accepts a role string' do
     lambda { role?('web') }.should.not.raise(ArgumentError)
   end
-  
+
   it 'requires a role string' do
     lambda { role? }.should.raise(ArgumentError)
   end
@@ -19,22 +19,22 @@ describe 'when checking for a role during setup or deployment' do
     ENV['WD_ROLES'] = ''
     role?(:web).should.be.false
   end
-  
+
   it 'returns true if the role, as a symbol is among the roles in the WD_ROLES env variable' do
     ENV['WD_ROLES'] = 'db:web'
     role?(:db).should.be.true
   end
-  
+
   it 'returns true if the role, as a string is among the roles in the WD_ROLES env variable' do
     ENV['WD_ROLES'] = 'db:web'
     role?('db').should.be.true
   end
-  
+
   it 'returns false if the role, as a symbol is not among the roles in the WD_ROLES env variable' do
     ENV['WD_ROLES'] = 'db:web'
     role?(:app).should.be.false
   end
-  
+
   it 'returns false if the role, as a string is not among the roles in the WD_ROLES env variable' do
     ENV['WD_ROLES'] = 'db:web'
     role?('app').should.be.false
@@ -56,40 +56,40 @@ describe 'when determining if certain files changed when a deployment was run' d
     @non_matching_file = '/nowhere/file'
     @substring_file    = '/nowhere/filething'
     @random_file       = '/random/path'
-    
+
     set_git_changes([])
     set_rsync_changes([])
   end
-  
+
   it 'accepts a path' do
     lambda { changed?('foo') }.should.not.raise(ArgumentError)
   end
-  
+
   it 'requires a path' do
     lambda { changed? }.should.raise(ArgumentError)
   end
-  
+
   it 'returns true when the specified file is in the list of git changes' do
     set_git_changes([ @matching_file, @random_file])
     changed?(@matching_file).should.be.true
   end
-  
+
   it 'ignores trailing "/"s in the provided path when doing an exact git change match' do
     set_git_changes([ @matching_file, @random_file])
-    changed?(@matching_file + '///').should.be.true    
-  end
-  
-  it 'returns true when the specified path is a full path prefix in the list of git changes' do
-    set_git_changes([ @matching_file , @random_file])
-    changed?(@matching_path).should.be.true    
-  end
-  
-  it 'ignores trailing "/"s in the provided path when doing a path git change match' do
-    set_git_changes([ @matching_file , @random_file])
-    changed?(@matching_path + '///').should.be.true    
+    changed?(@matching_file + '///').should.be.true
   end
 
-  it 'returns true when the specified file is in the list of rsync changes' do    
+  it 'returns true when the specified path is a full path prefix in the list of git changes' do
+    set_git_changes([ @matching_file , @random_file])
+    changed?(@matching_path).should.be.true
+  end
+
+  it 'ignores trailing "/"s in the provided path when doing a path git change match' do
+    set_git_changes([ @matching_file , @random_file])
+    changed?(@matching_path + '///').should.be.true
+  end
+
+  it 'returns true when the specified file is in the list of rsync changes' do
     set_rsync_changes([ @matching_file, @random_file])
     changed?(@matching_file).should.be.true
   end
@@ -101,29 +101,29 @@ describe 'when determining if certain files changed when a deployment was run' d
 
   it 'returnes true when the specified path is a full path prefix in the list of git changes' do
     set_rsync_changes([ @matching_file , @random_file])
-    changed?(@matching_path).should.be.true    
+    changed?(@matching_path).should.be.true
   end
-  
+
   it 'ignores trailing "/"s in the provided path when doing a path rsync change match' do
     set_rsync_changes([ @matching_file , @random_file])
-    changed?(@matching_path + '///').should.be.true    
+    changed?(@matching_path + '///').should.be.true
   end
-  
+
   it 'ignores regex metacharacters when looking for a git match' do
     set_git_changes([ '/path/to/somestring'])
     changed?('/path/to/some.*').should.be.false
   end
-  
+
   it 'ignores regex metacharacters when looking for an rsync match' do
     set_rsync_changes([ '/path/to/somestring'])
     changed?('/path/to/some.*').should.be.false
   end
-  
+
   it 'returns true when the git changes file cannot be found' do
     set_git_changes(nil)
-    changed?(@matching_file).should.be.true    
+    changed?(@matching_file).should.be.true
   end
-  
+
   it 'returns false if not path or file matches the specified file' do
     set_git_changes([@matching_file, @matching_path, @random_file, @substring_file])
     set_rsync_changes([@matching_file, @matching_path, @random_file, @substring_file])
@@ -153,32 +153,32 @@ spec/whiskey_disk/config_spec.rb
 spec/whiskey_disk/helpers_spec.rb
 spec/whiskey_disk_spec.rb
 whiskey_disk.gemspec
-'   
+'
   end
-    
+
   it 'works without arguments' do
     lambda { git_changes }.should.not.raise(ArgumentError)
   end
-  
+
   it 'does not allow arguments' do
     lambda { git_changes(:foo) }.should.raise(ArgumentError)
   end
-  
+
   it 'returns nil when a git changes file cannot be found' do
     self.stub!(:read_git_changes_file).and_raise
     git_changes.should.be.nil
   end
-  
+
   it 'returns an empty list if no files are found in the git changes file' do
     self.stub!(:read_git_changes_file).and_return('')
     git_changes.should == []
   end
-  
+
   it 'returns a list of all filenames mentioned in the git changes file' do
     self.stub!(:read_git_changes_file).and_return(@contents)
     git_changes.should == @contents.split("\n")
   end
-  
+
   it 'strips duplicates from filenames mentioned in the git changes file' do
     lines = @contents.split("\n")
     duplicates = @contents + lines.first + "\n" + lines.last + "\n"
@@ -329,15 +329,15 @@ describe 'when reading the git-related changes for a deployment' do
     self.stub!(:git_changes_path).and_return(@changes_path)
     File.stub!(:read).with(@changes_path).and_return(@contents)
   end
-  
+
   it 'works without arguments' do
     lambda { read_git_changes_file }.should.not.raise(ArgumentError)
   end
-  
+
   it 'does not allow arguments' do
     lambda { read_git_changes_file(:foo) }.should.raise(ArgumentError)
   end
-  
+
   it 'reads the git changes file' do
     File.should.receive(:read) do |arg|
       arg.should == @changes_path
@@ -345,11 +345,11 @@ describe 'when reading the git-related changes for a deployment' do
     end
     read_git_changes_file
   end
-  
+
   it 'returns the contents of the git changes file' do
     read_git_changes_file.should == @contents
   end
-  
+
   it 'fails if the git changes file cannot be read' do
     File.stub!(:read).with(@changes_path).and_raise(Errno::ENOENT)
     lambda { read_git_changes_file }.should.raise(Errno::ENOENT)
@@ -363,15 +363,15 @@ describe 'when reading the rsync-related changes for a deployment' do
     self.stub!(:rsync_changes_path).and_return(@changes_path)
     File.stub!(:read).with(@changes_path).and_return(@contents)
   end
-  
+
   it 'works without arguments' do
     lambda { read_rsync_changes_file }.should.not.raise(ArgumentError)
   end
-  
+
   it 'does not allow arguments' do
     lambda { read_rsync_changes_file(:foo) }.should.raise(ArgumentError)
   end
-  
+
   it 'reads the rsync changes file' do
     File.should.receive(:read) do |arg|
       arg.should == @changes_path
@@ -379,11 +379,11 @@ describe 'when reading the rsync-related changes for a deployment' do
     end
     read_rsync_changes_file
   end
-  
+
   it 'returns the contents of the rsync changes file' do
     read_rsync_changes_file.should == @contents
   end
-  
+
   it 'fails if the rsync changes file cannot be read' do
     File.stub!(:read).with(@changes_path).and_raise(Errno::ENOENT)
     lambda { read_rsync_changes_file }.should.raise(Errno::ENOENT)
@@ -397,22 +397,22 @@ describe 'computing the path to the git changes file' do
     IO.stub!(:popen).with("git rev-parse --show-toplevel").and_return(@io_handle)
     @io_handle.stub!(:read).and_return(@git_path + "\n")
   end
-  
+
   it 'works without arguments' do
     lambda { git_changes_path }.should.not.raise(ArgumentError)
   end
-  
+
   it 'does not allow arguments' do
     lambda { git_changes_path(:foo) }.should.raise(ArgumentError)
   end
-  
+
   it 'returns the path to the .whiskey_disk_git_changes file in the git top-level path' do
     git_changes_path.should == File.join(@git_path, '.whiskey_disk_git_changes')
   end
-  
+
   it 'returns the path to the .whiskey_disk_git_changes file in the current directory of the git top-level cannot be found' do
     @io_handle.stub!(:read).and_return('')
-    git_changes_path.should == File.join(Dir.pwd, '.whiskey_disk_git_changes')    
+    git_changes_path.should == File.join(Dir.pwd, '.whiskey_disk_git_changes')
   end
 end
 
@@ -423,21 +423,47 @@ describe 'computing the path to the rsync changes file' do
     IO.stub!(:popen).with("git rev-parse --show-toplevel").and_return(@io_handle)
     @io_handle.stub!(:read).and_return(@rsync_path + "\n")
   end
-  
+
   it 'works without arguments' do
     lambda { rsync_changes_path }.should.not.raise(ArgumentError)
   end
-  
+
   it 'does not allow arguments' do
     lambda { rsync_changes_path(:foo) }.should.raise(ArgumentError)
   end
-  
+
   it 'returns the path to the .whiskey_disk_rsync_changes file in the git top-level path' do
     rsync_changes_path.should == File.join(@rsync_path, '.whiskey_disk_rsync_changes')
   end
-  
+
   it 'returns the path to the .whiskey_disk_rsync_changes file in the current directory of the git top-level cannot be found' do
     @io_handle.stub!(:read).and_return('')
-    rsync_changes_path.should == File.join(Dir.pwd, '.whiskey_disk_rsync_changes')    
+    rsync_changes_path.should == File.join(Dir.pwd, '.whiskey_disk_rsync_changes')
   end
+end
+
+describe 'returning the git config deploy namespace' do
+  before do
+    @lastsha    = "fc82a782c5f78b6f2b9c71d9d91ebc472c4b1675"
+    @branch     = "develop"
+    @lastcommit = "fc82a78 whitespace"
+    @git_mock = mock(:config)
+    @git_mock.should.receive(:config).and_return({'deploy.previous-sha' => @lastsha, 'deploy.branch' => @branch,
+                                 'deploy.previous-commit' => @lastcommit})
+
+    Git.stub!(:open).and_return(@git_mock)
+  end
+
+  it 'should return the previous sha when asked' do
+    last_deploy_sha.should == @lastsha
+  end
+
+  it 'should return the deploy when asked' do
+    current_branch.should == @branch
+  end
+
+  it 'should return the last commit message when asked' do
+    last_commit.should == @lastcommit
+  end
+
 end

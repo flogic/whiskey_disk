@@ -2,6 +2,7 @@ require 'rubygems'
 require 'bacon'
 require 'facon'
 require 'fileutils'
+require 'git'
 
 if ENV['DEBUG'] and ENV['DEBUG'] != ''
   STDERR.puts "Enabling debugger for spec runs..."

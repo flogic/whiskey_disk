@@ -19,6 +19,27 @@ rescue Exception
   nil
 end
 
+# a helpful accessor to options set in git config
+def git_config(key)
+  git = Git.open('.').config
+  git["deploy.#{key}"].strip if git.keys.include?("deploy.#{key}")
+end
+
+# this provides a helpful accessor to the previous sha used in the deployment
+def last_deploy_sha
+  git_config("previous-sha")
+end
+
+def current_branch
+  git_config("branch")
+end
+
+def last_commit
+  git_config('previous-commit')
+end
+
+# FIXME: should these be protected, or should they be accessible to deploy /
+# rake authors?
 def rsync_changes
   changes = read_rsync_changes_file.split("\n")
   changes.map {|c| c.sub(/^[^ ]* [^ ]* [^ ]* /, '') }.
