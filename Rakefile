@@ -19,6 +19,7 @@ begin
     gemspec.email = "rick@rickbradley.com"
     gemspec.homepage = "http://github.com/flogic/whiskey_disk"
     gemspec.authors = ["Rick Bradley"]
+    gemspec.add_dependency('git')
     gemspec.add_dependency('rake')
 
     # I've decided that the integration spec shizzle shouldn't go into the gem
