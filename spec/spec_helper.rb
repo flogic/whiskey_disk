@@ -2,6 +2,8 @@ require 'rubygems'
 require 'bacon'
 require 'facon'
 require 'fileutils'
+require 'tempfile'
+require 'erb'
 
 if ENV['DEBUG'] and ENV['DEBUG'] != ''
   STDERR.puts "Enabling debugger for spec runs..."
@@ -53,7 +55,29 @@ end
 
 # build the correct local path to the deployment configuration for a given scenario
 def scenario_config(path)
+  return erb_scenario_config(path) if path =~ /\.erb$/
+  scenario_config_path(path)
+end
+
+def scenario_config_path(path)
   File.join(File.dirname(__FILE__), '..', 'scenarios', path)
+end
+
+def erb_scenario_config(path)
+  data = File.read(scenario_config_path(path))
+  converted = erb_eval(data)
+  write_tempfile(converted)
+end
+
+def erb_eval(data)
+  ERB.new(data).result
+end
+
+def write_tempfile(data)
+  tmp_file = Tempfile.new('whiskey_disk_integration_spec_scenario')
+  tmp_file.puts(data)
+  tmp_file.close
+  tmp_file.path
 end
 
 # clone a git repository locally (as if a "wd setup" had been deployed)
