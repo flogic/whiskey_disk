@@ -9,7 +9,7 @@ integration_spec do
 
     describe 'when the configuration specifies no domain' do
       before do
-        @config = scenario_config('local/deploy.yml')
+        @config = scenario_config('local/deploy.yml.erb')
         @args = "--path=#{@config} --to=project:local-default"
       end
 
@@ -53,7 +53,7 @@ integration_spec do
 
     describe 'when the configuration specifies a single domain via the "local" keyword' do
       before do
-        @config = scenario_config('local/deploy.yml')
+        @config = scenario_config('local/deploy.yml.erb')
         @args = "--path=#{@config} --to=project:local-keyword"
       end
 
@@ -97,7 +97,7 @@ integration_spec do
 
     describe 'when the configuration specifies a single domain specified as user@domain, using --only=domain' do
       before do
-        @config = scenario_config('local/deploy.yml')
+        @config = scenario_config('local/deploy.yml.erb')
         @args = "--path=#{@config} --to=project:local-user-domain --only=localhost"
       end
 
@@ -141,7 +141,7 @@ integration_spec do
 
     describe 'when the configuration specifies a single domain without username, using --only=domain' do
       before do
-        @config = scenario_config('local/deploy.yml')
+        @config = scenario_config('local/deploy.yml.erb')
         @args = "--path=#{@config} --to=project:local-domain --only=localhost"
       end
 
@@ -185,7 +185,7 @@ integration_spec do
 
     describe 'when the configuration specifies a single domain which does not match the --only domain' do
       before do
-        @config = scenario_config('local/deploy.yml')
+        @config = scenario_config('local/deploy.yml.erb')
         @args = "--path=#{@config} --to=project:local-domain --only=vagrant2"
       end
 

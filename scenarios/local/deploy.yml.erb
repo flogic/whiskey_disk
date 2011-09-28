@@ -1,0 +1,17 @@
+<% root = File.expand_path(File.join(File.dirname(__FILE__), 'scenarios', 'setup', 'vagrant', 'deployed', 'target')) %>
+project:
+  "local-default":
+    deploy_to: "<%= root %>/project"
+    repository: "git://localhost/project.git"
+  "local-keyword":
+    domain: "local"
+    deploy_to: "<%= root %>/project"
+    repository: "git://localhost/project.git"
+  "local-user-domain":
+    domain: "user@localhost"
+    deploy_to: "<%= root %>/project"
+    repository: "git://localhost/project.git"
+  "local-domain":
+    domain: "localhost"
+    deploy_to: "<%= root %>/project"
+    repository: "git://localhost/project.git"
