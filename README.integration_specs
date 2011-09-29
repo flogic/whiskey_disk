@@ -1,7 +1,7 @@
 Running Integration Specs
 -------------------------
 
-To run the integration spec suite you need to be able to run a Vagrant virtual machine (see: http://vagrantup.com/), which means you will have to have VirtualBox installed.  The Vagrant/VirtualBox setup is currently out of the scope of this document.
+To run the integration spec suite you need to be able to run a Vagrant virtual machine (see: http://vagrantup.com/), which means you will have to have VirtualBox installed.  The Vagrant/VirtualBox setup is currently out of the scope of this document.  By default, I have been using the lucid32 box as my "base" box.
 
 Once you are set up to be able to run Vagrant, you can create and start up an integration environment by running the following rake task:
 
