@@ -820,6 +820,7 @@ The IRC channel is #whiskey_disk on freenode.
 ### Contributors ###
 
  - [Rick Bradley](https://github.com/rick): author
+ - [James Cox](https://github.com/imajes): bugfixes, prototyping, design help, code, feedback
  - [Rein Henrichs](https://github.com/reinh): design help, code
  - [Jeremy Holland](https://github.com/awebneck): code
  - [Kevin Barnes](https://github.com/vinbarnes): design help, code
