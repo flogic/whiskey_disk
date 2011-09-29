@@ -72,10 +72,6 @@ class WhiskeyDisk
         buffer
       end
     end
-
-    def rake_exec
-      (self[:rake_exec] and self[:rake_exec] != '') ? self[:rake_exec] : 'rake'
-    end
     
     def parent_path(path)
       File.split(path).first
@@ -202,7 +198,7 @@ class WhiskeyDisk
     end
     
     def if_task_defined(task, cmd)
-      %Q(rakep=`#{env_vars} #{rake_exec} -P` && if [[ `echo "${rakep}" | grep #{task}` != "" ]]; then #{cmd}; fi )
+      %Q(rakep=`#{env_vars} rake -P` && if [[ `echo "${rakep}" | grep #{task}` != "" ]]; then #{cmd}; fi )
     end
     
     def safe_branch_checkout(path, my_branch)
@@ -226,7 +222,7 @@ class WhiskeyDisk
       enqueue "echo Running rake #{task_name}..."
       enqueue "cd #{path}"
       enqueue(if_file_present("#{self[:deploy_to]}/Rakefile", 
-        if_task_defined(task_name, "#{env_vars} #{rake_exec} #{'--trace' if Config.debug?} #{task_name} to=#{self[:environment]}")))
+        if_task_defined(task_name, "#{env_vars} rake #{'--trace' if Config.debug?} #{task_name} to=#{self[:environment]}")))
     end
     
     def build_path(path)
