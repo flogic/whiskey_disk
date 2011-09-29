@@ -9,6 +9,14 @@ file { '/opt/deploy/target':
   mode => '775'
 }
 
+file { '/home/vagrant/.bashrc':
+  ensure => 'present',
+  owner => 'vagrant',
+  group => 'vagrant',
+  mode => '755',
+  content => 'RUBYLIB="/opt/lib"; export RUBYLIB'
+}
+
 host {'host':
   ensure       => 'present',
   host_aliases => 'wd-git.example.com',
