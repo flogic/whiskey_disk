@@ -22,7 +22,7 @@ end
 def rsync_changes
   changes = read_rsync_changes_file.split("\n")
   changes.map {|c| c.sub(/^[^ ]* [^ ]* [^ ]* /, '') }.
-          grep(/^[^ ]{9} /).map {|c| c.sub(/^[^ ]{9} /, '') }.
+          grep(/^[^ ]{9,} /).map {|c| c.sub(/^[^ ]{9,} /, '') }.
           map {|s| s.sub(%r{/$}, '') } - ['.']
 rescue Exception
   nil
