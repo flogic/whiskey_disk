@@ -1,11 +1,21 @@
 
-0.6.22 / 2011-04-10 
+0.6.23 / 2011-09-29
+==================
+
+  * Fix incompatibility with latest jeweler (Rakefile error messages) [James Cox (imajes)]
+  * We now use vagrant for integration specs.
+  * Make rsync_changes more robust
+  * Add ERB support to YAML files used in integration specs
+  * add per-domain ssh_options support to config files
+  * Big refactoring of config handling into a filter stream architecture
+
+0.6.22 / 2011-04-10
 ==================
 
   * support branch-switching on deployments
   * added integration spec for "branch switching" behavior
 
-0.6.21 / 2011-04-06 
+0.6.21 / 2011-04-06
 ==================
 
   * change rsync changes capturing mechanism to be more portable
@@ -14,7 +24,7 @@
   * deploy.yml to test rsync changes w/ config repo
   * integration spec project and config changes to stored git repos
 
-0.6.20 / 2011-04-06 
+0.6.20 / 2011-04-06
 ==================
 
   * Output the entire command before running it when debugging.
@@ -48,7 +58,7 @@
   * README updates for #changed? helper functionality
 
 
-0.6.17 / 2011-03-25 
+0.6.17 / 2011-03-25
 ==================
 
   * updating contributor info in README
@@ -76,7 +86,7 @@
   * Add support section to README
 
 
-0.6.16 / 2011-03-08 
+0.6.16 / 2011-03-08
 ==================
 
   * Turning off shallow clones for 'wd setup'
@@ -85,7 +95,7 @@
   * adding integration specs to test setup + deploy at once
   * tweaking a couple of old path specs
 
-0.6.15 / 2011-03-07 
+0.6.15 / 2011-03-07
 ==================
 
   * integration specs for "git checkout #{branch}" functionality
@@ -93,12 +103,12 @@
   * Adding current_branch integration spec helper method
   * Ensure specified branch is checked out before applying the refresh
 
-0.6.14 / 2011-02-23 
+0.6.14 / 2011-02-23
 ==================
 
   * forcing bash as the execution shell
 
-0.6.13 / 2011-02-20 
+0.6.13 / 2011-02-20
 ==================
 
   * pass rake_env settings to post_* scripts
@@ -107,7 +117,7 @@
   * basic integration specs for post_* scripts
   * updating integration spec git repo data
 
-0.6.12 / 2011-02-20 
+0.6.12 / 2011-02-20
 ==================
 
   * bad Rakefile should cause deployment to fail
@@ -115,13 +125,13 @@
   * new scenarios to use when testing post_* rake hooks
   * adding a dump_log helper to use when developing integration specs
 
-0.6.11 / 2011-02-18 
+0.6.11 / 2011-02-18
 ==================
 
   * Generate an error message when we can't find --to proj/env in a config
   * Fixing typo in an integration spec's example text
 
-0.6.10 / 2011-02-08 
+0.6.10 / 2011-02-08
 ==================
 
   * reorganizing integration specs
@@ -143,17 +153,17 @@
   * WhiskeyDisk.remote? now takes a domain argument
   * can now specify path to deploy.yml info using an URL
 
-0.6.4 / 2011-01-26 
+0.6.4 / 2011-01-26
 ==================
 
   * bugfix: cd to deploy_to path before running post_{setup,deploy}_script
 
-0.6.3 / 2011-01-13 
+0.6.3 / 2011-01-13
 ==================
 
   * adding support for config_target in deploy.yml
 
-0.6.2 / 2010-12-23 
+0.6.2 / 2010-12-23
 ==================
 
   * update multiple deployment example to use roles
@@ -168,7 +178,7 @@
   * reordering domain config spec setup data structure for readability
 
 
-0.6.0 / 2010-12-22 
+0.6.0 / 2010-12-22
 ==================
 
   * adding a set of multi-domain examples
