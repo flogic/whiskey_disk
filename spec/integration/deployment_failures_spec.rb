@@ -11,22 +11,22 @@ integration_spec do
     end
 
     describe 'and performing a setup' do
-      it 'should not checkout a repository for the project to the target path' do
+      it 'does not checkout a repository for the project to the target path' do
         run_setup(@args)
         File.exists?(deployed_file('bogus')).should == false
       end
       
-      it 'should not checkout a repository for any project in the configuration file to the target path' do
+      it 'does not checkout a repository for any project in the configuration file to the target path' do
         run_setup(@args)
         File.exists?(deployed_file('project')).should == false
       end
       
-      it 'should include a helpful error message' do
+      it 'includes a helpful error message' do
         run_setup(@args)
         File.read(integration_log).should =~ /No configuration file defined data for project `bogus`/
       end
       
-      it 'should exit with a false status' do
+      it 'exits with a false status' do
         run_setup(@args).should == false
       end
     end
@@ -37,22 +37,22 @@ integration_spec do
         File.unlink(deployed_file('project/README'))  # modify the deployed checkout
       end        
 
-      it 'should not checkout a repository for the project to the target path' do
+      it 'does not checkout a repository for the project to the target path' do
         run_deploy(@args)
         File.exists?(deployed_file('bogus')).should == false
       end
       
-      it 'should not update the repository for any project in the configuration file to the target path' do
+      it 'does not update the repository for any project in the configuration file to the target path' do
         run_deploy(@args)
         File.exists?(deployed_file('project/README')).should == false
       end
       
-      it 'should include a helpful error message' do
+      it 'includes a helpful error message' do
         run_deploy(@args)
         File.read(integration_log).should =~ /No configuration file defined data for project `bogus`/
       end
       
-      it 'should exit with a false status' do
+      it 'exits with a false status' do
         run_deploy(@args).should == false
       end
     end
@@ -67,17 +67,17 @@ integration_spec do
     end
 
     describe 'and performing a setup' do
-      it 'should not checkout a repository for the project to the target path' do
+      it 'does not checkout a repository for the project to the target path' do
         run_setup(@args)
         File.exists?(deployed_file('project')).should == false
       end
       
-      it 'should include a helpful error message' do
+      it 'includes a helpful error message' do
         run_setup(@args)
         File.read(integration_log).should =~ /No configuration file defined data for project `project`, environment `bogus`/
       end
       
-      it 'should exit with a false status' do
+      it 'exits with a false status' do
         run_setup(@args).should == false
       end
     end
@@ -88,17 +88,17 @@ integration_spec do
         File.unlink(deployed_file('project/README'))  # modify the deployed checkout
       end        
 
-      it 'should not update the repository for the project to the target path' do
+      it 'does not update the repository for the project to the target path' do
         run_deploy(@args)
         File.exists?(deployed_file('project/README')).should == false
       end
       
-      it 'should include a helpful error message' do
+      it 'includes a helpful error message' do
         run_deploy(@args)
         File.read(integration_log).should =~ /No configuration file defined data for project `project`, environment `bogus`/
       end
       
-      it 'should exit with a false status' do
+      it 'exits with a false status' do
         run_deploy(@args).should == false
       end
     end
