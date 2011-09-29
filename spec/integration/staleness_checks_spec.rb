@@ -5,9 +5,9 @@ integration_spec do
   describe 'when configured for a local deployment' do
     before do
       setup_deployment_area
-      @config = scenario_config('local/deploy.yml')
+      @config = scenario_config('local/deploy.yml.erb')
     end
-    
+
     describe 'when staleness checkes are enabled' do
       before do
         @args = "--path=#{@config} --to=project:local-default --check"
