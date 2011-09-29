@@ -3,9 +3,9 @@ file { '/etc/motd':
 }
 
 file { '/opt/deploy/target':
-  ensure => directory, 
+  ensure => directory,
   owner => 'vagrant',
-  group => 'vagrant', 
+  group => 'vagrant',
   mode => '775'
 }
 
