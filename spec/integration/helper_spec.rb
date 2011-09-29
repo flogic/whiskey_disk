@@ -8,7 +8,7 @@ integration_spec do
       @config = scenario_config('remote/deploy.yml')
       @args = "--path=#{@config} --to=project:hook_with_changed"
     end
-    
+
     describe 'and performing a setup' do
       it 'performs a checkout of the repository to the target path' do
         run_setup(@args)
@@ -37,14 +37,14 @@ integration_spec do
 
       it 'reports the remote setup as successful' do
         run_setup(@args)
-        File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
+        File.read(integration_log).should =~ /vagrant => succeeded/
       end
 
       it 'exits with a true status' do
         run_setup(@args).should == true
       end
     end
-    
+
     describe 'and performing a deployment' do
       before do
         checkout_repo('project', 'hook_with_changed')
@@ -56,15 +56,15 @@ integration_spec do
         run_deploy(@args)
         File.exists?(deployed_file('project/README')).should == true
       end
-      
+
       it 'runs actions contingent on file changes' do
         run_deploy(@args)
         File.read(integration_log).should =~ /changed\? was true/
       end
-      
+
       it 'runs actions contingent on rsync file changes' do
         run_deploy(@args)
-        File.read(integration_log).should =~ /changed\? by rsync was true/        
+        File.read(integration_log).should =~ /changed\? by rsync was true/
       end
 
       it 'does not run actions contingent upon files not changing' do
@@ -79,11 +79,11 @@ integration_spec do
 
       it 'exits with a true status' do
         run_deploy(@args).should == true
-      end      
+      end
 
       it 'reports the deployment as successful' do
         run_deploy(@args)
-        File.read(integration_log).should =~ /wd-app1.example.com => succeeded/        
+        File.read(integration_log).should =~ /vagrant => succeeded/
       end
     end
   end

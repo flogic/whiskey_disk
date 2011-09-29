@@ -26,7 +26,7 @@ integration_spec do
             
         it 'reports the remote setup as successful' do
           run_setup(@args)
-          File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
+          File.read(integration_log).should =~ /vagrant => succeeded/
         end
 
         it 'exits with a true status' do
@@ -52,7 +52,7 @@ integration_spec do
             
         it 'reports the remote deployment as successful' do
           run_deploy(@args)
-          File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
+          File.read(integration_log).should =~ /vagrant => succeeded/
         end
 
         it 'exits with a true status' do
@@ -80,7 +80,7 @@ integration_spec do
             
         it 'reports the remote setup as a failure' do
           run_setup(@args)
-          File.read(integration_log).should =~ /wd-app1.example.com => failed/
+          File.read(integration_log).should =~ /vagrant => failed/
         end
 
         it 'exits with a false status' do
@@ -106,7 +106,7 @@ integration_spec do
             
         it 'reports the remote deployment as a failure' do
           run_deploy(@args)
-          File.read(integration_log).should =~ /wd-app1.example.com => failed/
+          File.read(integration_log).should =~ /vagrant => failed/
         end
 
         it 'exits with a false status' do
@@ -134,7 +134,7 @@ integration_spec do
             
         it 'reports the remote setup as successful' do
           run_setup(@args)
-          File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
+          File.read(integration_log).should =~ /vagrant => succeeded/
         end
 
         it 'exits with a true status' do
@@ -160,7 +160,7 @@ integration_spec do
             
         it 'reports the remote deployment as successful' do
           run_deploy(@args)
-          File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
+          File.read(integration_log).should =~ /vagrant => succeeded/
         end
 
         it 'exits with a true status' do
@@ -188,7 +188,7 @@ integration_spec do
             
         it 'reports the remote setup as successful' do
           run_setup(@args)
-          File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
+          File.read(integration_log).should =~ /vagrant => succeeded/
         end
 
         it 'exits with a true status' do
@@ -214,7 +214,7 @@ integration_spec do
             
         it 'reports the remote deployment as successful' do
           run_deploy(@args)
-          File.read(integration_log).should =~ /wd-app1.example.com => succeeded/
+          File.read(integration_log).should =~ /vagrant => succeeded/
         end
 
         it 'exits with a true status' do
