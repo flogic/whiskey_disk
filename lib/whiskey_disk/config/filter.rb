@@ -11,7 +11,7 @@ class WhiskeyDisk
           StringifyHashKeysFilter,
           EnvironmentScopeFilter, ProjectScopeFilter, SelectProjectAndEnvironmentFilter,
           CheckRepositoryRequirementsFilter, CheckConfigRepositoryRequirementsFilter,
-          AddEnvironmentNameFilter, AddProjectNameFilter,
+          AddEnvironmentSettingsFilter,
           DefaultConfigTargetFilter, DefaultDomainFilter,
           HashifyDomainEntriesFilter, LocalizeDomainsFilter, CheckForDuplicateDomainsFilter,
           ConvertRoleStringsToListFilter, DropEmptyDomainRolesFilter,
