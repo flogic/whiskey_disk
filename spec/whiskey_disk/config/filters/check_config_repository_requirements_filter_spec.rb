@@ -7,11 +7,11 @@ describe 'filtering configuration data by normalizing domains' do
     @config = WhiskeyDisk::Config.new
     @filter = WhiskeyDisk::Config::CheckConfigRepositoryRequirementsFilter.new(@config)
   end
-  
+
   it 'returns data if neither config_repository nor deploy_config_to is specified' do
     @filter.filter({ 'foo' => 'bar' }).should == { 'foo' => 'bar' }
   end
-  
+
   describe 'when config_repository and deploy_config_to are both specified' do
     before do
       @data = { 'config_repository' => 'x', 'deploy_config_to' => 'y' }
@@ -21,7 +21,7 @@ describe 'filtering configuration data by normalizing domains' do
       @data.delete('config_repository')
       lambda { @filter.filter(@data) }.should.raise
     end
-    
+
     it 'raises an exception if config_repository is nil' do
       @data['config_repository'] = ''
       lambda { @filter.filter(@data) }.should.raise
@@ -41,7 +41,7 @@ describe 'filtering configuration data by normalizing domains' do
       @data.delete('deploy_config_to')
       lambda { @filter.filter(@data) }.should.raise
     end
-    
+
     it 'raises an exception if deploy_config_to is nil' do
       @data['deploy_config_to'] = ''
       lambda { @filter.filter(@data) }.should.raise

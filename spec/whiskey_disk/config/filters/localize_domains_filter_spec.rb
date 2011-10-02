@@ -17,7 +17,7 @@ describe 'setting empty domain entries to "local"' do
         { 'name' => 'x' }
       ]
     }
-    
+
     @filter.filter(@data).should == {
       'domain' => [
         { 'name' => 'local' },

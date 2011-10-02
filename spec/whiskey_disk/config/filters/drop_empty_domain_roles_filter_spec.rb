@@ -7,7 +7,7 @@ describe 'converting domain role strings into lists' do
     @config = WhiskeyDisk::Config.new
     @filter = WhiskeyDisk::Config::DropEmptyDomainRolesFilter.new(@config)
   end
-  
+
   it 'drops roles with nil values' do
     @data = {
       'domain' => [
@@ -15,7 +15,7 @@ describe 'converting domain role strings into lists' do
         { 'name' => 'bar', 'roles' => nil }
       ]
     }
-    
+
     @filter.filter(@data).should == {
       'domain' => [
         { 'name' => 'foo' },
@@ -23,7 +23,7 @@ describe 'converting domain role strings into lists' do
       ]
     }
   end
-  
+
   it 'drops roles with empty list values' do
     @data = {
       'domain' => [
@@ -31,15 +31,15 @@ describe 'converting domain role strings into lists' do
         { 'name' => 'bar', 'roles' => [] }
       ]
     }
-    
+
     @filter.filter(@data).should == {
       'domain' => [
         { 'name' => 'foo' },
         { 'name' => 'bar' }
       ]
-    }    
+    }
   end
-  
+
   it 'preserves non-empty roles' do
     @data = {
       'domain' => [
@@ -48,7 +48,7 @@ describe 'converting domain role strings into lists' do
         { 'name' => 'baz', 'roles' => [ 'x', 'y', 'z' ] }
       ]
     }
-    
+
     @filter.filter(@data).should == {
       'domain' => [
         { 'name' => 'foo' },

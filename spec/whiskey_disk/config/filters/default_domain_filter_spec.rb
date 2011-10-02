@@ -7,7 +7,7 @@ describe 'setting empty domain entries to "local"' do
     @config = WhiskeyDisk::Config.new
     @filter = WhiskeyDisk::Config::DefaultDomainFilter.new(@config)
   end
-  
+
   it 'leaves data intact if it has a domain' do
     @filter.filter({ 'domain' => 'anything' }).should == { 'domain' => 'anything' }
   end

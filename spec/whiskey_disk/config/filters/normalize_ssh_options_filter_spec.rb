@@ -7,7 +7,7 @@ describe 'normalizing SSH options' do
     @config = WhiskeyDisk::Config.new
     @filter = WhiskeyDisk::Config::NormalizeSshOptionsFilter.new(@config)
   end
-    
+
   it 'eliminates ssh options with nil, or empty values' do
     @data = {
       'domain' => [
@@ -18,7 +18,7 @@ describe 'normalizing SSH options' do
         { 'name' => 'quux', 'ssh_options' => [nil, '', nil] },
       ]
     }
-    
+
     @filter.filter(@data).should == {
       'domain' => [
         { 'name' => 'foo' },
@@ -29,7 +29,7 @@ describe 'normalizing SSH options' do
       ]
     }
   end
-  
+
   it 'preserves non-empty ssh options' do
     @data = {
       'domain' => [
@@ -41,7 +41,7 @@ describe 'normalizing SSH options' do
         { 'name' => 'wut', 'ssh_options' => [nil, '', 'x', 'a', 'a', nil, 'b' ] },
       ]
     }
-    
+
     @filter.filter(@data).should == {
       'domain' => [
         { 'name' => 'foo' },

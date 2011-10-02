@@ -8,12 +8,12 @@ describe 'filtering configuration data by normalizing domains' do
     @filter = WhiskeyDisk::Config::CheckRepositoryRequirementsFilter.new(@config)
     @data = { 'repository' => 'x', 'deploy_to' => 'y' }
   end
-  
+
   it 'raises an exception if repository is unspecified' do
     @data.delete('repository')
     lambda { @filter.filter(@data) }.should.raise
   end
-    
+
   it 'raises an exception if repository is nil' do
     @data['repository'] = ''
     lambda { @filter.filter(@data) }.should.raise
@@ -33,7 +33,7 @@ describe 'filtering configuration data by normalizing domains' do
     @data.delete('deploy_to')
     lambda { @filter.filter(@data) }.should.raise
   end
-    
+
   it 'raises an exception if deploy_to is nil' do
     @data['deploy_to'] = ''
     lambda { @filter.filter(@data) }.should.raise

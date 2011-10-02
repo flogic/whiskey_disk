@@ -4,15 +4,15 @@ class WhiskeyDisk
   class Config
     class Locator
       attr_reader :env
-  
+
       def initialize(env)
         @env = env
       end
-  
+
       def path
         env.path
       end
-  
+
       def specified_project_name
         env.specified_project_name
       end
@@ -23,7 +23,7 @@ class WhiskeyDisk
 
       def location
         return path if valid_path?(path)
-  
+
         files = []
 
         files += [

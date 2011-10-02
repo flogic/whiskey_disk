@@ -7,7 +7,7 @@ describe WhiskeyDisk::Config::Locator do
     @environment = WhiskeyDisk::Config::Environment.new
     @locator = WhiskeyDisk::Config::Locator.new(@environment)
   end
-  
+
   describe 'computing the base path for the project' do
     before do
       @original_path = Dir.pwd
@@ -23,7 +23,7 @@ describe WhiskeyDisk::Config::Locator do
         ENV['path'] = @path = build_temp_dir
         @original_path = Dir.pwd
       end
-      
+
       after do
         FileUtils.rm_rf(@path)
         Dir.chdir(@original_path)
@@ -86,7 +86,7 @@ describe WhiskeyDisk::Config::Locator do
       end
     end
   end
-  
+
   describe 'finding the configuration file' do
     before do
       ENV['to'] = @env = 'staging'
@@ -101,21 +101,21 @@ describe WhiskeyDisk::Config::Locator do
         FileUtils.touch(File.join(@base_path, 'Rakefile'))
         @dir = File.join(@base_path, 'config')
         Dir.mkdir(@dir)
-        
-        [ 
-          "/deploy/foo/staging.yml", 
-          "/deploy/foo.yml", 
+
+        [
+          "/deploy/foo/staging.yml",
+          "/deploy/foo.yml",
           "/deploy/staging.yml",
-          "/staging.yml", 
+          "/staging.yml",
           "/deploy.yml"
         ].each { |file| make(File.join(@dir, file)) }
       end
-      
+
       after do
         FileUtils.rm_rf(@base_path)
         Dir.chdir(@original_path)
       end
-      
+
       describe 'and a project name is specified in ENV["to"]' do
         before do
           ENV['to'] = @env = 'foo:staging'
@@ -191,11 +191,11 @@ describe WhiskeyDisk::Config::Locator do
         @path = build_temp_dir
         ENV['path'] = @locator_file = File.join(@path, 'deploy.yml')
       end
-      
+
       after do
         FileUtils.rm_rf(@path)
       end
-    
+
       it 'fails if a path is specified which does not exist' do
         lambda { @locator.location }.should.raise
       end
@@ -209,12 +209,12 @@ describe WhiskeyDisk::Config::Locator do
     describe 'and a path which points to a directory is specified' do
       before do
         ENV['path'] = @path = build_temp_dir
-        
-        [ 
-          "/deploy/foo/staging.yml", 
-          "/deploy/foo.yml", 
+
+        [
+          "/deploy/foo/staging.yml",
+          "/deploy/foo.yml",
           "/deploy/staging.yml",
-          "/staging.yml", 
+          "/staging.yml",
           "/deploy.yml"
         ].each { |file| make(File.join(@path, file)) }
       end
@@ -222,7 +222,7 @@ describe WhiskeyDisk::Config::Locator do
       after do
         FileUtils.rm_rf(@path)
       end
-      
+
       describe 'and a project name is specified in ENV["to"]' do
         before do
           ENV['to'] = @env = 'foo:staging'

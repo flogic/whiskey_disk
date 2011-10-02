@@ -6,7 +6,7 @@ describe 'filtering configuration data to only have symbol hash keys' do
   before do
     @config = WhiskeyDisk::Config.new
     @filter = WhiskeyDisk::Config::StringifyHashKeysFilter.new(@config)
-    @data = { 
+    @data = {
       'a' => {
         :x => 'y',
         'c' => 'd',
@@ -17,7 +17,7 @@ describe 'filtering configuration data to only have symbol hash keys' do
       :b => [ '1', '2', '3' ]
     }
   end
-  
+
   it 'recursively stringifies hash keys in the provided data structure' do
     @filter.filter(@data).should == {
       'a' => {
@@ -30,7 +30,7 @@ describe 'filtering configuration data to only have symbol hash keys' do
       'b' => [ '1', '2', '3' ]
     }
   end
-  
+
   it 'clones value data so that the original data structure is not shared' do
     original = @data.clone
     result = @filter.filter(@data)

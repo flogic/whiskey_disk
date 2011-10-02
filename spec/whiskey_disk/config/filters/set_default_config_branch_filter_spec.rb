@@ -16,19 +16,19 @@ describe 'setting the default branch for a config repo' do
     it 'sets a non-specified branch to "master"' do
       @filter.filter({ 'config_repository' => 'foo'})['config_branch'].should == 'master'
     end
-  
+
     it 'sets an empty branch to "master"' do
       @filter.filter({ 'config_repository' => 'foo', 'config_branch' => '' })['config_branch'].should == 'master'
     end
-  
+
     it 'sets a whitespace branch to master' do
       @filter.filter({ 'config_repository' => 'foo', 'config_branch' => '  ' })['config_branch'].should == 'master'
     end
-  
+
     it 'sets a nil branch to master' do
       @filter.filter({ 'config_repository' => 'foo', 'config_branch' => nil })['config_branch'].should == 'master'
     end
-  
+
     it 'leaves a "master" branch as "master"' do
       @filter.filter({ 'config_repository' => 'foo', 'config_branch' => 'master' })['config_branch'].should == 'master'
     end

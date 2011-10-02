@@ -39,7 +39,7 @@ class WhiskeyDisk
 
       def key_or_false?(key)
         has_key?(key) ? ENV[key] : false
-      end      
+      end
 
       def has_key?(key)
         ENV[key] && ENV[key] != ''

@@ -11,14 +11,14 @@ describe 'setting empty domain entries to "local"' do
   it 'handles empty domain filtering among roles across all projects and targets' do
     @data = {
       'domain' => [
-        'x', 
-        nil, 
+        'x',
+        nil,
         { 'name' => 'foo', 'roles' => ['x', 'y'] },
-        '', 
+        '',
         'local'
       ]
     }
-    
+
     @filter.filter(@data).should == {
       'domain' => [
         { 'name' => 'x' },
@@ -29,12 +29,12 @@ describe 'setting empty domain entries to "local"' do
       ]
     }
   end
-  
+
   it 'handles the degenerate case of a single domain name' do
     @data = { 'domain' => 'foo' }
     @filter.filter(@data).should == { 'domain' => [ { 'name' => 'foo' } ] }
   end
-  
+
   it 'handles the degenerate case of no domain specified' do
     @filter.filter({}).should == { 'domain' => { 'name' => '' } }
   end

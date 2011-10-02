@@ -6,7 +6,7 @@ integration_spec do
     before do
       setup_deployment_area
     end
-  
+
     describe 'and deploying on a different branch than originally deployed' do
       before do
         @config = scenario_config('remote/deploy.yml')
@@ -17,11 +17,11 @@ integration_spec do
         @args = "--path=#{@config} --to=project:remote-on-other-branch"
         File.unlink(deployed_file('project/README'))  # modify the deployed checkout
       end
-      
+
       it 'updates the checkout of the repository on the target path' do
         run_deploy(@args)
         File.exists?(deployed_file('project/README')).should == true
-      end    
+      end
 
       it 'has the working copy set to the new branch' do
         run_deploy(@args)

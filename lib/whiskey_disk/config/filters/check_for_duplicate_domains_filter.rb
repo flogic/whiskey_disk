@@ -10,7 +10,7 @@ class WhiskeyDisk
           seen[domain['name']] = true
         end
       end
-      
+
       def filter(data)
         check_domains(data['domain'])
         data

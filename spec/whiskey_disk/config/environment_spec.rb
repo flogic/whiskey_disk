@@ -5,7 +5,7 @@ describe WhiskeyDisk::Config::Environment do
   before do
     @environment = WhiskeyDisk::Config::Environment.new
   end
-  
+
   describe 'when computing the environment name' do
     it 'returns false when there is no ENV["to"] setting' do
       ENV['to'] = nil
@@ -27,7 +27,7 @@ describe WhiskeyDisk::Config::Environment do
       @environment.environment_name.should == 'staging'
     end
   end
-  
+
   describe 'when computing the project name' do
     it 'returns the project name from the ENV["to"] setting when it is available' do
       ENV['to'] = 'foo:staging'
@@ -44,24 +44,24 @@ describe WhiskeyDisk::Config::Environment do
       @environment.project_name.should == 'unnamed_project'
     end
   end
-  
+
   describe 'when determining whether there is a domain limit set' do
     it 'returns false when ENV["only"] is nil' do
       ENV['only'] = nil
       @environment.domain_limit.should == false
     end
-    
+
     it 'returns false when ENV["only"] is empty' do
       ENV['only'] = ''
       @environment.domain_limit.should == false
     end
-    
+
     it 'returns the value in ENV["only"] when it is non-empty' do
       ENV['only'] = 'somedomain'
-      @environment.domain_limit.should == 'somedomain'      
+      @environment.domain_limit.should == 'somedomain'
     end
   end
-  
+
   describe 'when determining whether to turn debug mode on' do
     it 'returns false when there is no ENV["debug"] setting' do
       ENV['debug'] = nil
@@ -98,7 +98,7 @@ describe WhiskeyDisk::Config::Environment do
       @environment.debug?.should == true
     end
   end
-  
+
   describe 'when determining whether to do a staleness check before updating' do
     it 'returns false when there is no ENV["check"] setting' do
       ENV['check'] = nil

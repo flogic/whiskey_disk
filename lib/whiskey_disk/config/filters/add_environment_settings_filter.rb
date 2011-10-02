@@ -6,7 +6,7 @@ class WhiskeyDisk
       def defaulted_project_name
         project_name || 'unnamed_project'
       end
-      
+
       def filter(data)
         data.merge({
            'project' => defaulted_project_name,

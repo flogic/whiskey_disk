@@ -12,7 +12,7 @@ roles:
     - web
     - app
   - name: "ogc@nerthus.websages.com"
-    roles: db 
+    roles: db
   deploy_to: "/tmp/test-deployment/"
   repository: "git@git.ogtastic.com:whiskey_disk.git"
   branch: "feature/support-domain-roles"

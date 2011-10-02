@@ -7,11 +7,11 @@ class WhiskeyDisk
         return domain unless domain['roles']
         domain.merge('roles' => [ domain['roles'] ].flatten)
       end
-      
+
       def convert_all_roles(domains_list)
         domains_list.collect {|domain| convert_roles_for_domain(domain) }
       end
-      
+
       def filter(data)
         data.merge('domain' => convert_all_roles(data['domain']))
       end

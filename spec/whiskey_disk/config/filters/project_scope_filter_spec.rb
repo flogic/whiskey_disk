@@ -47,29 +47,29 @@ describe 'filtering configuration data by adding project scoping' do
     before do
       ENV['to'] = @env = 'whiskey_disk:staging'
     end
-  
+
     describe 'when a project name is not specified in the bare config hash' do
       it 'returns the original data if it has both project and environment scoping' do
         @filter.filter(@proj_data).should == @proj_data
       end
-  
+
       it 'returns the original data wrapped in project scope if it has environment scoping but no project scoping' do
         @filter.filter(@bare_data).should == { 'whiskey_disk' => @bare_data }
       end
     end
-  
+
     describe 'when a project name is specified in the bare config hash' do
       before do
         @bare_data['staging']['project'] = 'whiskey_disk'
       end
-  
+
       it 'returns the original data if it has both project and environment scoping' do
         @filter.filter(@proj_data).should == @proj_data
       end
-  
+
       it 'returns the original data wrapped in project scope if it has environment scoping but no project scoping' do
         @filter.filter(@bare_data).should == { 'whiskey_disk' => @bare_data }
       end
     end
-  end 
+  end
 end

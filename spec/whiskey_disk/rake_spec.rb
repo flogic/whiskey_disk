@@ -12,49 +12,49 @@ describe 'rake tasks' do
   after do
     Rake.application = nil
   end
-  
+
   describe 'deploy:setup' do
     before do
       @whiskey_disk.configuration = {}
       @whiskey_disk.stub!(:setup).and_return(true)
     end
-    
+
     it 'runs a whiskey_disk setup' do
       @whiskey_disk.should.receive(:setup).and_return(true)
       @rake["deploy:setup"].invoke
     end
-    
+
     it 'does not exit in error if all setup runs were successful' do
       lambda { @rake["deploy:setup"].invoke }.should.not.raise(SystemExit)
     end
-    
+
     it 'exits in error if some setup run was unsuccessful' do
       @whiskey_disk.stub!(:setup).and_return(false)
       lambda { @rake["deploy:setup"].invoke }.should.raise(SystemExit)
     end
   end
-    
+
   describe 'deploy:now' do
     before do
       @whiskey_disk.configuration = {}
       @whiskey_disk.stub!(:deploy).and_return(true)
     end
-    
+
     it 'runs a whiskey_disk setup' do
       @whiskey_disk.should.receive(:deploy).and_return(true)
       @rake["deploy:now"].invoke
     end
-    
+
     it 'does not exit in error if all setup runs were successful' do
       lambda { @rake["deploy:now"].invoke }.should.not.raise(SystemExit)
     end
-    
+
     it 'exits in error if some setup run was unsuccessful' do
       @whiskey_disk.stub!(:deploy).and_return(false)
       lambda { @rake["deploy:now"].invoke }.should.raise(SystemExit)
     end
   end
-      
+
   describe 'deploy:post_setup' do
     it 'runs the defined post_setup rake task when a post_setup rake task is defined for this environment' do
       @whiskey_disk.configuration = { 'environment' => 'production'}
@@ -72,7 +72,7 @@ describe 'rake tasks' do
       lambda { Rake::Task['deploy:post_setup'].invoke }.should.not.raise
     end
   end
-  
+
   describe 'deploy:post_deploy' do
     it 'runs the defined post_deploy rake task when a post_deploy rake task is defined for this environment' do
       @whiskey_disk.configuration = { 'environment' => 'production'}

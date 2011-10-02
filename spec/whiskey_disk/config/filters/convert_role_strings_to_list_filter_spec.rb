@@ -7,7 +7,7 @@ describe 'converting domain role strings into lists' do
     @config = WhiskeyDisk::Config.new
     @filter = WhiskeyDisk::Config::ConvertRoleStringsToListFilter.new(@config)
   end
-  
+
   it 'handles single strings' do
     @data = {
       'domain' => [
@@ -15,15 +15,15 @@ describe 'converting domain role strings into lists' do
         { 'name' => 'bar', 'roles' => 'xyzzy' },
       ]
     }
-    
-    @filter.filter(@data).should == {      
+
+    @filter.filter(@data).should == {
       'domain' => [
         { 'name' => 'foo', 'roles' => [ 'baz' ] },
         { 'name' => 'bar', 'roles' => [ 'xyzzy' ] },
       ]
     }
   end
-  
+
   it 'does not touch domains without roles' do
     @data = {
       'domain' => [
@@ -31,10 +31,10 @@ describe 'converting domain role strings into lists' do
         { 'name' => 'bar' }
       ]
     }
-    
-    @filter.filter(@data).should == @data  
+
+    @filter.filter(@data).should == @data
   end
-  
+
   it 'leaves existing role lists alone' do
     @data = {
       'domain' => [
@@ -42,7 +42,7 @@ describe 'converting domain role strings into lists' do
         { 'name' => 'bar', 'roles' => [ 'xyzzy', 'quux' ] },
       ]
     }
-    
+
     @filter.filter(@data).should == @data
   end
 end

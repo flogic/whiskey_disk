@@ -6,13 +6,13 @@ describe 'filtering configuration data by selecting the data for the project and
   before do
     @config = WhiskeyDisk::Config.new
     @filter = WhiskeyDisk::Config::SelectProjectAndEnvironmentFilter.new(@config)
-    
-    @data = { 
+
+    @data = {
       'project' => { 'environment' => { 'a' => 'b' } },
       'other'   => { 'missing' => { 'c' => 'd' } },
     }
   end
-  
+
   it 'fails when the specified project cannot be found' do
     ENV['to'] = @env = 'something:environment'
     lambda { @filter.filter(@data) }.should.raise

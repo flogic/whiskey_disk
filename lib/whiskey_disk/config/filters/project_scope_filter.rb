@@ -11,7 +11,7 @@ class WhiskeyDisk
         return depth if data.has_key?('repository')
         repository_depth(data.values.first, depth + 1)
       end
-  
+
       # is this data hash an environment data hash without a project name?
       def needs_project_scoping?(data)
         repository_depth(data) == 1

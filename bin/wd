@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby 
+#!/usr/bin/env ruby
 
 require 'optparse'
 require 'whiskey_disk/rake'
@@ -7,18 +7,18 @@ $0 = "#{$0} setup|deploy"  # jesus, this is a hack.
 
 options = {}
 op = OptionParser.new do |opts|
-  opts.on('-t=TARGET', '--to=TARGET', "deployment target") do |target| 
+  opts.on('-t=TARGET', '--to=TARGET', "deployment target") do |target|
     options[:target] = target
   end
-  
+
   opts.on('-p=TARGET', '--path=TARGET', "configuration path") do |path|
     options[:path] = path
   end
-    
+
   opts.on('-o=DOMAIN', '--only=DOMAIN', "limit deployment to this domain") do |domain|
     options[:only] = domain
   end
-    
+
   opts.on('-c', '--check', "do a staleness check before deploying") do |path|
     options[:check] = 'true'
   end
@@ -26,21 +26,21 @@ op = OptionParser.new do |opts|
   opts.on('-d', '--debug', "turn on debug mode (ssh -v and rake --trace)") do
     options[:debug] = 'true'
   end
-    
+
   opts.on('--version', 'show current version') do
     puts File.read(File.expand_path(File.join(File.dirname(__FILE__), '..', 'VERSION')))
     exit 0
   end
-  
+
   opts.on_tail('-h', '--help', 'show this message') do
     abort opts.to_s
   end
 end
 
 begin
-  rest = op.parse(ARGV) 
-rescue 
-  abort op.to_s 
+  rest = op.parse(ARGV)
+rescue
+  abort op.to_s
 end
 
 abort op.to_s unless options[:target]

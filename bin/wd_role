@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby 
+#!/usr/bin/env ruby
 require 'whiskey_disk/helpers'
 
 # simple command-line script to detect whether this deployment target
@@ -15,28 +15,28 @@ __END__
 
 $ export WD_ROLES='app:db'
 $ wd_role web && rock || shocker
-     .-.     
-   .-.U|     
-   |U| | .-. 
-   | | |_|U| 
-   | | | | | 
+     .-.
+   .-.U|
+   |U| | .-.
+   | | |_|U|
+   | | | | |
   /|     ` |
- | |       | 
- |         | 
-  \        / 
-  |       |  
-  |       |  
-             
+ | |       |
+ |         |
+  \        /
+  |       |
+  |       |
+
 $ wd_role app && rock || shocker
-   .-.       
-   |U|       
-   | |   .-. 
-   | |-._|U| 
-   | | | | | 
-  /|     ` | 
- | |       | 
- |         | 
-          / 
-  |       |  
-  |       |  
+   .-.
+   |U|
+   | |   .-.
+   | |-._|U|
+   | | | | |
+  /|     ` |
+ | |       |
+ |         |
+          /
+  |       |
+  |       |
 

@@ -6,24 +6,24 @@ integration_spec do
     before do
       setup_deployment_area
     end
-  
+
     describe 'with no Rakefile in the project' do
       before do
         @config = scenario_config('remote/deploy.yml')
         @args = "--path=#{@config} --to=project:no_rakefile"
       end
-      
+
       describe 'performing a setup' do
         it 'performs a checkout of the repository to the target path' do
           run_setup(@args)
           File.exists?(deployed_file('project/README')).should == true
         end
-        
+
         it 'does not run a deploy:post_setup rake task' do
           run_setup(@args)
           File.read(integration_log).should.not =~ /Running a post_setup task/
         end
-            
+
         it 'reports the remote setup as successful' do
           run_setup(@args)
           File.read(integration_log).should =~ /vagrant => succeeded/
@@ -33,23 +33,23 @@ integration_spec do
           run_setup(@args).should == true
         end
       end
-      
+
       describe 'performing a deployment' do
         before do
           checkout_repo('project')
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
-        
+
         it 'updates the checkout of the repository on the target path' do
           run_deploy(@args)
           File.exists?(deployed_file('project/README')).should == true
-        end    
+        end
 
         it 'does not run a deploy:post_deploy rake task' do
           run_deploy(@args)
           File.read(integration_log).should.not =~ /Running a post_deploy task/
         end
-            
+
         it 'reports the remote deployment as successful' do
           run_deploy(@args)
           File.read(integration_log).should =~ /vagrant => succeeded/
@@ -60,24 +60,24 @@ integration_spec do
         end
       end
     end
-    
+
     describe 'with an unparseable Rakefile in the project' do
       before do
         @config = scenario_config('remote/deploy.yml')
         @args = "--path=#{@config} --to=project:bad_rakefile"
       end
-      
+
       describe 'performing a setup' do
         it 'performs a checkout of the repository to the target path' do
           run_setup(@args)
           File.exists?(deployed_file('project/README')).should == true
         end
-        
+
         it 'does not run a deploy:post_setup rake task' do
           run_setup(@args)
           File.read(integration_log).should.not =~ /Running a post_setup task/
         end
-            
+
         it 'reports the remote setup as a failure' do
           run_setup(@args)
           File.read(integration_log).should =~ /vagrant => failed/
@@ -87,23 +87,23 @@ integration_spec do
           run_setup(@args).should == false
         end
       end
-      
+
       describe 'performing a deployment' do
         before do
           checkout_repo('project', 'bad_rakefile')
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
-        
+
         it 'updates the checkout of the repository on the target path' do
           run_deploy(@args)
           File.exists?(deployed_file('project/README')).should == true
-        end    
+        end
 
         it 'does not run a deploy:post_deploy rake task' do
           run_deploy(@args)
           File.read(integration_log).should.not =~ /Running a post_deploy task/
         end
-            
+
         it 'reports the remote deployment as a failure' do
           run_deploy(@args)
           File.read(integration_log).should =~ /vagrant => failed/
@@ -112,26 +112,26 @@ integration_spec do
         it 'exits with a false status' do
           run_deploy(@args).should == false
         end
-      end      
+      end
     end
-    
+
     describe 'with a valid Rakefile in the project with no post_setup or post_deploy hooks' do
       before do
         @config = scenario_config('remote/deploy.yml')
         @args = "--path=#{@config} --to=project:no_rake_hooks"
       end
-      
+
       describe 'and doing a setup' do
         it 'performs a checkout of the repository to the target path' do
           run_setup(@args)
           File.exists?(deployed_file('project/README')).should == true
         end
-        
+
         it 'does not run a deploy:post_setup rake task' do
           run_setup(@args)
           File.read(integration_log).should.not =~ /Running a post_setup task/
         end
-            
+
         it 'reports the remote setup as successful' do
           run_setup(@args)
           File.read(integration_log).should =~ /vagrant => succeeded/
@@ -147,17 +147,17 @@ integration_spec do
           checkout_repo('project', 'no_rake_hooks')
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
-        
+
         it 'updates the checkout of the repository on the target path' do
           run_deploy(@args)
           File.exists?(deployed_file('project/README')).should == true
-        end    
+        end
 
         it 'does not run a deploy:post_deploy rake task' do
           run_deploy(@args)
           File.read(integration_log).should.not =~ /Running a post_deploy task/
         end
-            
+
         it 'reports the remote deployment as successful' do
           run_deploy(@args)
           File.read(integration_log).should =~ /vagrant => succeeded/
@@ -168,24 +168,24 @@ integration_spec do
         end
       end
     end
-    
+
     describe 'with a valid Rakefile in the project with post_setup and post_deploy hooks' do
       before do
         @config = scenario_config('remote/deploy.yml')
         @args = "--path=#{@config} --to=project:with_rake_hooks"
       end
-      
+
       describe 'and doing a setup' do
         it 'performs a checkout of the repository to the target path' do
           run_setup(@args)
           File.exists?(deployed_file('project/README')).should == true
         end
-        
+
         it 'runs a deploy:post_setup rake task' do
           run_setup(@args)
           File.read(integration_log).should =~ /Running a post_setup task/
         end
-            
+
         it 'reports the remote setup as successful' do
           run_setup(@args)
           File.read(integration_log).should =~ /vagrant => succeeded/
@@ -201,17 +201,17 @@ integration_spec do
           checkout_repo('project', 'post_rake_tasks')
           File.unlink(deployed_file('project/README'))  # modify the deployed checkout
         end
-        
+
         it 'updates the checkout of the repository on the target path' do
           run_deploy(@args)
           File.exists?(deployed_file('project/README')).should == true
-        end    
+        end
 
         it 'runs a deploy:post_deploy rake task' do
           run_deploy(@args)
           File.read(integration_log).should =~ /Running a post_deploy task/
         end
-            
+
         it 'reports the remote deployment as successful' do
           run_deploy(@args)
           File.read(integration_log).should =~ /vagrant => succeeded/

@@ -7,23 +7,23 @@ describe 'setting the default branch for a main repo' do
     @config = WhiskeyDisk::Config.new
     @filter = WhiskeyDisk::Config::SetDefaultBranchFilter.new(@config)
   end
-  
+
   it 'sets a non-specified branch to "master"' do
     @filter.filter({ }).should == { 'branch' => 'master' }
   end
-  
+
   it 'sets an empty branch to "master"' do
-    @filter.filter({ 'branch' => '' }).should == { 'branch' => 'master' }    
+    @filter.filter({ 'branch' => '' }).should == { 'branch' => 'master' }
   end
-  
+
   it 'sets a whitespace branch to master' do
     @filter.filter({ 'branch' => '    ' }).should == { 'branch' => 'master' }
   end
-  
+
   it 'sets a nil branch to master' do
-    @filter.filter({ 'branch' => nil }).should == { 'branch' => 'master' }    
+    @filter.filter({ 'branch' => nil }).should == { 'branch' => 'master' }
   end
-  
+
   it 'leaves a "master" branch as "master"' do
     @filter.filter({ 'branch' => 'master' }).should == { 'branch' => 'master' }
   end
