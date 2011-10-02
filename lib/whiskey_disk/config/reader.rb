@@ -6,16 +6,13 @@ require 'yaml'
 class WhiskeyDisk
   class Config
     class Reader
-      attr_reader :env
-      
-      def initialize(environment)
-        @env = environment
+      def initialize(dummy)
       end
-      
+
       def fetch
         filter_data(load_data)
       end
-      
+
       def filter_data(data)
         filter.filter_data(data)
       end
@@ -40,6 +37,22 @@ class WhiskeyDisk
 
       def locator
         @locator ||= Locator.new(env)
+      end
+
+      def env
+        @env ||= Environment.new
+      end
+
+      def debug?
+        env.debug?
+      end
+
+      def domain_limit
+        env.domain_limit
+      end
+
+      def check_staleness?
+        env.check_staleness?
       end
     end
   end
