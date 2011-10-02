@@ -39,7 +39,7 @@ class WhiskeyDisk
 
         files.each { |file|  return file if File.exists?(file) }
 
-        raise "Could not locate configuration file in path [#{base_path}]"
+        raise "Could not locate configuration file in path [#{base_path}] for project [#{specified_project_name}] and environment [#{environment_name}]"
       end
 
       def valid_path?(path)
