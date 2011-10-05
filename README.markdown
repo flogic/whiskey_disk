@@ -826,6 +826,8 @@ The IRC channel is #whiskey_disk on freenode.
  - [Kevin Barnes](https://github.com/vinbarnes): design help, code
  - [Alex Sharp](https://github.com/ajsharp): issues, real-world usage cases, design help
  - [Yossef Mendelssohn](https://github.com/ymendel): design help, proofreading
- - [Josh Moore](https://github.com/joshsmoore): bug-hunting
+ - [Aaron Kalin](https://github.com/martinisoft) - bug hunting
+ - [Brandon Valentine](https://github.com/brandonvalentine) - help with bug fixing
+ - [Josh Moore](https://github.com/joshsmoore): bug hunting
 
  - Documentation/feedback: [Cristi Balan](https://github.com/evilchelu), [Hedgehog](http://github.com/hedgehog)
