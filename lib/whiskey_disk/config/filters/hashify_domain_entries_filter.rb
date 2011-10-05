@@ -17,7 +17,7 @@ class WhiskeyDisk
 
       def hashify_domains(domain_list)
         return new_domain unless domain_list
-        domain_list.collect {|domain| hashify_domain(domain) }
+        [ domain_list ].flatten.collect {|domain| hashify_domain(domain) }
       end
 
       def filter(data)
