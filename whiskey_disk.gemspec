@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "whiskey_disk"
-  s.version = "0.6.23"
+  s.version = "0.6.24"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Rick Bradley"]
-  s.date = "2011-09-29"
+  s.date = "2011-10-05"
   s.description = "Opinionated gem for doing fast git-based server deployments."
   s.email = "rick@rickbradley.com"
   s.executables = ["wd_role", "wd"]
