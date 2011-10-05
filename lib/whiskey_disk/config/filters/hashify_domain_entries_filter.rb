@@ -6,15 +6,15 @@ class WhiskeyDisk
       def needs_hashing?(domain)
         ! domain.respond_to?(:keys)
       end
-      
+
       def hashify_domain(domain)
         needs_hashing?(domain) ? { 'name' => domain } : domain
       end
-      
+
       def new_domain
         { 'name' => '' }
       end
-      
+
       def hashify_domains(domain_list)
         return new_domain unless domain_list
         domain_list.collect {|domain| hashify_domain(domain) }
