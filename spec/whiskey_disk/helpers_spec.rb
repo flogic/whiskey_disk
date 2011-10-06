@@ -42,11 +42,11 @@ describe 'when checking for a role during setup or deployment' do
 end
 
 def set_git_changes(changes)
-  self.stub!(:git_changes).and_return(changes)
+  self.stubs(:git_changes).returns(changes)
 end
 
 def set_rsync_changes(changes)
-  self.stub!(:rsync_changes).and_return(changes)
+  self.stubs(:rsync_changes).returns(changes)
 end
 
 describe 'when determining if certain files changed when a deployment was run' do
@@ -165,24 +165,24 @@ whiskey_disk.gemspec
   end
   
   it 'returns nil when a git changes file cannot be found' do
-    self.stub!(:read_git_changes_file).and_raise
+    self.stubs(:read_git_changes_file).raises
     git_changes.should.be.nil
   end
   
   it 'returns an empty list if no files are found in the git changes file' do
-    self.stub!(:read_git_changes_file).and_return('')
+    self.stubs(:read_git_changes_file).returns('')
     git_changes.should == []
   end
   
   it 'returns a list of all filenames mentioned in the git changes file' do
-    self.stub!(:read_git_changes_file).and_return(@contents)
+    self.stubs(:read_git_changes_file).returns(@contents)
     git_changes.should == @contents.split("\n")
   end
   
   it 'strips duplicates from filenames mentioned in the git changes file' do
     lines = @contents.split("\n")
     duplicates = @contents + lines.first + "\n" + lines.last + "\n"
-    self.stub!(:read_git_changes_file).and_return(duplicates)
+    self.stubs(:read_git_changes_file).returns(duplicates)
     git_changes.sort.should == @contents.split("\n").sort
   end
 end
@@ -307,17 +307,17 @@ describe "when finding files changed by rsync in a deployment" do
   end
 
   it 'returns nil when an rsync changes file cannot be found' do
-    self.stub!(:read_rsync_changes_file).and_raise
+    self.stubs(:read_rsync_changes_file).raises
     rsync_changes.should.be.nil
   end
 
   it 'returns an empty list if no files are found in the rsync changes file' do
-    self.stub!(:read_rsync_changes_file).and_return('')
+    self.stubs(:read_rsync_changes_file).returns('')
     rsync_changes.should == []
   end
 
   it 'returns a list of all changed filenames mentioned in the rsync changes file, excluding "."' do
-    self.stub!(:read_rsync_changes_file).and_return(@contents)
+    self.stubs(:read_rsync_changes_file).returns(@contents)
     rsync_changes.sort.first.should == @changes.sort.first
   end
 end
@@ -326,8 +326,8 @@ describe 'when reading the git-related changes for a deployment' do
   before do
     @contents = 'git changes'
     @changes_path = '/path/to/git/changes'
-    self.stub!(:git_changes_path).and_return(@changes_path)
-    File.stub!(:read).with(@changes_path).and_return(@contents)
+    self.stubs(:git_changes_path).returns(@changes_path)
+    File.stubs(:read).with(@changes_path).returns(@contents)
   end
   
   it 'works without arguments' do
@@ -339,7 +339,7 @@ describe 'when reading the git-related changes for a deployment' do
   end
   
   it 'reads the git changes file' do
-    File.should.receive(:read) do |arg|
+    File.expects(:read) do |arg|
       arg.should == @changes_path
       @contents
     end
@@ -351,7 +351,7 @@ describe 'when reading the git-related changes for a deployment' do
   end
   
   it 'fails if the git changes file cannot be read' do
-    File.stub!(:read).with(@changes_path).and_raise(Errno::ENOENT)
+    File.stubs(:read).with(@changes_path).raises(Errno::ENOENT)
     lambda { read_git_changes_file }.should.raise(Errno::ENOENT)
   end
 end
@@ -360,8 +360,8 @@ describe 'when reading the rsync-related changes for a deployment' do
   before do
     @contents = 'rsync changes'
     @changes_path = '/path/to/rsync/changes'
-    self.stub!(:rsync_changes_path).and_return(@changes_path)
-    File.stub!(:read).with(@changes_path).and_return(@contents)
+    self.stubs(:rsync_changes_path).returns(@changes_path)
+    File.stubs(:read).with(@changes_path).returns(@contents)
   end
   
   it 'works without arguments' do
@@ -373,7 +373,7 @@ describe 'when reading the rsync-related changes for a deployment' do
   end
   
   it 'reads the rsync changes file' do
-    File.should.receive(:read) do |arg|
+    File.expects(:read) do |arg|
       arg.should == @changes_path
       @contents
     end
@@ -385,7 +385,7 @@ describe 'when reading the rsync-related changes for a deployment' do
   end
   
   it 'fails if the rsync changes file cannot be read' do
-    File.stub!(:read).with(@changes_path).and_raise(Errno::ENOENT)
+    File.stubs(:read).with(@changes_path).raises(Errno::ENOENT)
     lambda { read_rsync_changes_file }.should.raise(Errno::ENOENT)
   end
 end
@@ -394,8 +394,8 @@ describe 'computing the path to the git changes file' do
   before do
     @git_path = '/path/to/toplevel'
     @io_handle = ''
-    IO.stub!(:popen).with("git rev-parse --show-toplevel").and_return(@io_handle)
-    @io_handle.stub!(:read).and_return(@git_path + "\n")
+    IO.stubs(:popen).with("git rev-parse --show-toplevel").returns(@io_handle)
+    @io_handle.stubs(:read).returns(@git_path + "\n")
   end
   
   it 'works without arguments' do
@@ -411,7 +411,7 @@ describe 'computing the path to the git changes file' do
   end
   
   it 'returns the path to the .whiskey_disk_git_changes file in the current directory of the git top-level cannot be found' do
-    @io_handle.stub!(:read).and_return('')
+    @io_handle.stubs(:read).returns('')
     git_changes_path.should == File.join(Dir.pwd, '.whiskey_disk_git_changes')    
   end
 end
@@ -420,8 +420,8 @@ describe 'computing the path to the rsync changes file' do
   before do
     @rsync_path = '/path/to/toplevel'
     @io_handle = ''
-    IO.stub!(:popen).with("git rev-parse --show-toplevel").and_return(@io_handle)
-    @io_handle.stub!(:read).and_return(@rsync_path + "\n")
+    IO.stubs(:popen).with("git rev-parse --show-toplevel").returns(@io_handle)
+    @io_handle.stubs(:read).returns(@rsync_path + "\n")
   end
   
   it 'works without arguments' do
@@ -437,7 +437,7 @@ describe 'computing the path to the rsync changes file' do
   end
   
   it 'returns the path to the .whiskey_disk_rsync_changes file in the current directory of the git top-level cannot be found' do
-    @io_handle.stub!(:read).and_return('')
+    @io_handle.stubs(:read).returns('')
     rsync_changes_path.should == File.join(Dir.pwd, '.whiskey_disk_rsync_changes')    
   end
 end

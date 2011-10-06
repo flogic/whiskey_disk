@@ -162,12 +162,12 @@ describe WhiskeyDisk::Config do
       end
 
       it 'fails if the configuration data cannot be retrieved' do
-        @config.stub!(:open).and_raise(RuntimeError)
+        @config.stubs(:open).raises(RuntimeError)
         lambda { @config.fetch }.should.raise
       end
 
       it 'fails if the retrieved configuration data is invalid' do
-        @config.stub!(:open).and_return("}")
+        @config.stubs(:open).returns("}")
         lambda { @config.fetch }.should.raise
       end
 

@@ -86,7 +86,7 @@ describe '@whiskey_disk' do
       before do
         @domain = 'myhost'
         @config = WhiskeyDisk::Config.new
-        @config.stub!(:domain_limit).and_return(@domain)
+        @config.stubs(:domain_limit).returns(@domain)
         @whiskey_disk.config = @config
       end
       
@@ -114,7 +114,7 @@ describe '@whiskey_disk' do
     describe 'when no domain limit is specified in the configuration' do
       before do
         @config = WhiskeyDisk::Config.new
-        @config.stub!(:domain_limit).and_return(nil)
+        @config.stubs(:domain_limit).returns(nil)
         @whiskey_disk.config = @config
       end
 
@@ -933,7 +933,7 @@ describe '@whiskey_disk' do
   describe 'determining if a domain is of interest to us' do
     before do
       @config = WhiskeyDisk::Config.new
-      @config.stub!(:domain_limit).and_return(false)
+      @config.stubs(:domain_limit).returns(false)
       @whiskey_disk.config = @config
     end
     
@@ -946,22 +946,22 @@ describe '@whiskey_disk' do
     end
     
     it 'returns true when our configuration does not specify a domain limit' do
-      @config.stub!(:domain_limit).and_return(false)
+      @config.stubs(:domain_limit).returns(false)
       @whiskey_disk.domain_of_interest?('somedomain').should == true
     end
     
     it 'returns true when the specified domain matches the configuration domain limit' do
-      @config.stub!(:domain_limit).and_return('somedomain')
+      @config.stubs(:domain_limit).returns('somedomain')
       @whiskey_disk.domain_of_interest?('somedomain').should == true      
     end
     
     it 'returns true when the specified domain matches the configuration domain limit, with a prepended "user@"' do
-      @config.stub!(:domain_limit).and_return('somedomain')
+      @config.stubs(:domain_limit).returns('somedomain')
       @whiskey_disk.domain_of_interest?('user@somedomain').should == true      
     end    
     
     it 'returns false when the specified domain does not match the configuration domain limit' do
-      @config.stub!(:domain_limit).and_return('otherdomain')
+      @config.stubs(:domain_limit).returns('otherdomain')
       @whiskey_disk.domain_of_interest?('somedomain').should == false  
     end
   end
@@ -971,10 +971,10 @@ describe '@whiskey_disk' do
       @cmd = 'ls'
       @domains = [ { 'name' => 'ogc@ogtastic.com' }, { 'name' => 'foo@example.com' }, { 'name' => 'local' } ]
       @whiskey_disk.configuration = { 'domain' => @domains }
-      @whiskey_disk.stub!(:domain_of_interest?).and_return(true)
-      @whiskey_disk.stub!(:bundle).and_return(@cmd)
-      @whiskey_disk.stub!(:system)
-      @whiskey_disk.stub!(:puts)
+      @whiskey_disk.stubs(:domain_of_interest?).returns(true)
+      @whiskey_disk.stubs(:bundle).returns(@cmd)
+      @whiskey_disk.stubs(:system)
+      @whiskey_disk.stubs(:puts)
     end
           
     it 'fails if the domain path is not specified' do
@@ -983,25 +983,26 @@ describe '@whiskey_disk' do
     end
 
     it 'uses "run" to issue commands for all remote domains' do
-      @whiskey_disk.should.receive(:run).with({ 'name' => 'ogc@ogtastic.com' }, @cmd)
-      @whiskey_disk.should.receive(:run).with({ 'name' => 'foo@example.com' }, @cmd)
+      @whiskey_disk.expects(:run).with({ 'name' => 'ogc@ogtastic.com' }, @cmd)
+      @whiskey_disk.expects(:run).with({ 'name' => 'foo@example.com' }, @cmd)
       @whiskey_disk.flush
     end
     
     it 'uses "shell" to issue commands for any local domains' do
-      @whiskey_disk.should.receive(:shell).with({ 'name' => 'local' }, @cmd)
+      @whiskey_disk.expects(:shell).with({ 'name' => 'local' }, @cmd)
       @whiskey_disk.flush      
     end    
 
     it 'does not issue a command via run for a remote domain which is not of interest' do
-      @whiskey_disk.stub!(:domain_of_interest?).with('ogc@ogtastic.com').and_return(false)
-      @whiskey_disk.should.not.receive(:run).with({ 'name' => 'ogc@ogtastic.com' }, @cmd)
+      @whiskey_disk.stubs(:domain_of_interest?).with('ogc@ogtastic.com').returns(false)
+      @whiskey_disk.stubs(:run).with({ 'name' => 'foo@example.com' }, @cmd)
+      @whiskey_disk.expects(:run).with({ 'name' => 'ogc@ogtastic.com' }, @cmd).never
       @whiskey_disk.flush
     end
 
     it 'does not issue a command via shell for a local domain which is not of interest' do
-      @whiskey_disk.stub!(:domain_of_interest?).with('local').and_return(false)
-      @whiskey_disk.should.not.receive(:shell).with({ 'name' => 'local' }, @cmd)
+      @whiskey_disk.stubs(:domain_of_interest?).with('local').returns(false)
+      @whiskey_disk.expects(:shell).with({ 'name' => 'local' }, @cmd).never
       @whiskey_disk.flush
     end
   end
@@ -1011,8 +1012,8 @@ describe '@whiskey_disk' do
       @domain_name = 'local'
       @domain = { 'name' => @domain_name }
       @whiskey_disk.configuration = { 'domain' => [ @domain ] }
-      @whiskey_disk.stub!(:system)
-      @whiskey_disk.stub!(:puts)
+      @whiskey_disk.stubs(:system)
+      @whiskey_disk.stubs(:puts)
     end
     
     it 'accepts a domain and a command string' do
@@ -1027,14 +1028,14 @@ describe '@whiskey_disk' do
       before { ENV['debug'] = 'true' }
 
       it 'passes the string to the shell with verbosity enabled' do
-        @whiskey_disk.should.receive(:system).with('bash', '-c', "set -x; ls")
+        @whiskey_disk.expects(:system).with('bash', '-c', "set -x; ls")
         @whiskey_disk.shell(@domain, 'ls')
       end
       
       it 'includes domain role settings when the domain has roles' do
         @domain = { 'name' => @domain_name, 'roles' => [ 'web', 'db' ] }
         @whiskey_disk.configuration = { 'domain' => [ @domain ] }
-        @whiskey_disk.should.receive(:system).with('bash', '-c', "set -x; export WD_ROLES='web:db'; ls")
+        @whiskey_disk.expects(:system).with('bash', '-c', "set -x; export WD_ROLES='web:db'; ls")
         @whiskey_disk.shell(@domain, 'ls')        
       end
     end
@@ -1043,14 +1044,14 @@ describe '@whiskey_disk' do
       before { ENV['debug'] = 'false' }
 
       it 'passes the string to the shell without verbosity enabled' do
-        @whiskey_disk.should.receive(:system).with('bash', '-c', "ls")
+        @whiskey_disk.expects(:system).with('bash', '-c', "ls")
         @whiskey_disk.shell(@domain, 'ls')
       end
       
       it 'includes domain role settings when the domain has roles' do
         @domain = { 'name' => @domain_name, 'roles' => [ 'web', 'db' ] }
         @whiskey_disk.configuration = { 'domain' => [ @domain ] }
-        @whiskey_disk.should.receive(:system).with('bash', '-c', "export WD_ROLES='web:db'; ls")
+        @whiskey_disk.expects(:system).with('bash', '-c', "export WD_ROLES='web:db'; ls")
         @whiskey_disk.shell(@domain, 'ls')        
       end
     end
@@ -1061,8 +1062,8 @@ describe '@whiskey_disk' do
       @domain_name = 'ogc@ogtastic.com'
       @domain = { 'name' => @domain_name }
       @whiskey_disk.configuration = { 'domain' => [ @domain ] }
-      @whiskey_disk.stub!(:system)
-      @whiskey_disk.stub!(:puts)
+      @whiskey_disk.stubs(:system)
+      @whiskey_disk.stubs(:puts)
     end
     
     it 'accepts a domain and a command string' do
@@ -1085,7 +1086,7 @@ describe '@whiskey_disk' do
       before { ENV['debug'] = 'true' }
 
       it 'passes the string to ssh for the domain, with verbosity enabled' do
-        @whiskey_disk.should.receive(:system).with('ssh', @domain_name, '-v', "set -x; ls")
+        @whiskey_disk.expects(:system).with('ssh', @domain_name, '-v', "set -x; ls")
         @whiskey_disk.run(@domain, 'ls')
       end
     end
@@ -1094,7 +1095,7 @@ describe '@whiskey_disk' do
       before { ENV['debug'] = 'false' }
 
       it 'passes the string to ssh for the domain, with verbosity disabled' do
-        @whiskey_disk.should.receive(:system).with('ssh', @domain_name, "ls")
+        @whiskey_disk.expects(:system).with('ssh', @domain_name, "ls")
         @whiskey_disk.run(@domain, 'ls')
       end
     end
@@ -1107,7 +1108,7 @@ describe '@whiskey_disk' do
       end
       
       it 'includes the ssh options when running ssh' do
-        @whiskey_disk.should.receive(:system).with('ssh', @domain_name, '-t', '-p 12345', 'ls')
+        @whiskey_disk.expects(:system).with('ssh', @domain_name, '-t', '-p 12345', 'ls')
         @whiskey_disk.run(@domain, 'ls')
       end
     end
@@ -1143,7 +1144,7 @@ describe '@whiskey_disk' do
   
   describe 'summarizing the results of a run' do
     before do
-      @whiskey_disk.stub!(:puts)
+      @whiskey_disk.stubs(:puts)
     end
     
     it 'works without arguments' do
@@ -1155,7 +1156,7 @@ describe '@whiskey_disk' do
     end
     
     it 'outputs a no runs message when no results are recorded' do
-      @whiskey_disk.should.receive(:puts).with('No deployments to report.')
+      @whiskey_disk.expects(:puts).with('No deployments to report.')
       @whiskey_disk.summarize
     end
     
@@ -1167,14 +1168,14 @@ describe '@whiskey_disk' do
       end
       
       it 'outputs a status line for each recorded deployment run' do
-        @whiskey_disk.should.receive(:puts).with('foo@bar.com => failed.')
-        @whiskey_disk.should.receive(:puts).with('ogc@ogtastic.com => succeeded.')
-        @whiskey_disk.should.receive(:puts).with('user@example.com => succeeded.')
+        @whiskey_disk.expects(:puts).with('foo@bar.com => failed.')
+        @whiskey_disk.expects(:puts).with('ogc@ogtastic.com => succeeded.')
+        @whiskey_disk.expects(:puts).with('user@example.com => succeeded.')
         @whiskey_disk.summarize
       end
     
       it 'outputs a summary line including the total runs, count of failures and count of successes.' do
-        @whiskey_disk.should.receive(:puts).with('Total: 3 deployments, 2 successes, 1 failure.')        
+        @whiskey_disk.expects(:puts).with('Total: 3 deployments, 2 successes, 1 failure.')        
         @whiskey_disk.summarize
       end
     end

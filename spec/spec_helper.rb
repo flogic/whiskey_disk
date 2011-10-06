@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'bacon'
-require 'facon'
+require 'mocha-on-bacon'
 require 'fileutils'
 require 'tempfile'
 require 'erb'
