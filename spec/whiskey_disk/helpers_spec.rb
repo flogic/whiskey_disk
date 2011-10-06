@@ -165,7 +165,7 @@ whiskey_disk.gemspec
   end
   
   it 'returns nil when a git changes file cannot be found' do
-    self.stubs(:read_git_changes_file).and_raise
+    self.stubs(:read_git_changes_file).raises
     git_changes.should.be.nil
   end
   
@@ -307,7 +307,7 @@ describe "when finding files changed by rsync in a deployment" do
   end
 
   it 'returns nil when an rsync changes file cannot be found' do
-    self.stubs(:read_rsync_changes_file).and_raise
+    self.stubs(:read_rsync_changes_file).raises
     rsync_changes.should.be.nil
   end
 
@@ -351,7 +351,7 @@ describe 'when reading the git-related changes for a deployment' do
   end
   
   it 'fails if the git changes file cannot be read' do
-    File.stubs(:read).with(@changes_path).and_raise(Errno::ENOENT)
+    File.stubs(:read).with(@changes_path).raises(Errno::ENOENT)
     lambda { read_git_changes_file }.should.raise(Errno::ENOENT)
   end
 end
@@ -385,7 +385,7 @@ describe 'when reading the rsync-related changes for a deployment' do
   end
   
   it 'fails if the rsync changes file cannot be read' do
-    File.stubs(:read).with(@changes_path).and_raise(Errno::ENOENT)
+    File.stubs(:read).with(@changes_path).raises(Errno::ENOENT)
     lambda { read_rsync_changes_file }.should.raise(Errno::ENOENT)
   end
 end

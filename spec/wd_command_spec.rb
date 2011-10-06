@@ -140,7 +140,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -162,7 +162,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -178,7 +178,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -200,7 +200,7 @@ describe 'wd command' do
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
 
@@ -223,7 +223,7 @@ describe 'wd command' do
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
 
@@ -240,7 +240,7 @@ describe 'wd command' do
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
 
@@ -266,7 +266,7 @@ describe 'wd command' do
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
 
@@ -292,7 +292,7 @@ describe 'wd command' do
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
 
@@ -314,7 +314,7 @@ describe 'wd command' do
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
 
@@ -358,7 +358,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -380,7 +380,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -396,7 +396,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -418,7 +418,7 @@ describe 'wd command' do
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
 
@@ -441,7 +441,7 @@ describe 'wd command' do
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
 
@@ -458,7 +458,7 @@ describe 'wd command' do
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
 
@@ -567,7 +567,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -588,7 +588,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -610,7 +610,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -627,7 +627,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -649,7 +649,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -672,7 +672,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -689,7 +689,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -773,7 +773,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -794,7 +794,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -816,7 +816,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -832,7 +832,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -854,7 +854,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -877,7 +877,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
@@ -894,7 +894,7 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).and_raise(RuntimeError)
+          @rake.stubs(:invoke).raises(RuntimeError)
           lambda { run_command }.should.raise
         end
       
