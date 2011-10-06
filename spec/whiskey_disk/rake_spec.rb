@@ -51,7 +51,7 @@ describe 'rake tasks' do
     
     describe 'when no configuration repo is specified' do
       it 'does not ensure that the path for the configuration repository checkout is present' do
-        @whiskey_disk.should.not.receive(:ensure_config_parent_path_is_present)
+        @whiskey_disk.expects(:ensure_config_parent_path_is_present).never
         @rake["deploy:setup"].invoke        
       end
     end
@@ -71,7 +71,7 @@ describe 'rake tasks' do
     
     describe 'when no configuration repository is specified' do
       it 'does not check out the configuration repository' do
-        @whiskey_disk.should.not.receive(:checkout_configuration_repository)
+        @whiskey_disk.expects(:checkout_configuration_repository).never
         @rake["deploy:setup"].invoke
       end
     end
@@ -96,7 +96,7 @@ describe 'rake tasks' do
     
     describe 'when no configuration repository is specified' do
       it 'updates the configuration repository checkout' do
-        @whiskey_disk.should.not.receive(:update_configuration_repository_checkout)
+        @whiskey_disk.expects(:update_configuration_repository_checkout).never
         @rake["deploy:setup"].invoke
       end
     end
@@ -111,7 +111,7 @@ describe 'rake tasks' do
     
     describe 'when no configuration repository is specified' do      
       it 'does not refresh the configuration' do
-        @whiskey_disk.should.not.receive(:refresh_configuration)
+        @whiskey_disk.expects(:refresh_configuration).never
         @rake["deploy:setup"].invoke
       end
     end
@@ -178,7 +178,7 @@ describe 'rake tasks' do
     
     describe 'when no configuration repository is specified' do
       it 'does not update the configuration repository checkout' do
-        @whiskey_disk.should.not.receive(:update_configuration_repository_checkout)
+        @whiskey_disk.expects(:update_configuration_repository_checkout).never
         @rake["deploy:now"].invoke
       end
     end
@@ -193,7 +193,7 @@ describe 'rake tasks' do
     
     describe 'when no configuration repository is specified' do
       it 'does not refresh the configuration' do
-        @whiskey_disk.should.not.receive(:refresh_configuration)
+        @whiskey_disk.expects(:refresh_configuration).never
         @rake["deploy:now"].invoke
       end
     end

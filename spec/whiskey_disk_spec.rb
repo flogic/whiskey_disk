@@ -995,13 +995,13 @@ describe '@whiskey_disk' do
 
     it 'does not issue a command via run for a remote domain which is not of interest' do
       @whiskey_disk.stubs(:domain_of_interest?).with('ogc@ogtastic.com').returns(false)
-      @whiskey_disk.should.not.receive(:run).with({ 'name' => 'ogc@ogtastic.com' }, @cmd)
+      @whiskey_disk.expects(:run).with({ 'name' => 'ogc@ogtastic.com' }, @cmd).never
       @whiskey_disk.flush
     end
 
     it 'does not issue a command via shell for a local domain which is not of interest' do
       @whiskey_disk.stubs(:domain_of_interest?).with('local').returns(false)
-      @whiskey_disk.should.not.receive(:shell).with({ 'name' => 'local' }, @cmd)
+      @whiskey_disk.expects(:shell).with({ 'name' => 'local' }, @cmd).never
       @whiskey_disk.flush
     end
   end
