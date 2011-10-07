@@ -1,4 +1,4 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '/spec_helper.rb'))
+require File.dirname(__FILE__) + '/spec_helper.rb'
 
 def run_command
   eval File.read(File.join(File.dirname(__FILE__), *%w[.. bin wd_role]))

@@ -1,4 +1,4 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '/spec_helper.rb'))
+require File.dirname(__FILE__) + '/spec_helper.rb'
 require 'rake'
 
 def run_command
@@ -28,7 +28,7 @@ describe 'wd command' do
     end  
     
     it 'does not run rake tasks' do
-      Rake::Application.expects(:new).never
+      Rake::Application.should.receive(:new).never
       lambda { run_command }
     end
   
@@ -90,7 +90,7 @@ describe 'wd command' do
 
     describe 'and no target is specified' do    
       it 'does not run rake tasks' do
-        Rake::Application.expects(:new).never
+        Rake::Application.should.receive(:new).never
         lambda { run_command }
       end
 
@@ -112,7 +112,7 @@ describe 'wd command' do
       before do
         ARGV.push '--to=foo'
         @rake = Rake::Task['deploy:setup']
-        @rake.stubs(:invoke)
+        @rake.stub!(:invoke)
       end
       
       it 'does not fail' do
@@ -120,7 +120,7 @@ describe 'wd command' do
       end
       
       it 'runs the deploy:setup rake task' do
-        @rake.expects(:invoke)
+        @rake.should.receive(:invoke)
         run_command
       end
       
@@ -140,12 +140,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -162,12 +162,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -178,12 +178,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -200,12 +200,12 @@ describe 'wd command' do
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -223,12 +223,12 @@ describe 'wd command' do
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -240,12 +240,12 @@ describe 'wd command' do
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -256,7 +256,7 @@ describe 'wd command' do
         end
 
         it 'runs the deploy:now rake task' do
-          @rake.expects(:invoke)
+          @rake.should.receive(:invoke)
           run_command
         end
 
@@ -266,12 +266,12 @@ describe 'wd command' do
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -282,7 +282,7 @@ describe 'wd command' do
         end
 
         it 'runs the deploy:now rake task' do
-          @rake.expects(:invoke)
+          @rake.should.receive(:invoke)
           run_command
         end
 
@@ -292,12 +292,12 @@ describe 'wd command' do
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -309,17 +309,17 @@ describe 'wd command' do
         end
 
         it 'runs the deploy:now rake task' do
-          @rake.expects(:invoke)
+          @rake.should.receive(:invoke)
           run_command
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -330,7 +330,7 @@ describe 'wd command' do
         ARGV.push '-t'
         ARGV.push 'foo'
         @rake = Rake::Task['deploy:setup']
-        @rake.stubs(:invoke)
+        @rake.stub!(:invoke)
       end
 
       it 'does not fail' do
@@ -338,7 +338,7 @@ describe 'wd command' do
       end
 
       it 'runs the deploy:setup rake task' do
-        @rake.expects(:invoke)
+        @rake.should.receive(:invoke)
         run_command
       end
 
@@ -358,12 +358,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -380,12 +380,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -396,12 +396,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -418,12 +418,12 @@ describe 'wd command' do
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -441,12 +441,12 @@ describe 'wd command' do
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -458,12 +458,12 @@ describe 'wd command' do
         end
 
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
 
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -478,7 +478,7 @@ describe 'wd command' do
 
     describe 'but no target is specified' do
       it 'does not run rake tasks' do
-        Rake::Application.expects(:new).never
+        Rake::Application.should.receive(:new).never
         lambda { run_command }
       end
   
@@ -499,7 +499,7 @@ describe 'wd command' do
       before do
         ARGV.push '--to=foo'
         @rake = Rake::Task['deploy:now']
-        @rake.stubs(:invoke)
+        @rake.stub!(:invoke)
       end
       
       it 'does not fail' do
@@ -507,7 +507,7 @@ describe 'wd command' do
       end
       
       it 'runs the deploy:now rake task' do
-        @rake.expects(:invoke)
+        @rake.should.receive(:invoke)
         run_command
       end
       
@@ -520,7 +520,7 @@ describe 'wd command' do
         before do
           ARGV.push '--check'
           @rake = Rake::Task['deploy:now']
-          @rake.stubs(:invoke)
+          @rake.stub!(:invoke)
         end
            
         it 'does not fail' do
@@ -528,7 +528,7 @@ describe 'wd command' do
         end
       
         it 'runs the deploy:now rake task' do
-          @rake.expects(:invoke)
+          @rake.should.receive(:invoke)
           run_command
         end
       
@@ -542,7 +542,7 @@ describe 'wd command' do
         before do
           ARGV.push '-c'
           @rake = Rake::Task['deploy:now']
-          @rake.stubs(:invoke)
+          @rake.stub!(:invoke)
         end
            
         it 'does not fail' do
@@ -550,7 +550,7 @@ describe 'wd command' do
         end
       
         it 'runs the deploy:now rake task' do
-          @rake.expects(:invoke)
+          @rake.should.receive(:invoke)
           run_command
         end
       
@@ -567,12 +567,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -588,12 +588,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -610,12 +610,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -627,12 +627,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -649,12 +649,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -672,12 +672,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -689,12 +689,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -705,7 +705,7 @@ describe 'wd command' do
         ARGV.push '-t'
         ARGV.push 'foo'
         @rake = Rake::Task['deploy:now']
-        @rake.stubs(:invoke)
+        @rake.stub!(:invoke)
       end
 
       it 'does not fail' do
@@ -713,7 +713,7 @@ describe 'wd command' do
       end
 
       it 'runs the deploy:now rake task' do
-        @rake.expects(:invoke)
+        @rake.should.receive(:invoke)
         run_command
       end
 
@@ -726,7 +726,7 @@ describe 'wd command' do
         before do
           ARGV.push '--check'
           @rake = Rake::Task['deploy:now']
-          @rake.stubs(:invoke)
+          @rake.stub!(:invoke)
         end
          
         it 'does not fail' do
@@ -734,7 +734,7 @@ describe 'wd command' do
         end
     
         it 'runs the deploy:now rake task' do
-          @rake.expects(:invoke)
+          @rake.should.receive(:invoke)
           run_command
         end
     
@@ -748,7 +748,7 @@ describe 'wd command' do
         before do
           ARGV.push '-c'
           @rake = Rake::Task['deploy:now']
-          @rake.stubs(:invoke)
+          @rake.stub!(:invoke)
         end
          
         it 'does not fail' do
@@ -756,7 +756,7 @@ describe 'wd command' do
         end
     
         it 'runs the deploy:now rake task' do
-          @rake.expects(:invoke)
+          @rake.should.receive(:invoke)
           run_command
         end
     
@@ -773,12 +773,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -794,12 +794,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -816,12 +816,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -832,12 +832,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -854,12 +854,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -877,12 +877,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end
@@ -894,12 +894,12 @@ describe 'wd command' do
         end
       
         it 'fails if the rake task fails' do
-          @rake.stubs(:invoke).raises(RuntimeError)
+          @rake.stub!(:invoke).and_raise(RuntimeError)
           lambda { run_command }.should.raise
         end
       
         it 'does not fail if the rake task succeeds' do
-          @rake.stubs(:invoke).returns(true)
+          @rake.stub!(:invoke).and_return(true)
           lambda { run_command }.should.not.raise
         end
       end

@@ -6,12 +6,12 @@ end
 
 describe 'the plugin install.rb script' do
   before do
-    self.stubs(:puts).returns(true)
+    self.stub!(:puts).and_return(true)
   end
   
   it 'displays the content of the plugin README file' do
-    self.stubs(:readme_contents).returns('README CONTENTS')
-    self.expects(:puts).with('README CONTENTS')
+    self.stub!(:readme_contents).and_return('README CONTENTS')
+    self.should.receive(:puts).with('README CONTENTS')
     do_install
   end
   
@@ -28,15 +28,15 @@ describe 'the plugin install.rb script' do
     
     it 'reads the plugin README file' do
       do_install
-      File.stubs(:join).returns('/path/to/README')
-      IO.expects(:read).with('/path/to/README')
+      File.stub!(:join).and_return('/path/to/README')
+      IO.should.receive(:read).with('/path/to/README')
       readme_contents
     end
     
     it 'returns the contents of the plugin README file' do
       do_install
-      File.stubs(:join).returns('/path/to/README')
-      IO.stubs(:read).with('/path/to/README').returns('README CONTENTS')
+      File.stub!(:join).and_return('/path/to/README')
+      IO.stub!(:read).with('/path/to/README').and_return('README CONTENTS')
       readme_contents.should == 'README CONTENTS'
     end
   end
