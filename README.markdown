@@ -150,6 +150,7 @@ Known config file settings (if you're familiar with capistrano and vlad these sh
     post_deploy_script:  path to a shell script to run after deployment
     post_setup_script:   path to a shell script to run after setup
     rake_env:            hash of environment variables to set when running post_setup and post_deploy rake tasks
+    rake_command:        command to invoke rake with (default: rake)
 
 
 A simple config/deploy.yml might look like:
