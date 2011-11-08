@@ -585,6 +585,20 @@ describe '@whiskey_disk' do
       @whiskey_disk.buffer.join(' ').should.match(%r{rake.*deploy:post_setup})
     end
     
+    it 'runs the post setup tasks with given rake command' do
+      @parameters = { 'deploy_to' => '/path/to/main/repo', 'rake_command' => 'bundle exec rake' }
+      @whiskey_disk.configuration = @parameters
+      @whiskey_disk.run_post_setup_hooks
+      @whiskey_disk.buffer.join(' ').should.match(%r{bundle exec rake.*deploy:post_setup})
+    end
+
+    it 'runs the post setup tasks with default rake command if the rake command is empty' do
+      @parameters = { 'deploy_to' => '/path/to/main/repo', 'rake_command' => '' }
+      @whiskey_disk.configuration = @parameters
+      @whiskey_disk.run_post_setup_hooks
+      @whiskey_disk.buffer.join(' ').should.match(%r{rake.*deploy:post_setup})
+    end
+
     it 'uses the same environment when running the rake tasks' do
       @whiskey_disk.run_post_setup_hooks
       @whiskey_disk.buffer.join(' ').should.match(%r{to=#{@env}})      
@@ -598,6 +612,13 @@ describe '@whiskey_disk' do
     it 'makes the post setup rake tasks conditional on the deploy:post_setup rake task being defined' do
       @whiskey_disk.run_post_setup_hooks
       @whiskey_disk.buffer.join(' ').should.match(%r{rakep=\`.*rake -P\` && if \[\[ \`echo "\$\{rakep\}" | grep deploy:post_setup\` != "" \]\];})      
+    end
+
+    it 'uses the given rake command when checking the existance of the deploy:post_setup task' do
+      @parameters = { 'deploy_to' => '/path/to/main/repo', 'rake_command' => 'bundle exec rake' }
+      @whiskey_disk.configuration = @parameters
+      @whiskey_disk.run_post_setup_hooks
+      @whiskey_disk.buffer.join(' ').should.match(%r{rakep=\`.*bundle exec rake -P\`})
     end
 
     it 'ensures that any rake ENV variable are set when checking for deploy:post_setup tasks' do
@@ -707,6 +728,20 @@ describe '@whiskey_disk' do
       @whiskey_disk.run_post_deploy_hooks
       @whiskey_disk.buffer.join(' ').should.match(%r{rake.*deploy:post_deploy})
     end
+
+    it 'runs the post deployment tasks with given rake command' do
+      @parameters = { 'deploy_to' => '/path/to/main/repo', 'rake_command' => 'bundle exec rake' }
+      @whiskey_disk.configuration = @parameters
+      @whiskey_disk.run_post_deploy_hooks
+      @whiskey_disk.buffer.join(' ').should.match(%r{bundle exec rake.*deploy:post_deploy})
+    end
+
+    it 'runs the post deployment tasks with default rake command if the rake command is empty' do
+      @parameters = { 'deploy_to' => '/path/to/main/repo', 'rake_command' => '' }
+      @whiskey_disk.configuration = @parameters
+      @whiskey_disk.run_post_deploy_hooks
+      @whiskey_disk.buffer.join(' ').should.match(%r{rake.*deploy:post_deploy})
+    end
     
     it 'uses the same environment when running the rake tasks' do
       @whiskey_disk.run_post_deploy_hooks
@@ -721,6 +756,13 @@ describe '@whiskey_disk' do
     it 'makes the post deployment rake tasks conditional on the deploy:post_deploy rake task being defined' do
       @whiskey_disk.run_post_deploy_hooks
       @whiskey_disk.buffer.join(' ').should.match(%r{rakep=\`.*rake -P\` && if \[\[ \`echo "\$\{rakep\}" | grep deploy:post_deploy\` != "" \]\];})      
+    end
+
+    it 'uses the given rake command when checking the existance of the deploy:post_deploy task' do
+      @parameters = { 'deploy_to' => '/path/to/main/repo', 'rake_command' => 'bundle exec rake' }
+      @whiskey_disk.configuration = @parameters
+      @whiskey_disk.run_post_deploy_hooks
+      @whiskey_disk.buffer.join(' ').should.match(%r{rakep=\`.*bundle exec rake -P\`})
     end
 
     it 'ensures that any rake ENV variable are set when checking for deploy:post_setup tasks' do

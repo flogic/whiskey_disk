@@ -131,6 +131,10 @@ class WhiskeyDisk
   def build_command(domain, cmd)
     "#{'set -x; ' if debugging?}" + encode_roles(domain['roles']) + cmd
   end
+
+  def rake_command
+    (setting(:rake_command) and setting(:rake_command) != '') ? setting(:rake_command) : 'rake'
+  end
   
   def run(domain, cmd)
     ssh(domain, cmd)
@@ -202,7 +206,7 @@ class WhiskeyDisk
   end
   
   def if_task_defined(task, cmd)
-    %Q(rakep=`#{env_vars} rake -P` && if [[ `echo "${rakep}" | grep #{task}` != "" ]]; then #{cmd}; fi )
+    %Q(rakep=`#{env_vars} #{rake_command} -P` && if [[ `echo "${rakep}" | grep #{task}` != "" ]]; then #{cmd}; fi )
   end
   
   def safe_branch_checkout(path, my_branch)
@@ -226,7 +230,7 @@ class WhiskeyDisk
     enqueue "echo Running rake #{task_name}..."
     enqueue "cd #{path}"
     enqueue(if_file_present("#{setting(:deploy_to)}/Rakefile", 
-      if_task_defined(task_name, "#{env_vars} rake #{'--trace' if debugging?} #{task_name} to=#{setting(:environment)}")))
+      if_task_defined(task_name, "#{env_vars} #{rake_command} #{'--trace' if debugging?} #{task_name} to=#{setting(:environment)}")))
   end
   
   def build_path(path)
