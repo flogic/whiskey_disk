@@ -273,7 +273,12 @@ describe '@whiskey_disk' do
 
     it 'does branch checkouts from the repository path' do
       @whiskey_disk.checkout_main_repository
-      @whiskey_disk.buffer.join(' ').should.match(%r{cd /path/to/main/repo && git checkout})      
+      @whiskey_disk.buffer.join(' ').should.match(%r{git checkout})
+    end
+
+    it 'should verify if branch is already checked out' do
+      @whiskey_disk.checkout_main_repository
+      @whiskey_disk.buffer.join(' ').should.match(%r{cd /path/to/main/repo && \(branch=\`git symbolic-ref HEAD\`; \[ \$branch == "refs/heads/master" \]\) \|\| git checkout})
     end
   end
   
