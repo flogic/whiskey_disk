@@ -2,6 +2,11 @@ require 'rinda/tuplespace'
 
 class Barrier
   attr_reader :name, :ts
+
+  def self.sync(ts, number_of_clients, name=nil)
+    self.new(ts, number_of_clients, name).sync
+  end
+
   def initialize(ts, number_of_clients, name=nil)
     @ts = ts
     @name = name || self
@@ -42,7 +47,6 @@ else
 end
 
 def wait_for(symbol, &block)
-  barrier = Barrier.new(@ts, 2, symbol.to_s)
   yield
-  barrier.sync
+  Barrier.sync(@ts, 2, symbol.to_s)
 end
