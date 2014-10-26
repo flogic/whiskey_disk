@@ -1,0 +1,16 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    bacon (1.1.0)
+    extensions (0.6.0)
+    facon (0.5.0)
+    rake (0.9.6)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bacon (~> 1.1.0)
+  extensions
+  facon (~> 0.5.0)
+  rake (~> 0.9)
