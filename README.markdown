@@ -3,10 +3,11 @@
 
 A very opinionated deployment tool, designed to be as fast as technologically possible.  (For more background, read the [WHY.txt](http://github.com/flogic/whiskey_disk/raw/master/WHY.txt) file)  Should work with any project which is git hosted, not just Ruby / Ruby on Rails projects.  Allows for local deploys as well as remote.
 
-Right-arrow through a short whiskey_disk presentation at [http://wd2010.rickbradley.com/](http://wd2010.rickbradley.com) (slide source available [here](http://github.com/rick/whiskey_disk_presentation).), covering the 0.2.*-era functionality.
+You can right-arrow through a talk on the design process of whiskey_disk, given at the 2011 Madison Ruby Conference (as well as the Ruby Hoedown), entitled "Free Whiskey" by going to [http://madisonruby.rickbradley.com](http://madisonruby.rickbradley.com) (slide source available [here](http://github.com/rick/madison_free_whiskey)).
 
-You can also right-arrow through a shorter but more up-to-date whiskey_disk "lightning talk" presentation
-(from the 2010 Ruby Hoedown) at [http://wdlightning.rickbradley.com/](http://wdlightning.rickbradley.com) (slide source available [here](http://github.com/rick/whiskey_disk_presentation/tree/lightning).), covering the 0.4.*-era functionality.
+Or... right-arrow through a short whiskey_disk presentation at [http://wd2010.rickbradley.com/](http://wd2010.rickbradley.com) (slide source available [here](http://github.com/rick/whiskey_disk_presentation).), covering the 0.2.*-era functionality.
+
+You can also right-arrow through a shorter but more up-to-date whiskey_disk "lightning talk" presentation (from the 2010 Ruby Hoedown) at [http://wdlightning.rickbradley.com/](http://wdlightning.rickbradley.com) (slide source available [here](http://github.com/rick/whiskey_disk_presentation/tree/lightning).), covering the 0.4.*-era functionality.
 
 ### tl;dr ###
 
