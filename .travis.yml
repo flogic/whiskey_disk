@@ -1,0 +1,7 @@
+language: ruby
+cache: bundler
+
+rvm:
+  - 1.9.3
+  - 2.1.3
+  - rbx-2
