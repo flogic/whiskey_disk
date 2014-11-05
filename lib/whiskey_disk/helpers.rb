@@ -5,6 +5,16 @@ def role?(role)
   ENV['WD_ROLES'].split(':').include?(role.to_s)
 end
 
+# does the current deployment have any role definitions?
+def no_roles?
+  ENV['WD_ROLES'] == ''
+end
+
+# look for a given role, or lack of all roles
+def nothing_or_role?(role)
+  no_roles? || role?(role)
+end
+
 # have files of interest changed on this deployment?
 def changed?(path)
   return true unless gc = git_changes
