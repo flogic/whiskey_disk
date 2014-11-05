@@ -7,7 +7,7 @@ end
 
 # does the current deployment have any role definitions?
 def no_roles?
-  ENV['WD_ROLES'] == ''
+  ENV['WD_ROLES'].nil? || ENV['WD_ROLES'] == ''
 end
 
 # look for a given role, or lack of all roles
