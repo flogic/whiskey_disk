@@ -49,11 +49,9 @@ describe 'when checking for a role during setup or deployment' do
 
   it "returns true when given role is set, or no roles exist" do
     ENV['WD_ROLES'] = ''
-    nothing_or_role?.should.be.true
     nothing_or_role?('foo').should.be.true
     nothing_or_role?('web').should.be.true
     ENV['WD_ROLES'] = 'db:web'
-    nothing_or_role?.should.be.false
     nothing_or_role?('foo').should.be.false
     nothing_or_role?('web').should.be.true
   end
